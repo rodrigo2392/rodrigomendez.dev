@@ -51,7 +51,7 @@ const Navbar = () => {
                                 onClick={() => setOpen(false)}
                                 className="block py-2 pl-2 pr-2 rounded text-sm "
                                 aria-current="page"
-                                scroll={false}
+                                scroll={true}
                             >
                                 Inicio
                             </Link>
@@ -62,7 +62,7 @@ const Navbar = () => {
                                 onClick={() => setOpen(false)}
                                 className="block py-2 pl-1 pr-2 rounded text-sm"
                                 aria-current="page"
-                                scroll={false}
+                                scroll={true}
                             >
                                 Sobre mí
                             </Link>
@@ -73,7 +73,7 @@ const Navbar = () => {
                                 onClick={() => setOpen(false)}
                                 className="block py-2 pl-1 pr-2 rounded text-sm"
                                 aria-current="page"
-                                scroll={false}
+                                scroll={true}
                             >
                                 Blog
                             </Link>
@@ -84,7 +84,7 @@ const Navbar = () => {
                                 onClick={() => setOpen(false)}
                                 className="block py-2 pl-1 pr-2 rounded text-sm"
                                 aria-current="page"
-                                scroll={false}
+                                scroll={true}
                             >
                                 Videos
                             </Link>
@@ -95,7 +95,7 @@ const Navbar = () => {
                                 onClick={() => setOpen(false)}
                                 className="block py-2 pl-1 pr-4rounded text-sm"
                                 aria-current="page"
-                                scroll={false}
+                                scroll={true}
                             >
                                 Contacto
                             </Link>
