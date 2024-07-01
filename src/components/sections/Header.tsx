@@ -67,13 +67,6 @@ const Header = () => {
                         ¡Hola! Soy Rodrigo Méndez, tengo 10 años de experiencia
                         como desarrollador de software. Actualmente trabajo con el stack de React Native, React y Nodejs.
                     </p>
-                    <div className="pb-9 pt-7 flex flex-col md:flex-row gap-6  items-center justify-center lg:justify-start">
-                        <Button
-                            title="Visitar tienda"
-                            url="/comingsoon"
-                            black
-                        />
-                    </div>
                     <div className="pt-4 flex flex-row gap-2 justify-center md:justify-start">
                         <a
                             href="https://www.linkedin.com/in/%E2%98%95-rodrigo-m%C3%A9ndez/"

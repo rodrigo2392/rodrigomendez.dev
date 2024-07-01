@@ -58,17 +58,6 @@ const Navbar = () => {
                         </li>
                         <li>
                             <Link
-                                href="/comingsoon"
-                                onClick={() => setOpen(false)}
-                                className="block py-2 pl-1 pr-2 rounded text-sm"
-                                aria-current="page"
-                                scroll={false}
-                            >
-                                Tienda
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
                                 href="/#acerca"
                                 onClick={() => setOpen(false)}
                                 className="block py-2 pl-1 pr-2 rounded text-sm"
