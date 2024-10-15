@@ -34,3 +34,4 @@ export const getPost = async (slug: string) => {
 
     return response.items;
 };
+
