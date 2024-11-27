@@ -35,3 +35,7 @@ body {
     text-wrap: balance;
   }
 }
+
+#disqus_thread {
+  background-color: inherit;
+}

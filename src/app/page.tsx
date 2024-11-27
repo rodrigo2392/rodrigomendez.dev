@@ -8,60 +8,60 @@ import BlogList from "@/components/sections/BlogList";
 import Videos from "@/components/sections/Videos";
 import Social from "@/components/sections/Social";
 import Contact from "@/components/sections/Contact";
-import {getBlog, getVideos} from '@/contentful'
-
-
+import { getBlog, getVideos } from "@/contentful";
+import StoreProvider from "./storeprovider";
+import Main from "@/components/Main";
 
 export default async function Home() {
-
   const videos = await getVideos();
   const blogs = await getBlog();
 
   const Sections = [
     {
-        section: <Header />,
-        id: "inicio",
+      section: <Header />,
+      id: "inicio",
     },
     {
       section: <About />,
       id: "acerca",
     },
     {
-        section: <BlogList blogs={blogs} />,
-        id: "blog",
+      section: <BlogList blogs={blogs} />,
+      id: "blog",
     },
-    
+
     {
       section: <Videos videos={videos} />,
       id: "videos",
-  },
-  {
+    },
+    {
       section: <Social />,
       id: "redes",
-  },
-  {
+    },
+    {
       section: <Contact />,
       id: "contacto",
-  },
-];
-
+    },
+  ];
 
   return (
-    <main>
-      <Navbar />
-      {Sections.map((section, index) => (
-                        <Container
-                            key={section.id}
-                            id={section.id}
-                            gray={index % 2 === 0}
-                            noPaddingTop={index === 0}
-                        >
-                            {section.section}
-                        </Container>
-                    ))}
+    <StoreProvider>
+      <Main>
+        <Navbar />
+        {Sections.map((section, index) => (
+          <Container
+            key={section.id}
+            id={section.id}
+            gray={index % 2 === 0}
+            noPaddingTop={index === 0}
+          >
+            {section.section}
+          </Container>
+        ))}
 
         <BackTop />
         <Footer />
-    </main>
+      </Main>
+    </StoreProvider>
   );
 }

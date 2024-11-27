@@ -3,23 +3,25 @@ import { DiscussionEmbed } from "disqus-react";
 import { BlogPost } from "@/types/contentful";
 
 interface Props {
-    post: BlogPost;
+  post: BlogPost;
 }
 
 const DisqusComments = ({ post }: Props) => {
-    const disqusShortname = "rodrigomendez-dev";
-    const disqusConfig = {
-        url: `https://rodrigomendez.dev/blog/${post?.fields.slug}`,
-        identifier: post?.sys.id,
-        title: post?.fields.title,
-    };
-    return (
-        <div>
-            <DiscussionEmbed
-                shortname={disqusShortname}
-                config={disqusConfig}
-            />
-        </div>
-    );
+  const disqusShortname = "rodrigomendez-dev";
+  const disqusConfig = {
+    url: `https://rodrigomendez.dev/blog/${post?.fields.slug}`,
+    identifier: post?.sys.id,
+    title: post?.fields.title,
+    colorScheme: "dark",
+  };
+  return (
+    <div>
+      <DiscussionEmbed
+        key={"dark"}
+        shortname={disqusShortname}
+        config={disqusConfig}
+      />
+    </div>
+  );
 };
 export default DisqusComments;

@@ -10,13 +10,16 @@
   },
   "dependencies": {
     "@contentful/rich-text-react-renderer": "^15.22.11",
+    "@reduxjs/toolkit": "^2.3.0",
     "contentful": "^10.6.19",
     "dayjs": "^1.11.10",
     "disqus-react": "^1.1.5",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
-    "react-icons": "^5.0.1"
+    "react-icons": "^5.3.0",
+    "react-redux": "^9.1.2",
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
