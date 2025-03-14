@@ -11,7 +11,7 @@ const Footer = () => {
             </div>
             <div className="flex-row gap-2 justify-center md:justify-start hidden md:flex">
                 <a
-                    href="https://www.linkedin.com/in/%E2%98%95-rodrigo-m%C3%A9ndez/"
+                    href="https://www.linkedin.com/in/rodrigomendezdev/"
                     target="_blank"
                     rel="noreferrer"
                 >

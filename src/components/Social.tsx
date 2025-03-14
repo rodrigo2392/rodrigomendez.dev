@@ -9,6 +9,7 @@ import {
   Youtube,
   MessageCircle,
   Globe,
+  Github
 } from "lucide-react";
 import Link from "next/link";
 
@@ -28,6 +29,13 @@ export default function SocialMediaLinks() {
       icon: <Youtube size={22} />,
       gradient: "from-rose-500/80 to-red-600/80",
       shadowColor: "shadow-red-500/20",
+    },
+    {
+      name: "Github",
+      url: "https://rodrigomendez.dev",
+      icon: <Github size={22} />,
+      gradient: "black",
+      shadowColor: "shadow-emerald-500/20",
     },
     {
       name: "Discord",
