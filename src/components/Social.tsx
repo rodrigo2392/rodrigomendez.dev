@@ -9,7 +9,8 @@ import {
   Youtube,
   MessageCircle,
   Globe,
-  Github
+  Github,
+  Twitch,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -24,6 +25,13 @@ interface SocialMediaLink {
 export default function SocialMediaLinks() {
   const socialLinks: SocialMediaLink[] = [
     {
+      name: "Twitch",
+      url: "https://www.twitch.tv/rodrigomendezdev",
+      icon: <Twitch size={22} />,
+      gradient: "from-rose-500/80 to-red-600/80",
+      shadowColor: "shadow-red-500/20",
+    },
+    {
       name: "YouTube",
       url: "https://youtube.com/@rodrigomendezdev",
       icon: <Youtube size={22} />,
@@ -32,10 +40,10 @@ export default function SocialMediaLinks() {
     },
     {
       name: "Github",
-      url: "https://rodrigomendez.dev",
+      url: "https://github.com/rodrigo2392",
       icon: <Github size={22} />,
       gradient: "black",
-      shadowColor: "shadow-emerald-500/20",
+      shadowColor: "black",
     },
     {
       name: "Discord",
