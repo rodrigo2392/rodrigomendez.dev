@@ -20,8 +20,6 @@ export const AUTHOR = {
   years: 11,
   oneLiner:
     'Software Developer con más de 11 años de experiencia. Compartiendo, aprendiendo y construyendo productos de software.',
-  bioShort:
-    'Fullstack Product Developer en Guadalajara. Construyo Piclink y cuento el proceso, en cristiano.',
   email: 'hola@rodrigomendez.dev',
   photo: '/img/rodrigo.jpg',
 } as const;
