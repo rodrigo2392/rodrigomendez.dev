@@ -180,7 +180,7 @@ a {
 /* Contenedor */
 .container-site {
   width: 100%;
-  max-width: 72rem;
+  max-width: 90rem; /* 1440px */
   margin-inline: auto;
   padding-inline: 1.5rem;
 }
