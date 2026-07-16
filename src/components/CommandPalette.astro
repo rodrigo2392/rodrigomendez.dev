@@ -6,8 +6,10 @@ const posts = await getPublishedPosts();
 const items = [
   { label: 'Inicio', href: '/', hint: 'inicio.tsx', kind: 'nav' },
   { label: 'Sobre mí', href: '/#sobre', hint: 'sobre.md', kind: 'nav' },
+  { label: 'Proyectos', href: '/proyectos', hint: 'proyectos/', kind: 'nav' },
   { label: 'Blog', href: '/blog', hint: 'blog/', kind: 'nav' },
   { label: 'Videos', href: '/#videos', hint: 'videos/', kind: 'nav' },
+  { label: 'Uses', href: '/uses', hint: 'uses', kind: 'nav' },
   { label: 'Contacto', href: '/#contacto', hint: 'contacto', kind: 'nav' },
   ...posts.map((p) => ({ label: p.data.title, href: postUrl(p), hint: p.data.tags[0], kind: 'post' })),
   { label: 'YouTube', href: SOCIALS.youtube, hint: '↗', kind: 'ext' },

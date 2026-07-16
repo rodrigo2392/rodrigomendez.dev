@@ -75,3 +75,15 @@ despliega. Ver `../marketer/scripts/publish-blog.mjs` y el agente `blog-writer`.
 
 > Nota: para que la fábrica publique sola, su `SITE_DIR` debe apuntar a este repo (default `../site`)
 > y este repo debe tener el remoto de GitHub configurado para que `git push` dispare el deploy.
+
+## Más features
+
+- **Proyectos** (`/proyectos`) y **`/uses`** — showcase de Piclink/Cronowork y el setup.
+- **Tags** (`/blog/tag/<tag>`) — páginas indexables por etiqueta.
+- **Buscador** — Pagefind indexa `dist` en el build (`astro build && pagefind --site dist`) y el `/blog` monta la UI.
+- **OG dinámicas** — `src/pages/og/[...route].ts` genera una imagen por post (título + tag, dark-tech) con `astro-og-canvas`.
+- **Command palette** — ⌘/Ctrl+K (o `/`) para navegar.
+
+### Variables de entorno (opcionales, ver `.env.example`)
+- `PUBLIC_CF_BEACON_TOKEN` — activa Cloudflare Web Analytics (token del dashboard).
+- `PUBLIC_NEWSLETTER_ENDPOINT` — endpoint del proveedor de newsletter (Buttondown/Formspree). Sin él, el form cae a "escríbeme por correo".

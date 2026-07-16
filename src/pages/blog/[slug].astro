@@ -61,13 +61,14 @@ const jsonLd = {
 <BaseLayout
   title={title}
   description={description}
+  image={`/og/${post.id}.png`}
   type="article"
   publishedTime={isoDate(pubDate)}
   jsonLd={jsonLd}
 >
   <div class="progress" data-progress></div>
 
-  <article class="container-site post">
+  <article class="container-site post" data-pagefind-body>
     <header class="post__header">
       <a class="crumb" href="/blog">
         <span class="crumb__dot"></span> blog <span class="crumb__sep">/</span> {post.id}.md
@@ -75,7 +76,9 @@ const jsonLd = {
       <p class="meta post__meta">
         <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
         <span aria-hidden="true">·</span> {min} min
-        <span aria-hidden="true">·</span> <span class="tag">{tags[0]}</span>
+        {tags.map((t) => (
+          <><span aria-hidden="true">·</span> <a href={`/blog/tag/${t}`} class="tag post__tag">{t}</a></>
+        ))}
       </p>
       <h1 class="post__title">{title}</h1>
       <p class="post__dek">{description}</p>

@@ -26,6 +26,8 @@ const PAGE_SIZE = 8;
       </p>
     </header>
 
+    <div class="blogsearch" id="search" data-search></div>
+
     {
       featured && (
         <a class="feat" href={postUrl(featured)}>
@@ -109,6 +111,35 @@ const PAGE_SIZE = 8;
     render();
   }
   document.addEventListener('astro:page-load', initBlogFilter);
+
+  // Buscador Pagefind (solo existe en el build; en dev se auto-oculta).
+  function initSearch() {
+    const el = document.getElementById('search');
+    if (!el || el.dataset.done) return;
+    el.dataset.done = '1';
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = '/pagefind/pagefind-ui.css';
+    document.head.appendChild(css);
+    const s = document.createElement('script');
+    s.src = '/pagefind/pagefind-ui.js';
+    s.onload = () => {
+      // @ts-ignore
+      new window.PagefindUI({
+        element: '#search',
+        showImages: false,
+        showSubResults: true,
+        resetStyles: false,
+        translations: {
+          placeholder: 'Buscar en el blog…',
+          zero_results: 'Sin resultados para [SEARCH_TERM]',
+        },
+      });
+    };
+    s.onerror = () => { el.remove(); };
+    document.body.appendChild(s);
+  }
+  document.addEventListener('astro:page-load', initSearch);
 </script>
 
 <style>
@@ -125,6 +156,24 @@ const PAGE_SIZE = 8;
     color: var(--color-muted);
     font-size: 1.25rem;
     max-width: 54ch;
+  }
+
+  /* Buscador Pagefind, themeado a la marca */
+  .blogsearch {
+    margin: 2.25rem 0 0;
+    max-width: 34rem;
+    --pagefind-ui-scale: 0.9;
+    --pagefind-ui-primary: var(--color-accent);
+    --pagefind-ui-text: var(--color-ink);
+    --pagefind-ui-background: var(--color-surface);
+    --pagefind-ui-border: var(--color-border);
+    --pagefind-ui-tag: var(--color-surface-2);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 10px;
+    --pagefind-ui-font: var(--font-sans);
+  }
+  .blogsearch:empty {
+    display: none;
   }
 
   /* Destacado */

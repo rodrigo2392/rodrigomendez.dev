@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostRow from '../../../components/PostRow.astro';
+import { getPublishedPosts, collectTags, type Post } from '../../../lib/blog';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return collectTags(posts).map((tag) => ({
+    params: { tag },
+    props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)) },
+  }));
+}
+
+interface Props {
+  tag: string;
+  posts: Post[];
+}
+const { tag, posts } = Astro.props;
+---
+<BaseLayout title={`#${tag}`} description={`Todo lo que he escrito sobre ${tag}.`}>
+  <section class="container-site tagpage">
+    <header class="tagpage__head">
+      <p class="kicker">blog / tag</p>
+      <h1 class="tagpage__title">#{tag}</h1>
+      <p class="tagpage__intro">
+        {posts.length} {posts.length === 1 ? 'post' : 'posts'} sobre {tag}.
+        <a href="/blog" class="tagpage__back">← todo el blog</a>
+      </p>
+    </header>
+    <div class="list">
+      {posts.map((post) => (
+        <div class="list__item"><PostRow post={post} thumb /></div>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .tagpage {
+    padding-block: 3.5rem 2rem;
+  }
+  .tagpage__title {
+    font-family: var(--font-mono);
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-accent);
+    margin: 0.5rem 0 1rem;
+  }
+  .tagpage__intro {
+    color: var(--color-muted);
+    font-size: 1.15rem;
+  }
+  .tagpage__back {
+    color: var(--color-accent);
+    margin-left: 0.5rem;
+  }
+  .list {
+    border-bottom: 1px solid var(--color-border);
+    margin-top: 1.5rem;
+  }
+</style>

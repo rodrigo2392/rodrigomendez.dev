@@ -3,15 +3,42 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import CodeCard from '../components/CodeCard.astro';
 import PostRow from '../components/PostRow.astro';
 import VideoCard from '../components/VideoCard.astro';
-import { AUTHOR, SOCIALS, STACK } from '../consts';
+import NewsletterForm from '../components/NewsletterForm.astro';
+import { AUTHOR, SITE, SOCIALS, STACK } from '../consts';
 import { getPublishedPosts } from '../lib/blog';
 import videosData from '../data/videos.json';
 
 const posts = await getPublishedPosts();
 const latest = posts.slice(0, 3);
 const videos = videosData.slice(0, 6);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': `${SITE.url}/#rodrigo`,
+      name: AUTHOR.name,
+      url: SITE.url,
+      image: new URL(AUTHOR.photo, SITE.url).href,
+      jobTitle: AUTHOR.role,
+      description: AUTHOR.oneLiner,
+      homeLocation: { '@type': 'Place', name: AUTHOR.location },
+      sameAs: [SOCIALS.youtube, SOCIALS.github, SOCIALS.x, SOCIALS.instagram, SOCIALS.tiktok],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE.url}/#website`,
+      url: SITE.url,
+      name: SITE.title,
+      description: SITE.description,
+      inLanguage: SITE.lang,
+      publisher: { '@id': `${SITE.url}/#rodrigo` },
+    },
+  ],
+};
 ---
-<BaseLayout>
+<BaseLayout jsonLd={jsonLd}>
   <!-- HERO -->
   <section class="hero container-site">
     <div class="hero__text">
@@ -114,6 +141,12 @@ const videos = videosData.slice(0, 6);
     <p class="kicker">contacto</p>
     <h2 class="contact__title">¿Construyes algo? Escríbeme.</h2>
     <p class="contact__lead">Respondo mejor por correo o X. Si es sobre colaboraciones, mejor aún.</p>
+
+    <div class="contact__news">
+      <NewsletterForm />
+    </div>
+    <p class="contact__or">o escríbeme directo</p>
+
     <div class="terminal reveal">
       <p class="terminal__cmd"><span class="terminal__prompt">$</span> echo $EMAIL<span class="terminal__cursor" aria-hidden="true"></span></p>
       <p class="terminal__out">
@@ -295,6 +328,16 @@ const videos = videosData.slice(0, 6);
     max-width: 46ch;
     margin: 0 auto 2rem;
   }
+  .contact__news {
+    margin-bottom: 2.25rem;
+  }
+  .contact__or {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-faint);
+    margin-bottom: 1.1rem;
+  }
+
   /* Contacto tipo terminal: $ echo $EMAIL */
   .terminal {
     max-width: 30rem;

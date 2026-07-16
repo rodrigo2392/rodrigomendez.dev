@@ -82,6 +82,18 @@ const ogImage = new URL(image, SITE.url).href;
         <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
       )
     }
+
+    {
+      /* Cloudflare Web Analytics — sin cookies. Se activa si PUBLIC_CF_BEACON_TOKEN está seteado. */
+      import.meta.env.PUBLIC_CF_BEACON_TOKEN && (
+        <script
+          is:inline
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={`{"token":"${import.meta.env.PUBLIC_CF_BEACON_TOKEN}"}`}
+        />
+      )
+    }
   </head>
   <body>
     {!noNav && <Nav transition:persist />}

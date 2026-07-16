@@ -1,0 +1,134 @@
+---
+// Form de newsletter. Postea a PUBLIC_NEWSLETTER_ENDPOINT (Buttondown, Formspree, etc.).
+// Si no hay endpoint, cae a "escríbeme por correo". El sitio sigue 100% estático.
+const endpoint = import.meta.env.PUBLIC_NEWSLETTER_ENDPOINT || '';
+---
+<form class="news" data-news data-endpoint={endpoint} aria-label="Recibir avisos por correo">
+  <p class="news__title">¿Te aviso cuando publique algo nuevo?</p>
+  <div class="news__row">
+    <span class="news__prompt" aria-hidden="true">›</span>
+    <input
+      class="news__input"
+      type="email"
+      name="email"
+      required
+      autocomplete="email"
+      placeholder="tu@correo.com"
+      aria-label="Tu correo"
+      data-news-input
+    />
+    <button class="news__btn btn-accent" type="submit">Avísame</button>
+  </div>
+  <p class="news__msg" data-news-msg aria-live="polite"></p>
+</form>
+
+<script>
+  function initNews() {
+    const form = document.querySelector('[data-news]') as HTMLFormElement | null;
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = '1';
+    const endpoint = form.dataset.endpoint || '';
+    const input = form.querySelector('[data-news-input]') as HTMLInputElement;
+    const btn = form.querySelector('button') as HTMLButtonElement;
+    const msg = form.querySelector('[data-news-msg]') as HTMLElement;
+    const set = (text: string, ok = false) => {
+      msg.textContent = text;
+      msg.classList.toggle('is-ok', ok);
+      msg.classList.toggle('is-err', !ok && !!text);
+    };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = input.value.trim();
+      if (!email) return;
+      if (!endpoint) {
+        set('Escríbeme a hola@rodrigomendez.dev y te aviso.', true);
+        return;
+      }
+      btn.disabled = true;
+      set('Enviando…', true);
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Accept: 'application/json',
+          },
+          body: new URLSearchParams({ email }),
+        });
+        if (res.ok) {
+          form.reset();
+          set('¡Listo! Revisa tu correo para confirmar.', true);
+        } else {
+          set('No se pudo suscribir. Intenta de nuevo o escríbeme.');
+        }
+      } catch {
+        set('No se pudo suscribir. Intenta de nuevo o escríbeme.');
+      }
+      btn.disabled = false;
+    });
+  }
+  document.addEventListener('astro:page-load', initNews);
+</script>
+
+<style>
+  .news {
+    max-width: 30rem;
+    margin: 0 auto;
+    text-align: left;
+  }
+  .news__title {
+    font-size: 1.05rem;
+    color: var(--color-ink);
+    margin-bottom: 0.9rem;
+    text-align: center;
+  }
+  .news__row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.4rem 0.4rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    transition: border-color 0.15s ease;
+  }
+  .news__row:focus-within {
+    border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  }
+  .news__prompt {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+  }
+  .news__input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+  }
+  .news__input::placeholder {
+    color: var(--color-faint);
+  }
+  .news__btn {
+    flex-shrink: 0;
+    padding: 0.55rem 1.1rem;
+  }
+  .news__msg {
+    min-height: 1.2rem;
+    margin-top: 0.7rem;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--color-muted);
+  }
+  .news__msg.is-ok { color: var(--color-accent); }
+  .news__msg.is-err { color: #e5868c; }
+  @media (max-width: 30rem) {
+    .news__row { flex-wrap: wrap; border-radius: 14px; }
+    .news__input { flex: 1 0 100%; padding: 0.4rem 0; }
+    .news__btn { width: 100%; justify-content: center; }
+  }
+</style>

@@ -36,9 +36,36 @@ export const SOCIALS = {
 export const NAV = [
   { label: 'inicio.tsx', href: '/' },
   { label: 'sobre.md', href: '/#sobre' },
+  { label: 'proyectos/', href: '/proyectos' },
   { label: 'blog/', href: '/blog' },
   { label: 'videos/', href: '/#videos' },
   { label: 'contacto', href: '/#contacto' },
+] as const;
+
+// Proyectos mostrados en /proyectos.
+export const PROJECTS = [
+  {
+    name: 'Piclink',
+    tagline: 'SaaS para fotógrafos',
+    description:
+      'Galerías profesionales para que los fotógrafos entreguen sus fotos listas para vender. En producción, con gente pagando.',
+    url: 'https://piclink.mx',
+    repo: null,
+    stack: ['React', 'React Native', 'Node', 'AWS'],
+    status: 'En producción',
+    accent: 'live',
+  },
+  {
+    name: 'Cronowork',
+    tagline: 'Mi propio Jira, con IA',
+    description:
+      'Gestor de tareas minimalista (Kanban + Scrum) que genera tareas con IA vía MCP y corre self-hosted. Gratis y open source.',
+    url: 'https://cronowork.app',
+    repo: 'https://github.com/rodrigo2392/cronowork',
+    stack: ['React', 'NestJS', 'MongoDB', 'MCP'],
+    status: 'Live · Open source',
+    accent: 'oss',
+  },
 ] as const;
 
 // Stack mostrado en el home.
