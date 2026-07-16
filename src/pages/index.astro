@@ -146,7 +146,8 @@ const videos = videosData.slice(0, 6);
   /* Hero */
   .hero {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 32rem) minmax(0, 40rem);
+    justify-content: start;
     gap: 3.5rem;
     align-items: center;
     padding-block: 5.5rem 4rem;
