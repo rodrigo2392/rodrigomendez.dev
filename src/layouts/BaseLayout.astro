@@ -81,20 +81,37 @@ const ogImage = new URL(image, SITE.url).href;
 
     <script>
       // Reveal on scroll (respeta prefers-reduced-motion vía CSS).
-      const els = document.querySelectorAll('.reveal');
+      const els = Array.from(document.querySelectorAll('.reveal'));
       if (els.length) {
         const io = new IntersectionObserver(
-          (entries) => {
+          (entries, obs) => {
             for (const e of entries) {
               if (e.isIntersecting) {
                 e.target.classList.add('is-visible');
-                io.unobserve(e.target);
+                obs.unobserve(e.target);
               }
             }
           },
           { rootMargin: '0px 0px -8% 0px' }
         );
-        els.forEach((el) => io.observe(el));
+        // Revela lo que ya está en pantalla o quedó POR ENCIMA del viewport
+        // (p.ej. cuando un refresh restaura el scroll); observa lo que sigue abajo.
+        // Sin esto, el contenido por encima del scroll restaurado se quedaba invisible.
+        const settle = () => {
+          for (const el of els) {
+            if (el.classList.contains('is-visible')) continue;
+            if (el.getBoundingClientRect().top < window.innerHeight * 0.95) {
+              el.classList.add('is-visible');
+              io.unobserve(el);
+            } else {
+              io.observe(el);
+            }
+          }
+        };
+        settle();
+        // El scroll se restaura durante la carga: re-evalúa al terminar y en bfcache.
+        window.addEventListener('load', settle);
+        window.addEventListener('pageshow', settle);
       }
     </script>
   </body>
