@@ -39,7 +39,15 @@ const videos = videosData.slice(0, 6);
     <p class="kicker">sobre-mi</p>
     <div class="about reveal">
       <div class="about__photo placeholder-stripes">
-        <img src={AUTHOR.photo} alt="Rodrigo Méndez" loading="lazy" />
+        <img
+          src={AUTHOR.photo}
+          alt="Rodrigo Méndez"
+          width="900"
+          height="1125"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
       </div>
       <div class="about__text">
         <h2 class="about__title">Once años escribiendo código. Y contando el proceso.</h2>
