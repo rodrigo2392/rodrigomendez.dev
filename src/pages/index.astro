@@ -16,7 +16,7 @@ const videos = videosData.slice(0, 6);
   <section class="hero container-site">
     <div class="hero__text">
       <p class="kicker kicker--accent hero__kicker">FULLSTACK PRODUCT DEVELOPER</p>
-      <h1 class="hero__name">Rodrigo<br />Méndez</h1>
+      <h1 class="hero__name">Rodrigo Méndez</h1>
       <p class="hero__lead">{AUTHOR.oneLiner}</p>
       <div class="hero__cta">
         <a href={SOCIALS.youtube} class="btn-accent" target="_blank" rel="noopener">
@@ -146,9 +146,8 @@ const videos = videosData.slice(0, 6);
   /* Hero */
   .hero {
     display: grid;
-    grid-template-columns: minmax(0, 32rem) minmax(0, 40rem);
-    justify-content: start;
-    gap: 3.5rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
     align-items: center;
     padding-block: 5.5rem 4rem;
   }
@@ -159,29 +158,37 @@ const videos = videosData.slice(0, 6);
     min-width: 0;
   }
   .hero__kicker {
+    font-size: 1.1rem;
     margin-bottom: 1.75rem;
   }
   .hero__name {
-    font-size: clamp(3.2rem, 7vw, 5.5rem);
+    font-size: clamp(2.8rem, 5.4vw, 5.4rem);
     font-weight: 700;
-    line-height: 0.98;
-    letter-spacing: -0.03em;
+    line-height: 1;
+    letter-spacing: -0.035em;
+    white-space: nowrap;
   }
   .hero__lead {
-    font-size: 1.35rem;
-    line-height: 1.5;
+    font-size: 1.5rem;
+    line-height: 1.55;
     color: var(--color-muted);
-    max-width: 32ch;
-    margin-top: 1.6rem;
+    max-width: 34ch;
+    margin-top: 1.75rem;
   }
   .hero__cta {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
-    margin-top: 2rem;
+    margin-top: 2.25rem;
+  }
+  .hero__cta :global(.btn-accent),
+  .hero__cta :global(.btn-outline) {
+    font-size: 1.05rem;
+    padding: 0.85rem 1.7rem;
   }
   .hero__meta {
-    margin-top: 2.5rem;
+    font-size: 0.95rem;
+    margin-top: 2.75rem;
   }
   .hero__meta .sep {
     color: var(--color-border);
@@ -288,6 +295,10 @@ const videos = videosData.slice(0, 6);
       grid-template-columns: minmax(0, 1fr);
       gap: 2.5rem;
       padding-block: 3.5rem 2.5rem;
+    }
+    .hero__name {
+      white-space: normal;
+      font-size: clamp(2.6rem, 13vw, 4rem);
     }
     .about {
       grid-template-columns: 1fr;
