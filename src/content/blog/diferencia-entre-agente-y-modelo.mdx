@@ -1,0 +1,65 @@
+---
+title: "¿Cuál es la diferencia entre un agente y un modelo?"
+description: "Claude Code y Opus 4.8 no son lo mismo, y confundirlos es lo más común ahora mismo. Te lo aclaro sin jerga."
+pubDate: 2026-07-05
+tags: ["ia"]
+heroImage: "/img/blog/agente-vs-modelo.jpg"
+heroCaption: "fig. 1 — el modelo es el cerebro; el agente le da manos"
+---
+
+Hay una confusión que veo todos los días: la gente usa "Claude Code" y "Opus 4.8"
+como si fueran lo mismo. Y no lo son. Entender la diferencia te cambia la forma de
+elegir tus herramientas, así que te la aclaro sin jerga.
+
+## El modelo es el cerebro
+
+Un modelo, como Opus 4.8, es el cerebro. Le escribes, razona y te responde. Vive en
+el chat: piensa muy bien, pero **no toca nada por sí solo**. No abre tus archivos, no
+corre comandos, no edita tu código. Es puro razonamiento.
+
+Y no es solo Claude: GPT-5 y Gemini también son modelos. Cambia el nombre, pero la
+naturaleza es la misma, un cerebro al que le hablas.
+
+## El agente le da manos
+
+Un agente, como Claude Code, toma ese cerebro y le da **manos**: lee tus archivos,
+corre comandos, edita tu código. Es quien de verdad actúa sobre tu proyecto.
+
+<Nota>
+Claude Code no ES un modelo. Es quien USA a un modelo (como Opus 4.8) para actuar.
+Esa es toda la diferencia en una frase.
+</Nota>
+
+Y aquí está el detalle que casi nadie explica: el modelo no vive "dentro" del agente.
+El agente lo **llama por API**, igual que tú le hablas a un experto por teléfono. El
+experto piensa; tú ejecutas lo que dice.
+
+## Qué vuelve "agente" a un modelo
+
+Si el modelo solo razona, ¿qué le da la capacidad de actuar? Tres cosas:
+
+- **Herramientas:** leer, escribir, ejecutar comandos.
+- **Memoria:** para no perder el hilo entre pasos.
+- **Un bucle:** intenta algo, ve el resultado y corrige. Una y otra vez.
+
+Ese bucle es la magia. Un modelo suelto te da una respuesta y ya. Un agente prueba,
+se equivoca, lee el error y lo vuelve a intentar hasta que sale.
+
+## No es solo el cerebro: es el arnés
+
+Aquí está lo que casi nadie nota. Claude Code, Cursor y Codex pueden usar **el mismo
+modelo** por dentro. Lo que los distingue no es el cerebro, son las **herramientas**
+que traen: uno domina la terminal, otro se mete en tu editor, otro maneja el
+navegador.
+
+> El arnés pesa tanto como el cerebro. Dos agentes con el mismo modelo se comportan
+> distinto según las herramientas que les pusieron.
+
+Y una cosa más sobre los modelos: los hay de todos los tamaños. Haiku es chico y
+veloz; Opus, grande y potente; Sonnet y Fable, cada uno con su objetivo. La regla
+práctica es simple: usa el más chico que resuelva tu tarea. El grande cuesta más y
+es más lento; no lo gastes en algo que un modelo pequeño hace igual de bien.
+
+Así que la próxima vez que alguien mezcle "el modelo" con "la herramienta", ya sabes
+distinguirlos: el modelo piensa, el agente actúa, y el arnés decide qué tan lejos
+llega.
