@@ -1,8 +1,8 @@
 /* Tipografía de artículo del blog. Global (el HTML viene de <Content/>). */
 
 .prose {
-  font-size: 1.12rem;
-  line-height: 1.75;
+  font-size: 1.15rem;
+  line-height: 1.8;
   color: var(--color-ink);
 }
 
