@@ -21,7 +21,8 @@ export const AUTHOR = {
   oneLiner:
     'Software Developer con más de 11 años de experiencia. Compartiendo, aprendiendo y construyendo productos de software.',
   email: 'hola@rodrigomendez.dev',
-  photo: '/img/rodrigo.jpg',
+  photo: '/img/rodrigo-portrait.jpg',
+  avatar: '/img/rodrigo-avatar.jpg',
 } as const;
 
 export const SOCIALS = {

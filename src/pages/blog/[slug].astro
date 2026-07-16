@@ -80,7 +80,7 @@ const jsonLd = {
       <h1 class="post__title">{title}</h1>
       <p class="post__dek">{description}</p>
       <div class="author">
-        <img class="author__pic" src="/img/avatar.jpg" alt={AUTHOR.name} />
+        <img class="author__pic" src={AUTHOR.avatar} alt={AUTHOR.name} />
         <div>
           <p class="author__name">{AUTHOR.name}</p>
           <p class="author__role">{AUTHOR.role}</p>
@@ -129,7 +129,7 @@ const jsonLd = {
     <!-- Cierre -->
     <div class="post__foot">
       <div class="authorcard">
-        <img class="authorcard__pic" src="/img/avatar.jpg" alt={AUTHOR.name} />
+        <img class="authorcard__pic" src={AUTHOR.avatar} alt={AUTHOR.name} />
         <div class="authorcard__text">
           <p class="authorcard__name">{AUTHOR.name}</p>
           <p class="authorcard__bio">{AUTHOR.oneLiner}</p>
