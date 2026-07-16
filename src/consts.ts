@@ -6,7 +6,7 @@ export const SITE = {
   tld: 'dev',
   url: 'https://rodrigomendez.dev',
   description:
-    'Dev con +11 años compartiendo lo que aprende construyendo productos reales, en cristiano. Código, IA e ingeniería.',
+    'Dev con +11 años compartiendo lo que aprende construyendo productos reales, de forma fácil. Código, IA e ingeniería.',
   tagline: 'Código, IA e ingeniería',
   lang: 'es-MX',
   locale: 'es_MX',
