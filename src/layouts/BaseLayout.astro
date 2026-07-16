@@ -5,6 +5,7 @@ import '@fontsource/jetbrains-mono/500.css';
 import '@fontsource/jetbrains-mono/700.css';
 import '../styles/global.css';
 
+import { ClientRouter } from 'astro:transitions';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { SITE } from '../consts';
@@ -38,7 +39,16 @@ const ogImage = new URL(image, SITE.url).href;
   <head>
     <script is:inline>
       document.documentElement.classList.add('js');
+      console.log(
+        '%c</> hola, curioso.',
+        'color:#37D5E7;font:700 20px ui-monospace,monospace'
+      );
+      console.log(
+        '%c¿husmeando el código? escríbeme: hola@rodrigomendez.dev  ·  tip: teclea "dev"',
+        'color:#8a93a6;font:13px ui-monospace,monospace'
+      );
     </script>
+    <ClientRouter />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -73,16 +83,17 @@ const ogImage = new URL(image, SITE.url).href;
     }
   </head>
   <body>
-    {!noNav && <Nav />}
+    {!noNav && <Nav transition:persist />}
     <main id="contenido">
       <slot />
     </main>
-    <Footer />
+    <Footer transition:persist />
 
     <script>
       // Reveal on scroll (respeta prefers-reduced-motion vía CSS).
-      const els = Array.from(document.querySelectorAll('.reveal'));
-      if (els.length) {
+      function initReveal() {
+        const els = Array.from(document.querySelectorAll('.reveal'));
+        if (!els.length) return;
         const io = new IntersectionObserver(
           (entries, obs) => {
             for (const e of entries) {
@@ -94,9 +105,8 @@ const ogImage = new URL(image, SITE.url).href;
           },
           { rootMargin: '0px 0px -8% 0px' }
         );
-        // Revela lo que ya está en pantalla o quedó POR ENCIMA del viewport
+        // Revela lo que ya está en pantalla o quedó por encima del viewport
         // (p.ej. cuando un refresh restaura el scroll); observa lo que sigue abajo.
-        // Sin esto, el contenido por encima del scroll restaurado se quedaba invisible.
         const settle = () => {
           for (const el of els) {
             if (el.classList.contains('is-visible')) continue;
@@ -109,9 +119,66 @@ const ogImage = new URL(image, SITE.url).href;
           }
         };
         settle();
-        // El scroll se restaura durante la carga: re-evalúa al terminar y en bfcache.
-        window.addEventListener('load', settle);
-        window.addEventListener('pageshow', settle);
+        requestAnimationFrame(settle);
+      }
+
+      // Copiar el correo con feedback "copiado ✓".
+      function initCopyEmail() {
+        const btn = document.querySelector('[data-copy-email]') as HTMLButtonElement | null;
+        if (!btn || btn.dataset.bound) return;
+        btn.dataset.bound = '1';
+        const original = btn.textContent;
+        btn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(btn.dataset.copyEmail || '');
+            btn.textContent = 'copiado ✓';
+            btn.classList.add('is-copied');
+            setTimeout(() => {
+              btn.textContent = original;
+              btn.classList.remove('is-copied');
+            }, 1600);
+          } catch {}
+        });
+      }
+
+      // Se re-ejecutan en cada navegación (View Transitions).
+      document.addEventListener('astro:page-load', () => {
+        initReveal();
+        initCopyEmail();
+      });
+
+      // --- Easter egg: teclea "dev" → lluvia de símbolos de código ---
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let buf = '';
+      document.addEventListener('keydown', (e) => {
+        if ((e.target as HTMLElement)?.matches?.('input,textarea')) return;
+        if (e.key.length !== 1) return;
+        buf = (buf + e.key.toLowerCase()).slice(-3);
+        if (buf === 'dev') {
+          buf = '';
+          codeRain();
+        }
+      });
+      let raining = false;
+      function codeRain() {
+        if (raining || reduceMotion) return;
+        raining = true;
+        const glyphs = ['</>', '{', '}', '=>', '()', ';', '[]', '&&', 'const', '<Profile/>', '//', '{...}'];
+        const layer = document.createElement('div');
+        layer.className = 'coderain';
+        document.body.appendChild(layer);
+        const n = 34;
+        for (let i = 0; i < n; i++) {
+          const s = document.createElement('span');
+          s.textContent = glyphs[i % glyphs.length];
+          s.style.left = Math.random() * 100 + 'vw';
+          s.style.animationDuration = 2.4 + Math.random() * 2.6 + 's';
+          s.style.animationDelay = Math.random() * 1.2 + 's';
+          s.style.fontSize = 0.8 + Math.random() * 1.1 + 'rem';
+          s.style.opacity = String(0.35 + Math.random() * 0.55);
+          layer.appendChild(s);
+        }
+        setTimeout(() => { layer.remove(); raining = false; }, 6000);
       }
     </script>
   </body>

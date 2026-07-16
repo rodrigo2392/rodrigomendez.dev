@@ -5,10 +5,11 @@ interface Props {
   url: string;
   thumb?: string | null;
   description?: string | null;
+  delayMs?: number;
 }
-const { title, duration, url, thumb, description } = Astro.props;
+const { title, duration, url, thumb, description, delayMs = 0 } = Astro.props;
 ---
-<a class="vcard" href={url} target="_blank" rel="noopener">
+<a class="vcard" href={url} target="_blank" rel="noopener" style={`--d:${delayMs}ms`}>
   <div class="vcard__thumb placeholder-stripes">
     {thumb && <img src={thumb} alt="" loading="lazy" />}
     <span class="vcard__play" aria-hidden="true">

@@ -72,39 +72,43 @@ const PAGE_SIZE = 8;
 </BaseLayout>
 
 <script define:vars={{ PAGE_SIZE }}>
-  const list = document.querySelector('[data-list]');
-  const items = Array.from(list?.querySelectorAll('.list__item') ?? []);
-  const filterBtns = document.querySelectorAll('[data-filter]');
-  const moreBtn = document.querySelector('[data-more]');
-  let activeTag = 'todos';
-  let shown = PAGE_SIZE;
+  function initBlogFilter() {
+    const list = document.querySelector('[data-list]');
+    if (!list) return;
+    const items = Array.from(list.querySelectorAll('.list__item'));
+    const filterBtns = document.querySelectorAll('[data-filter]');
+    const moreBtn = document.querySelector('[data-more]');
+    let activeTag = 'todos';
+    let shown = PAGE_SIZE;
 
-  function render() {
-    const matches = items.filter(
-      (el) => activeTag === 'todos' || (el.dataset.tags || '').split(',').includes(activeTag)
+    const render = () => {
+      const matches = items.filter(
+        (el) => activeTag === 'todos' || (el.dataset.tags || '').split(',').includes(activeTag)
+      );
+      items.forEach((el) => (el.hidden = true));
+      matches.slice(0, shown).forEach((el) => (el.hidden = false));
+      if (moreBtn) moreBtn.hidden = matches.length <= shown;
+    };
+
+    filterBtns.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        activeTag = btn.dataset.filter;
+        shown = PAGE_SIZE;
+        filterBtns.forEach((b) => {
+          const on = b === btn;
+          b.classList.toggle('chip--active', on);
+          b.setAttribute('aria-pressed', String(on));
+        });
+        render();
+      })
     );
-    items.forEach((el) => (el.hidden = true));
-    matches.slice(0, shown).forEach((el) => (el.hidden = false));
-    if (moreBtn) moreBtn.hidden = matches.length <= shown;
-  }
-
-  filterBtns.forEach((btn) =>
-    btn.addEventListener('click', () => {
-      activeTag = btn.dataset.filter;
-      shown = PAGE_SIZE;
-      filterBtns.forEach((b) => {
-        const on = b === btn;
-        b.classList.toggle('chip--active', on);
-        b.setAttribute('aria-pressed', String(on));
-      });
+    moreBtn?.addEventListener('click', () => {
+      shown += PAGE_SIZE;
       render();
-    })
-  );
-  moreBtn?.addEventListener('click', () => {
-    shown += PAGE_SIZE;
+    });
     render();
-  });
-  render();
+  }
+  document.addEventListener('astro:page-load', initBlogFilter);
 </script>
 
 <style>

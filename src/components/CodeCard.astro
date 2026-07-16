@@ -58,8 +58,10 @@ const lines = [
 </div>
 
 <script>
-  const card = document.querySelector('[data-typewriter]');
-  if (card) {
+  function initCodeCard() {
+    const card = document.querySelector('[data-typewriter]') as HTMLElement | null;
+    if (!card || card.dataset.twInit) return;
+    card.dataset.twInit = '1';
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const runBtn = card.querySelector('[data-run]') as HTMLButtonElement | null;
     const runLabel = card.querySelector('[data-run-label]');
@@ -151,6 +153,8 @@ const lines = [
       io.observe(card);
     }
   }
+  initCodeCard();
+  document.addEventListener('astro:page-load', initCodeCard);
 </script>
 
 <style>
@@ -161,7 +165,16 @@ const lines = [
     border-radius: 14px;
     background: var(--color-surface);
     overflow: hidden;
-    box-shadow: 0 20px 60px -30px rgba(0, 0, 0, 0.8);
+    box-shadow:
+      0 20px 60px -30px rgba(0, 0, 0, 0.8),
+      0 0 42px -22px color-mix(in srgb, var(--color-accent) 35%, transparent);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .cc:hover {
+    border-color: color-mix(in srgb, var(--color-accent) 26%, var(--color-border));
+    box-shadow:
+      0 20px 60px -30px rgba(0, 0, 0, 0.8),
+      0 0 55px -16px color-mix(in srgb, var(--color-accent) 50%, transparent);
   }
   .cc__bar {
     display: flex;

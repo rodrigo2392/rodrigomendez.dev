@@ -67,8 +67,8 @@ const videos = videosData.slice(0, 6);
   <!-- STACK -->
   <section class="section container-site">
     <p class="kicker">stack</p>
-    <div class="stack reveal">
-      {STACK.map((s) => <span class="chip">{s}</span>)}
+    <div class="stack reveal reveal--stagger">
+      {STACK.map((s, i) => <span class="chip" style={`--d:${i * 45}ms`}>{s}</span>)}
     </div>
   </section>
 
@@ -93,14 +93,15 @@ const videos = videosData.slice(0, 6);
             ver el canal <span aria-hidden="true">→</span>
           </a>
         </div>
-        <div class="videos reveal">
-          {videos.map((v) => (
+        <div class="videos reveal reveal--stagger">
+          {videos.map((v, i) => (
             <VideoCard
               title={v.title}
               duration={v.duration}
               url={v.url}
               thumb={v.thumbnail}
               description={v.description}
+              delayMs={i * 70}
             />
           ))}
         </div>
@@ -113,7 +114,12 @@ const videos = videosData.slice(0, 6);
     <p class="kicker">contacto</p>
     <h2 class="contact__title">¿Construyes algo? Escríbeme.</h2>
     <p class="contact__lead">Respondo mejor por correo o X. Si es sobre colaboraciones, mejor aún.</p>
-    <a href={`mailto:${AUTHOR.email}`} class="contact__email">{AUTHOR.email}</a>
+    <div class="contact__email-row">
+      <a href={`mailto:${AUTHOR.email}`} class="contact__email">{AUTHOR.email}</a>
+      <button class="copy-btn" type="button" data-copy-email={AUTHOR.email} aria-label="Copiar correo">
+        copiar
+      </button>
+    </div>
     <div class="contact__socials">
       <a href={SOCIALS.youtube} class="chip" target="_blank" rel="noopener">YouTube</a>
       <a href={SOCIALS.instagram} class="chip" target="_blank" rel="noopener">Instagram</a>
@@ -167,6 +173,17 @@ const videos = videosData.slice(0, 6);
     line-height: 1;
     letter-spacing: -0.035em;
     white-space: nowrap;
+  }
+  .hero__name::after {
+    content: "";
+    display: inline-block;
+    width: 0.055em;
+    height: 0.8em;
+    margin-left: 0.14em;
+    border-radius: 2px;
+    background: var(--color-accent);
+    vertical-align: -0.02em;
+    animation: cc-blink 1.05s step-end infinite;
   }
   .hero__lead {
     font-size: 1.5rem;
@@ -274,6 +291,13 @@ const videos = videosData.slice(0, 6);
     font-size: 1.15rem;
     max-width: 46ch;
     margin: 0 auto 2rem;
+  }
+  .contact__email-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    flex-wrap: wrap;
   }
   .contact__email {
     font-family: var(--font-mono);

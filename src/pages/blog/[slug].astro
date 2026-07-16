@@ -185,37 +185,40 @@ const jsonLd = {
 </BaseLayout>
 
 <script>
-  // Barra de progreso de lectura
-  const bar = document.querySelector('[data-progress]');
-  const onScroll = () => {
-    const h = document.documentElement;
-    const max = h.scrollHeight - h.clientHeight;
-    const p = max > 0 ? (h.scrollTop / max) * 100 : 0;
-    if (bar) (bar as HTMLElement).style.width = p + '%';
-  };
-  document.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  function initPost() {
+    const bar = document.querySelector('[data-progress]') as HTMLElement | null;
+    if (!bar) return; // no estamos en un post
+    // Barra de progreso de lectura
+    const onScroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+    };
+    document.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
 
-  // TOC activo
-  const links = new Map<string, Element>();
-  document.querySelectorAll('[data-toc]').forEach((a) =>
-    links.set(a.getAttribute('data-toc')!, a)
-  );
-  const heads = document.querySelectorAll('.prose h2, .prose h3');
-  if (links.size && heads.length) {
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            links.forEach((el) => el.classList.remove('toc__link--active'));
-            links.get((e.target as HTMLElement).id)?.classList.add('toc__link--active');
-          }
-        }
-      },
-      { rootMargin: '-10% 0px -80% 0px' }
+    // TOC activo
+    const links = new Map<string, Element>();
+    document.querySelectorAll('[data-toc]').forEach((a) =>
+      links.set(a.getAttribute('data-toc')!, a)
     );
-    heads.forEach((h) => io.observe(h));
+    const heads = document.querySelectorAll('.prose h2, .prose h3');
+    if (links.size && heads.length) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              links.forEach((el) => el.classList.remove('toc__link--active'));
+              links.get((e.target as HTMLElement).id)?.classList.add('toc__link--active');
+            }
+          }
+        },
+        { rootMargin: '-10% 0px -80% 0px' }
+      );
+      heads.forEach((h) => io.observe(h));
+    }
   }
+  document.addEventListener('astro:page-load', initPost);
 </script>
 
 <style>

@@ -240,6 +240,74 @@ html.js .cc-type .cc__ln.is-on {
   }
 }
 
+/* Aparición escalonada de hijos (stack, videos). El contenedor NO se desvanece;
+   sus hijos entran uno por uno con un retraso --d por índice. */
+html.js .reveal.reveal--stagger {
+  opacity: 1;
+  transform: none;
+}
+html.js .reveal--stagger > * {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition-delay: var(--d, 0ms);
+}
+html.js .reveal--stagger.is-visible > * {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal--stagger > * {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Botón "copiar" (correo de contacto) */
+.copy-btn {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.copy-btn:hover {
+  color: var(--color-ink);
+  border-color: #2b3646;
+}
+.copy-btn.is-copied {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* Lluvia de código (easter egg "dev") */
+.coderain {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+}
+.coderain span {
+  position: absolute;
+  top: -8vh;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 60%, transparent);
+  animation-name: coderain-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+  will-change: transform;
+}
+@keyframes coderain-fall {
+  from { transform: translateY(0) rotate(0deg); }
+  to { transform: translateY(118vh) rotate(12deg); }
+}
+
 /* Reveal al hacer scroll.
    Seguro por defecto: sin JS o con reduced-motion, el contenido SÍ se ve.
    El estado oculto solo aplica cuando <html> tiene la clase .js. */

@@ -50,6 +50,20 @@ const isActive = (href: string) => {
       toggle?.setAttribute('aria-expanded', 'false');
     })
   );
+
+  // El nav persiste entre transiciones: actualiza el enlace activo por navegación.
+  function updateActiveLink() {
+    const path = location.pathname;
+    document.querySelectorAll<HTMLAnchorElement>('.nav__link').forEach((a) => {
+      const url = new URL(a.href);
+      let active = false;
+      if (url.hash) active = false;
+      else if (url.pathname === '/blog') active = path === '/blog' || path.startsWith('/blog/');
+      else if (url.pathname === '/') active = path === '/';
+      a.classList.toggle('nav__link--active', active);
+    });
+  }
+  document.addEventListener('astro:page-load', updateActiveLink);
 </script>
 
 <style>
