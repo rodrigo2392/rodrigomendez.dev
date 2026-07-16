@@ -51,21 +51,4 @@ export const STACK = [
   'AWS',
 ] as const;
 
-// Videos destacados (placeholder hasta conectar YouTube).
-export const VIDEOS = [
-  {
-    title: 'Refactoricé mi app en vivo: de 3s a 400ms',
-    duration: '12:04',
-    url: 'https://youtube.com/@rodrigomendezdev',
-  },
-  {
-    title: 'Mi setup de VS Code 2026, sin extensiones de más',
-    duration: '08:41',
-    url: 'https://youtube.com/@rodrigomendezdev',
-  },
-  {
-    title: 'Construí una feature de Piclink en una hora',
-    duration: '15:22',
-    url: 'https://youtube.com/@rodrigomendezdev',
-  },
-] as const;
+// Los videos viven en src/data/videos.json (generado por scripts/pull-youtube.mjs).

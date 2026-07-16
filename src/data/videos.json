@@ -1,0 +1,56 @@
+[
+  {
+    "id": "28YL6HtuInc",
+    "title": "Hice mi propio Jira (gratis, open source y con IA)",
+    "url": "https://www.youtube.com/watch?v=28YL6HtuInc",
+    "description": "Llevaba meses probando Jira, Trello y Plane para organizar mis proyectos… y ninguna me convencía. Así que hice mi propio gestor de tareas:…",
+    "duration": "5:09",
+    "thumbnail": "/img/videos/28YL6HtuInc.jpg",
+    "publishedAt": "2026-07-02T11:46:24-07:00"
+  },
+  {
+    "id": "psol9rE2chU",
+    "title": "¿Vale la pena estudiar SOFTWARE en 2026?",
+    "url": "https://www.youtube.com/watch?v=psol9rE2chU",
+    "description": "¿La IA ya mató la programación? El sector tech se cayó fuerte… pero la razón no es la que todos creen. En este video te cuento, sin rodeos, si…",
+    "duration": "4:28",
+    "thumbnail": "/img/videos/psol9rE2chU.jpg",
+    "publishedAt": "2026-06-24T23:46:39-07:00"
+  },
+  {
+    "id": "5cDsm-Zep9A",
+    "title": "Ser programador puede reducir tu promedio de vida.",
+    "url": "https://www.youtube.com/watch?v=5cDsm-Zep9A",
+    "description": "Hablemos de los malos hábitos como programadores.",
+    "duration": "6:35",
+    "thumbnail": "/img/videos/5cDsm-Zep9A.jpg",
+    "publishedAt": "2025-06-17T23:31:03-07:00"
+  },
+  {
+    "id": "Wmw5BsL844I",
+    "title": "¿Eres DESARROLLADOR o sólo PROGRAMADOR?",
+    "url": "https://www.youtube.com/watch?v=Wmw5BsL844I",
+    "description": "En este video te doy mi punto de vista sobre lo que es ser un desarrollador de software y lo que es ser programnador.",
+    "duration": "10:25",
+    "thumbnail": "/img/videos/Wmw5BsL844I.jpg",
+    "publishedAt": "2025-04-12T16:59:13-07:00"
+  },
+  {
+    "id": "hvxZcYLMTkk",
+    "title": "Por esto las empresas NO CONTRATAN juniors",
+    "url": "https://www.youtube.com/watch?v=hvxZcYLMTkk",
+    "description": "Platicamos un poco de las softskills que muchas veces nos hacen falta como desarrolladores, la mayoría de las veces no se trata de nuestro código…",
+    "duration": "13:16",
+    "thumbnail": "/img/videos/hvxZcYLMTkk.jpg",
+    "publishedAt": "2025-03-27T19:31:08-07:00"
+  },
+  {
+    "id": "JGEeSR6qQG4",
+    "title": "EP02 - ¿La IA va a reemplazar a los programadores? | #DEPURA2",
+    "url": "https://www.youtube.com/watch?v=JGEeSR6qQG4",
+    "description": "En este video te doy mi punto de vista relacionado al tema de la inteligencia artificial y como mucha gente piensa que va a reemplazar a los…",
+    "duration": "25:33",
+    "thumbnail": "/img/videos/JGEeSR6qQG4.jpg",
+    "publishedAt": "2025-01-08T16:00:12-08:00"
+  }
+]

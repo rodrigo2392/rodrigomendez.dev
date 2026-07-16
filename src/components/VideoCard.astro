@@ -1,11 +1,12 @@
 ---
 interface Props {
   title: string;
-  duration: string;
+  duration?: string | null;
   url: string;
-  thumb?: string;
+  thumb?: string | null;
+  description?: string | null;
 }
-const { title, duration, url, thumb } = Astro.props;
+const { title, duration, url, thumb, description } = Astro.props;
 ---
 <a class="vcard" href={url} target="_blank" rel="noopener">
   <div class="vcard__thumb placeholder-stripes">
@@ -13,9 +14,10 @@ const { title, duration, url, thumb } = Astro.props;
     <span class="vcard__play" aria-hidden="true">
       <svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
     </span>
-    <span class="vcard__dur">{duration}</span>
+    {duration && <span class="vcard__dur">{duration}</span>}
   </div>
   <h3 class="vcard__title">{title}</h3>
+  {description && <p class="vcard__desc">{description}</p>}
 </a>
 
 <style>
@@ -68,9 +70,20 @@ const { title, duration, url, thumb } = Astro.props;
     font-size: 1.05rem;
     font-weight: 600;
     margin-top: 0.9rem;
+    line-height: 1.3;
     transition: color 0.15s ease;
   }
   .vcard:hover .vcard__title {
     color: var(--color-accent);
+  }
+  .vcard__desc {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 </style>

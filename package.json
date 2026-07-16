@@ -8,6 +8,7 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "pull:youtube": "node scripts/pull-youtube.mjs",
     "astro": "astro"
   },
   "dependencies": {
