@@ -11,15 +11,63 @@ const lines = [
   { c: [{ t: "}", k: "pun" }] },
 ];
 ---
-<div class="cc" role="img" aria-label="Perfil de Rodrigo en formato de objeto de código">
+<div class="cc cc-type" data-typewriter role="img" aria-label="Perfil de Rodrigo en formato de objeto de código">
   <div class="cc__bar">
     <span class="cc__dots"><i></i><i></i><i></i></span>
     <span class="cc__file">rodrigo.ts</span>
   </div>
   <pre class="cc__code"><code>{lines.map((line, i) => (
-    <span class="cc__line"><span class="cc__ln">{i + 1}</span><span class="cc__content">{line.c.map((s) => (<span class={`tok tok--${s.k}`}>{s.t}</span>))}</span></span>
+    <span class="cc__line"><span class="cc__ln">{i + 1}</span><span class="cc__content">{line.c.map((s) => (<span class={`tok tok--${s.k}`}>{s.t.split('').map((ch) => (<span class="ch">{ch}</span>))}</span>))}</span></span>
   ))}</code></pre>
 </div>
+
+<script>
+  const card = document.querySelector('[data-typewriter]');
+  if (card) {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lines = Array.from(card.querySelectorAll('.cc__line'));
+    const seq: { ch: Element; num: Element | null }[] = [];
+    for (const line of lines) {
+      const num = line.querySelector('.cc__ln');
+      const chs = Array.from(line.querySelectorAll('.ch'));
+      chs.forEach((ch, idx) => seq.push({ ch, num: idx === 0 ? num : null }));
+    }
+    const revealAll = () => {
+      seq.forEach(({ ch, num }) => {
+        ch.classList.add('is-on');
+        num?.classList.add('is-on');
+      });
+      seq[seq.length - 1]?.ch.classList.add('caret');
+    };
+    if (reduce || !seq.length) {
+      revealAll();
+    } else {
+      let i = 0;
+      let prev: Element | null = null;
+      const step = () => {
+        if (prev) prev.classList.remove('caret');
+        if (i >= seq.length) {
+          seq[seq.length - 1].ch.classList.add('caret');
+          return;
+        }
+        const { ch, num } = seq[i++];
+        num?.classList.add('is-on');
+        ch.classList.add('is-on', 'caret');
+        prev = ch;
+        const c = ch.textContent;
+        const base = c === ' ' ? 8 : 14 + Math.random() * 34;
+        setTimeout(step, num ? base + 80 : base);
+      };
+      const io = new IntersectionObserver((entries, obs) => {
+        if (entries[0].isIntersecting) {
+          obs.disconnect();
+          setTimeout(step, 400);
+        }
+      }, { threshold: 0.25 });
+      io.observe(card);
+    }
+  }
+</script>
 
 <style>
   .cc {
