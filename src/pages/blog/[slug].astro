@@ -217,6 +217,28 @@ const jsonLd = {
       );
       heads.forEach((h) => io.observe(h));
     }
+
+    // Anchors copiables en los headings (hover → # que copia el deep-link).
+    document.querySelectorAll<HTMLElement>('.prose h2[id], .prose h3[id]').forEach((h) => {
+      if (h.querySelector('.heading-anchor')) return;
+      const a = document.createElement('a');
+      a.className = 'heading-anchor';
+      a.href = '#' + h.id;
+      a.setAttribute('aria-label', 'Copiar enlace a esta sección');
+      a.textContent = '#';
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        history.replaceState(null, '', '#' + h.id);
+        navigator.clipboard
+          ?.writeText(location.origin + location.pathname + '#' + h.id)
+          .then(() => {
+            a.classList.add('is-copied');
+            setTimeout(() => a.classList.remove('is-copied'), 1300);
+          })
+          .catch(() => {});
+      });
+      h.appendChild(a);
+    });
   }
   document.addEventListener('astro:page-load', initPost);
 </script>

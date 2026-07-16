@@ -19,6 +19,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     at fetchPage (<span class="err__dim">server.ts:88</span>)
 
 <span class="err__com">// quizá se movió, o nunca existió. Regresemos a terreno conocido.</span></code></pre>
+      <form class="err__prompt" data-cmd-form>
+        <span class="err__ps1" aria-hidden="true">rodrigo@dev:~$</span>
+        <input
+          class="err__input"
+          data-cmd
+          type="text"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="home · blog · videos · help"
+          aria-label="Comando"
+        />
+      </form>
+      <p class="err__out" data-cmd-out hidden></p>
     </div>
 
     <div class="err__cta">
@@ -29,12 +42,36 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
-  function setPath() {
+  function initErr() {
     const p = location.pathname + location.search;
     document.querySelectorAll('[data-path]').forEach((el) => (el.textContent = p));
+
+    const form = document.querySelector('[data-cmd-form]') as HTMLFormElement | null;
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = '1';
+    const input = form.querySelector('[data-cmd]') as HTMLInputElement;
+    const out = document.querySelector('[data-cmd-out]') as HTMLElement;
+    const routes: Record<string, string> = {
+      home: '/', inicio: '/', cd: '/', 'cd ~': '/', 'cd /': '/',
+      blog: '/blog', 'cd blog': '/blog',
+      videos: '/#videos', contacto: '/#contacto', contact: '/#contacto',
+    };
+    const say = (t: string) => { out.hidden = false; out.textContent = t; };
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const raw = input.value.trim().toLowerCase();
+      input.value = '';
+      if (!raw) return;
+      if (raw === 'help' || raw === '?') return say("comandos: home · blog · videos · contacto · ls · clear");
+      if (raw === 'ls') return say("inicio   sobre   blog/   videos/   contacto");
+      if (raw === 'clear' || raw === 'cls') { out.hidden = true; out.textContent = ''; return; }
+      const dest = routes[raw];
+      if (dest) { say('→ ' + dest); location.assign(dest); return; }
+      say(`comando no encontrado: ${raw} — prueba 'help'`);
+    });
   }
-  setPath();
-  document.addEventListener('astro:page-load', setPath);
+  initErr();
+  document.addEventListener('astro:page-load', initErr);
 </script>
 
 <style>
@@ -105,6 +142,39 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
   .err__com {
     color: var(--color-faint);
+  }
+  .err__prompt {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.3rem;
+    border-top: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+  }
+  .err__ps1 {
+    color: var(--color-accent);
+    white-space: nowrap;
+  }
+  .err__input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+    caret-color: var(--color-accent);
+  }
+  .err__input::placeholder {
+    color: var(--color-faint);
+  }
+  .err__out {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin-top: 0.85rem;
   }
   .err__cta {
     display: flex;

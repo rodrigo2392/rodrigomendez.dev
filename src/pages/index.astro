@@ -25,7 +25,7 @@ const videos = videosData.slice(0, 6);
         <a href="/blog" class="btn-outline">Lee el blog</a>
       </div>
       <p class="hero__meta meta">
-        {AUTHOR.location} <span class="sep">|</span> +{AUTHOR.years} años construyendo
+        {AUTHOR.location} <span class="sep">|</span> +<span data-countup={AUTHOR.years}>{AUTHOR.years}</span> años construyendo
         <span class="sep">|</span> <span class="tag">{AUTHOR.handle}</span>
       </p>
     </div>
@@ -114,11 +114,14 @@ const videos = videosData.slice(0, 6);
     <p class="kicker">contacto</p>
     <h2 class="contact__title">¿Construyes algo? Escríbeme.</h2>
     <p class="contact__lead">Respondo mejor por correo o X. Si es sobre colaboraciones, mejor aún.</p>
-    <div class="contact__email-row">
-      <a href={`mailto:${AUTHOR.email}`} class="contact__email">{AUTHOR.email}</a>
-      <button class="copy-btn" type="button" data-copy-email={AUTHOR.email} aria-label="Copiar correo">
-        copiar
-      </button>
+    <div class="terminal reveal">
+      <p class="terminal__cmd"><span class="terminal__prompt">$</span> echo $EMAIL<span class="terminal__cursor" aria-hidden="true"></span></p>
+      <p class="terminal__out">
+        <a href={`mailto:${AUTHOR.email}`} class="contact__email">{AUTHOR.email}</a>
+        <button class="copy-btn" type="button" data-copy-email={AUTHOR.email} aria-label="Copiar correo">
+          copiar
+        </button>
+      </p>
     </div>
     <div class="contact__socials">
       <a href={SOCIALS.youtube} class="chip" target="_blank" rel="noopener">YouTube</a>
@@ -292,16 +295,56 @@ const videos = videosData.slice(0, 6);
     max-width: 46ch;
     margin: 0 auto 2rem;
   }
-  .contact__email-row {
+  /* Contacto tipo terminal: $ echo $EMAIL */
+  .terminal {
+    max-width: 30rem;
+    margin: 0 auto;
+    text-align: left;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface);
+    padding: 1.1rem 1.3rem;
+    font-family: var(--font-mono);
+    box-shadow: 0 20px 60px -34px rgba(0, 0, 0, 0.8);
+  }
+  .terminal__cmd {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+  .terminal__prompt {
+    color: var(--color-accent);
+    margin-right: 0.4rem;
+  }
+  .terminal__cursor {
+    display: inline-block;
+    width: 0.55ch;
+    height: 1.05em;
+    margin-left: 0.15rem;
+    vertical-align: -0.18em;
+    background: var(--color-accent);
+    animation: cc-blink 1.05s step-end infinite;
+  }
+  .terminal__out {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 0.9rem;
     flex-wrap: wrap;
+    margin-top: 0.7rem;
+    opacity: 0;
+  }
+  .reveal.is-visible .terminal__out {
+    animation: term-print 0.45s ease 0.35s forwards;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .terminal__out { opacity: 1; animation: none; }
+  }
+  @keyframes term-print {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: none; }
   }
   .contact__email {
     font-family: var(--font-mono);
-    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+    font-size: clamp(1.05rem, 2.2vw, 1.45rem);
     color: var(--color-accent);
   }
   .contact__email:hover {

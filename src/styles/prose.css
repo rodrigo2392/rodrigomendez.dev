@@ -142,3 +142,34 @@
 .prose .expressive-code .frame.has-title .title {
   padding-left: 3.5rem;
 }
+
+/* Anchors copiables en los headings */
+.prose h2,
+.prose h3 {
+  position: relative;
+}
+.prose .heading-anchor {
+  margin-left: 0.5rem;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.8em;
+  color: var(--color-faint);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.prose h2:hover .heading-anchor,
+.prose h3:hover .heading-anchor {
+  opacity: 1;
+}
+.prose .heading-anchor:hover {
+  color: var(--color-accent);
+}
+.prose .heading-anchor.is-copied {
+  opacity: 1;
+  color: var(--color-accent);
+}
+.prose .heading-anchor.is-copied::after {
+  content: " copiado";
+  font-size: 0.85em;
+}

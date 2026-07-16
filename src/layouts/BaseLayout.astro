@@ -8,6 +8,7 @@ import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import CommandPalette from '../components/CommandPalette.astro';
 import { SITE } from '../consts';
 
 interface Props {
@@ -88,6 +89,7 @@ const ogImage = new URL(image, SITE.url).href;
       <slot />
     </main>
     <Footer transition:persist />
+    <CommandPalette transition:persist />
 
     <script>
       // Reveal on scroll (respeta prefers-reduced-motion vía CSS).
@@ -141,10 +143,69 @@ const ogImage = new URL(image, SITE.url).href;
         });
       }
 
+      // Count-up de números marcados con data-countup (ej. "+11 años").
+      function initCountUp() {
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const els = Array.from(document.querySelectorAll('[data-countup]')) as HTMLElement[];
+        for (const el of els) {
+          if (el.dataset.done) continue;
+          const target = parseInt(el.dataset.countup || '0', 10);
+          if (reduce) { el.textContent = String(target); el.dataset.done = '1'; continue; }
+          const io = new IntersectionObserver((entries, obs) => {
+            if (!entries[0].isIntersecting) return;
+            obs.disconnect();
+            el.dataset.done = '1';
+            const dur = 950;
+            const start = performance.now();
+            const tick = (now: number) => {
+              const t = Math.min(1, (now - start) / dur);
+              const eased = 1 - Math.pow(1 - t, 3);
+              el.textContent = String(Math.round(eased * target));
+              if (t < 1) requestAnimationFrame(tick);
+              else el.textContent = String(target);
+            };
+            requestAnimationFrame(tick);
+          }, { threshold: 1 });
+          io.observe(el);
+        }
+      }
+
+      // Decode/scramble de los kickers "// texto" al entrar en viewport.
+      function initKickerScramble() {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const glyphs = '!<>-_\\/[]{}=+*^?#01x';
+        const els = Array.from(document.querySelectorAll('.kicker')) as HTMLElement[];
+        for (const el of els) {
+          if (el.dataset.scrambled) continue;
+          const io = new IntersectionObserver((entries, obs) => {
+            if (!entries[0].isIntersecting) return;
+            obs.disconnect();
+            el.dataset.scrambled = '1';
+            const final = el.textContent || '';
+            let frame = 0;
+            const total = final.length * 1.25 + 16;
+            const anim = () => {
+              let out = '';
+              for (let i = 0; i < final.length; i++) {
+                if (final[i] === ' ') { out += ' '; continue; }
+                out += frame > i * 1.25 + 4 ? final[i] : glyphs[Math.floor(Math.random() * glyphs.length)];
+              }
+              el.textContent = out;
+              if (frame++ <= total) requestAnimationFrame(anim);
+              else el.textContent = final;
+            };
+            anim();
+          }, { threshold: 0.6 });
+          io.observe(el);
+        }
+      }
+
       // Se re-ejecutan en cada navegación (View Transitions).
       document.addEventListener('astro:page-load', () => {
         initReveal();
         initCopyEmail();
+        initCountUp();
+        initKickerScramble();
       });
 
       // --- Easter egg: teclea "dev" → lluvia de símbolos de código ---

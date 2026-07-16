@@ -63,6 +63,15 @@ const lines = [
     if (!card || card.dataset.twInit) return;
     card.dataset.twInit = '1';
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Spotlight que sigue el cursor sobre la tarjeta.
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+        card.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+      });
+    }
     const runBtn = card.querySelector('[data-run]') as HTMLButtonElement | null;
     const runLabel = card.querySelector('[data-run-label]');
     const output = card.querySelector('[data-output]');
@@ -176,6 +185,24 @@ const lines = [
       0 20px 60px -30px rgba(0, 0, 0, 0.8),
       0 0 55px -16px color-mix(in srgb, var(--color-accent) 50%, transparent);
   }
+  .cc::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    background: radial-gradient(
+      220px circle at var(--mx, 50%) var(--my, 0%),
+      color-mix(in srgb, var(--color-accent) 13%, transparent),
+      transparent 60%
+    );
+  }
+  .cc:hover::before { opacity: 1; }
+  .cc__bar,
+  .cc__code,
+  .cc__output { position: relative; z-index: 1; }
   .cc__bar {
     display: flex;
     align-items: center;

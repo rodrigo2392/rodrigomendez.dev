@@ -1,6 +1,18 @@
 ---
 import { SITE, SOCIALS } from '../consts';
 import Wordmark from './Wordmark.astro';
+
+// Hash del commit desplegado: Cloudflare Pages expone CF_PAGES_COMMIT_SHA;
+// en local caemos a git. Se resuelve en build (SSG).
+let commit = (process.env.CF_PAGES_COMMIT_SHA || '').slice(0, 7);
+if (!commit) {
+  try {
+    const { execSync } = await import('node:child_process');
+    commit = execSync('git rev-parse --short HEAD').toString().trim();
+  } catch {
+    commit = 'dev';
+  }
+}
 ---
 <footer class="footer">
   <div class="container-site footer__inner">
@@ -13,6 +25,13 @@ import Wordmark from './Wordmark.astro';
       <a href={SOCIALS.github} target="_blank" rel="noopener">GitHub</a>
       <a href={SOCIALS.x} target="_blank" rel="noopener">X</a>
     </nav>
+  </div>
+  <div class="container-site footer__meta">
+    <span class="footer__deploy">
+      <span class="footer__dot" aria-hidden="true"></span>
+      deploy <span class="footer__hash">{commit}</span> · built with Astro on Cloudflare
+    </span>
+    <span class="footer__kbd"><kbd>⌘</kbd><kbd>K</kbd> para navegar</span>
   </div>
 </footer>
 
@@ -47,5 +66,44 @@ import Wordmark from './Wordmark.astro';
   }
   .footer__links a:hover {
     color: var(--color-accent);
+  }
+  .footer__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-faint);
+  }
+  .footer__deploy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .footer__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--color-accent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 70%, transparent);
+  }
+  .footer__hash {
+    color: var(--color-muted);
+  }
+  .footer__kbd {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .footer__kbd kbd {
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    padding: 0.05rem 0.35rem;
+    color: var(--color-muted);
   }
 </style>
