@@ -5,6 +5,8 @@ import expressiveCode from 'astro-expressive-code';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import tailwindcss from '@tailwindcss/vite';
 
+import cloudflare from "@astrojs/cloudflare";
+
 const SURFACE = '#121722';
 const BORDER = '#1E2530';
 
@@ -12,6 +14,7 @@ const BORDER = '#1E2530';
 export default defineConfig({
   site: 'https://rodrigomendez.dev',
   devToolbar: { enabled: false },
+
   integrations: [
     expressiveCode({
       themes: ['github-dark-default'],
@@ -47,7 +50,10 @@ export default defineConfig({
     mdx(),
     sitemap(),
   ],
+
   vite: {
     plugins: [tailwindcss()],
   },
+
+  adapter: cloudflare()
 });

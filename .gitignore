@@ -13,3 +13,8 @@ Thumbs.db
 # logs
 *.log
 out/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
