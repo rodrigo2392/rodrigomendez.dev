@@ -46,10 +46,11 @@ const min = readingMinutes(post.body, readingTime);
     grid-template-columns: 1fr 180px;
   }
   .row__title {
-    font-size: 1.6rem;
+    font-size: 1.85rem;
     font-weight: 700;
     letter-spacing: -0.01em;
-    margin: 0.7rem 0 0.5rem;
+    line-height: 1.15;
+    margin: 0.8rem 0 0.6rem;
     transition: color 0.15s ease;
   }
   .row:hover .row__title {
@@ -57,7 +58,8 @@ const min = readingMinutes(post.body, readingTime);
   }
   .row__excerpt {
     color: var(--color-muted);
-    max-width: 60ch;
+    font-size: 1.08rem;
+    max-width: 64ch;
   }
   .row__thumb {
     align-self: stretch;
