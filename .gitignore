@@ -12,3 +12,4 @@ dist/
 Thumbs.db
 # logs
 *.log
+out/
