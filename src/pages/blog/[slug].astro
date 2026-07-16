@@ -229,12 +229,12 @@ const jsonLd = {
     z-index: 60;
   }
   .post {
-    max-width: 66rem;
+    max-width: 68rem;
     margin-inline: auto;
     padding-block: 2.5rem 1rem;
   }
   .post__header {
-    max-width: 48rem;
+    max-width: none;
   }
 
   .crumb {
@@ -256,16 +256,17 @@ const jsonLd = {
 
   .post__meta { margin: 1.5rem 0 0.75rem; }
   .post__title {
-    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-size: clamp(2.3rem, 5.5vw, 3.9rem);
     font-weight: 700;
-    line-height: 1.05;
+    line-height: 1.04;
     letter-spacing: -0.02em;
+    max-width: 30ch;
   }
   .post__dek {
-    font-size: 1.3rem;
+    font-size: 1.35rem;
     color: var(--color-muted);
     margin-top: 1.25rem;
-    max-width: 42ch;
+    max-width: 62ch;
   }
 
   .author {
@@ -305,7 +306,7 @@ const jsonLd = {
 
   .post__grid {
     display: grid;
-    grid-template-columns: minmax(0, 48rem) 14rem;
+    grid-template-columns: minmax(0, 50rem) 14rem;
     gap: 4rem;
     margin-top: 2.5rem;
   }
@@ -343,7 +344,7 @@ const jsonLd = {
 
   /* Cierre */
   .post__foot {
-    max-width: 48rem;
+    max-width: none;
   }
   .authorcard {
     display: flex;
