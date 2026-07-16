@@ -1,0 +1,22 @@
+---
+import { SITE } from '../consts';
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+<span class:list={['wordmark', className]}>
+  {SITE.wordmark}<span class="tld">.{SITE.tld}</span>
+</span>
+
+<style>
+  .wordmark {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+  }
+  .tld {
+    color: var(--color-accent);
+  }
+</style>

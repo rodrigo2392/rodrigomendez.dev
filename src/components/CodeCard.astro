@@ -1,0 +1,82 @@
+---
+// Code-card estático del hero (rodrigo.ts). Estilo editor, no ejecuta nada.
+const lines = [
+  { c: [{ t: "// construyendo en público, sin filtros", k: "com" }] },
+  { c: [{ t: "const ", k: "kw" }, { t: "rodrigo ", k: "var" }, { t: "= {", k: "pun" }] },
+  { c: [{ t: "  rol", k: "key" }, { t: ": ", k: "pun" }, { t: "'Fullstack Product Developer'", k: "str" }, { t: ",", k: "pun" }] },
+  { c: [{ t: "  base", k: "key" }, { t: ": ", k: "pun" }, { t: "'Guadalajara, MX'", k: "str" }, { t: ",", k: "pun" }] },
+  { c: [{ t: "  experiencia", k: "key" }, { t: ": ", k: "pun" }, { t: "11", k: "num" }, { t: ",", k: "pun" }] },
+  { c: [{ t: "  construyendo", k: "key" }, { t: ": ", k: "pun" }, { t: "'Piclink'", k: "str" }, { t: ",", k: "pun" }] },
+  { c: [{ t: "  comparte", k: "key" }, { t: ": ", k: "pun" }, { t: "'lo que aprende'", k: "str" }, { t: ",", k: "pun" }] },
+  { c: [{ t: "}", k: "pun" }] },
+];
+---
+<div class="cc" role="img" aria-label="Perfil de Rodrigo en formato de objeto de código">
+  <div class="cc__bar">
+    <span class="cc__dots"><i></i><i></i><i></i></span>
+    <span class="cc__file">rodrigo.ts</span>
+  </div>
+  <pre class="cc__code"><code>{lines.map((line, i) => (
+    <span class="cc__line"><span class="cc__ln">{i + 1}</span><span class="cc__content">{line.c.map((s) => (<span class={`tok tok--${s.k}`}>{s.t}</span>))}</span></span>
+  ))}</code></pre>
+</div>
+
+<style>
+  .cc {
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    background: var(--color-surface);
+    overflow: hidden;
+    box-shadow: 0 20px 60px -30px rgba(0, 0, 0, 0.8);
+  }
+  .cc__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.75rem 1.1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .cc__dots {
+    display: inline-flex;
+    gap: 7px;
+  }
+  .cc__dots i {
+    width: 11px;
+    height: 11px;
+    border-radius: 999px;
+    background: #2a3342;
+    display: block;
+  }
+  .cc__file {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+  .cc__code {
+    margin: 0;
+    padding: 1.1rem 1.1rem 1.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+    line-height: 1.9;
+    overflow-x: auto;
+  }
+  .cc__line {
+    display: flex;
+    gap: 1.4rem;
+    white-space: pre;
+  }
+  .cc__ln {
+    color: #3a4556;
+    width: 1ch;
+    text-align: right;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .tok--com { color: var(--color-faint); }
+  .tok--kw  { color: var(--color-accent); }
+  .tok--var { color: var(--color-ink); }
+  .tok--key { color: #8fb8c9; }
+  .tok--str { color: #98c8b0; }
+  .tok--num { color: #e0b070; }
+  .tok--pun { color: var(--color-muted); }
+</style>

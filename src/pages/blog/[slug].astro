@@ -1,0 +1,423 @@
+---
+import { render } from 'astro:content';
+import '../../styles/prose.css';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nota from '../../components/mdx/Nota.astro';
+import Figura from '../../components/mdx/Figura.astro';
+import { AUTHOR, SITE, SOCIALS } from '../../consts';
+import {
+  getPublishedPosts,
+  formatDate,
+  isoDate,
+  readingMinutes,
+  postUrl,
+  type Post,
+} from '../../lib/blog';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post, i) => {
+    const newer = posts[i - 1] ?? null; // más reciente
+    const older = posts[i + 1] ?? null; // más viejo
+    const related = posts
+      .filter((p) => p.id !== post.id)
+      .sort((a, b) => {
+        const sa = a.data.tags.some((t) => post.data.tags.includes(t)) ? 0 : 1;
+        const sb = b.data.tags.some((t) => post.data.tags.includes(t)) ? 0 : 1;
+        return sa - sb;
+      })
+      .slice(0, 3);
+    return { params: { slug: post.id }, props: { post, newer, older, related } };
+  });
+}
+
+interface Props {
+  post: Post;
+  newer: Post | null;
+  older: Post | null;
+  related: Post[];
+}
+const { post, newer, older, related } = Astro.props;
+const { Content, headings } = await render(post);
+const { title, description, pubDate, updatedDate, tags, heroImage, heroCaption, readingTime } =
+  post.data;
+const min = readingMinutes(post.body, readingTime);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: isoDate(pubDate),
+  dateModified: isoDate(updatedDate ?? pubDate),
+  author: { '@type': 'Person', name: AUTHOR.name, url: SITE.url },
+  publisher: { '@type': 'Person', name: AUTHOR.name },
+  mainEntityOfPage: new URL(postUrl(post), SITE.url).href,
+  keywords: tags.join(', '),
+  ...(heroImage ? { image: new URL(heroImage, SITE.url).href } : {}),
+};
+---
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  publishedTime={isoDate(pubDate)}
+  jsonLd={jsonLd}
+>
+  <div class="progress" data-progress></div>
+
+  <article class="container-site post">
+    <header class="post__header">
+      <a class="crumb" href="/blog">
+        <span class="crumb__dot"></span> blog <span class="crumb__sep">/</span> {post.id}.md
+      </a>
+      <p class="meta post__meta">
+        <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
+        <span aria-hidden="true">·</span> {min} min
+        <span aria-hidden="true">·</span> <span class="tag">{tags[0]}</span>
+      </p>
+      <h1 class="post__title">{title}</h1>
+      <p class="post__dek">{description}</p>
+      <div class="author">
+        <img class="author__pic" src="/img/avatar.jpg" alt={AUTHOR.name} />
+        <div>
+          <p class="author__name">{AUTHOR.name}</p>
+          <p class="author__role">{AUTHOR.role}</p>
+        </div>
+      </div>
+    </header>
+
+    {
+      (heroImage || heroCaption) && (
+        <figure class="post__hero">
+          {heroImage ? (
+            <img src={heroImage} alt={heroCaption ?? ''} />
+          ) : (
+            <div class="post__hero-ph placeholder-stripes" />
+          )}
+          {heroCaption && <figcaption>{heroCaption}</figcaption>}
+        </figure>
+      )
+    }
+
+    <div class="post__grid">
+      <div class="prose">
+        <Content components={{ Nota, Figura }} />
+      </div>
+
+      {
+        toc.length > 0 && (
+          <aside class="toc" aria-label="Tabla de contenidos">
+            <p class="toc__label">EN ESTA PÁGINA</p>
+            <nav>
+              {toc.map((h) => (
+                <a
+                  href={`#${h.slug}`}
+                  class:list={['toc__link', { 'toc__link--sub': h.depth === 3 }]}
+                  data-toc={h.slug}
+                >
+                  {h.text}
+                </a>
+              ))}
+            </nav>
+          </aside>
+        )
+      }
+    </div>
+
+    <!-- Cierre -->
+    <div class="post__foot">
+      <div class="authorcard">
+        <img class="authorcard__pic" src="/img/avatar.jpg" alt={AUTHOR.name} />
+        <div class="authorcard__text">
+          <p class="authorcard__name">{AUTHOR.name}</p>
+          <p class="authorcard__bio">{AUTHOR.bioShort}</p>
+        </div>
+        <a href={SOCIALS.youtube} class="btn-accent authorcard__cta" target="_blank" rel="noopener">
+          Suscríbete en YouTube
+        </a>
+      </div>
+
+      <nav class="pager" aria-label="Más posts">
+        {
+          older ? (
+            <a class="pager__item" href={postUrl(older)}>
+              <span class="pager__dir">← anterior</span>
+              <span class="pager__title">{older.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          newer ? (
+            <a class="pager__item pager__item--next" href={postUrl(newer)}>
+              <span class="pager__dir">siguiente →</span>
+              <span class="pager__title">{newer.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )
+        }
+      </nav>
+
+      {
+        related.length > 0 && (
+          <section class="related">
+            <p class="kicker">relacionados</p>
+            <div class="related__grid">
+              {related.map((r) => (
+                <a class="rcard" href={postUrl(r)}>
+                  <p class="meta">
+                    <time datetime={isoDate(r.data.pubDate)}>{formatDate(r.data.pubDate)}</time>
+                    <span aria-hidden="true">·</span> <span class="tag">{r.data.tags[0]}</span>
+                  </p>
+                  <h3 class="rcard__title">{r.data.title}</h3>
+                </a>
+              ))}
+            </div>
+          </section>
+        )
+      }
+    </div>
+  </article>
+</BaseLayout>
+
+<script>
+  // Barra de progreso de lectura
+  const bar = document.querySelector('[data-progress]');
+  const onScroll = () => {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const p = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (bar) (bar as HTMLElement).style.width = p + '%';
+  };
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // TOC activo
+  const links = new Map<string, Element>();
+  document.querySelectorAll('[data-toc]').forEach((a) =>
+    links.set(a.getAttribute('data-toc')!, a)
+  );
+  const heads = document.querySelectorAll('.prose h2, .prose h3');
+  if (links.size && heads.length) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            links.forEach((el) => el.classList.remove('toc__link--active'));
+            links.get((e.target as HTMLElement).id)?.classList.add('toc__link--active');
+          }
+        }
+      },
+      { rootMargin: '-10% 0px -80% 0px' }
+    );
+    heads.forEach((h) => io.observe(h));
+  }
+</script>
+
+<style>
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background: var(--color-accent);
+    z-index: 60;
+  }
+  .post {
+    padding-block: 2.5rem 1rem;
+  }
+  .post__header {
+    max-width: 46rem;
+  }
+
+  .crumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--color-muted);
+  }
+  .crumb:hover { color: var(--color-ink); }
+  .crumb__dot {
+    width: 8px; height: 8px; border-radius: 999px; background: #2a3342;
+  }
+  .crumb__sep { color: var(--color-faint); }
+
+  .post__meta { margin: 1.5rem 0 0.75rem; }
+  .post__title {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .post__dek {
+    font-size: 1.3rem;
+    color: var(--color-muted);
+    margin-top: 1.25rem;
+    max-width: 42ch;
+  }
+
+  .author {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 2rem;
+  }
+  .author__pic {
+    width: 44px; height: 44px; border-radius: 999px; object-fit: cover;
+    border: 1px solid var(--color-border);
+  }
+  .author__name { font-weight: 600; font-size: 0.95rem; }
+  .author__role {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--color-muted);
+  }
+
+  .post__hero {
+    margin: 2.5rem 0 0;
+  }
+  .post__hero img,
+  .post__hero-ph {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    object-fit: cover;
+    display: block;
+  }
+  .post__hero figcaption {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin-top: 0.7rem;
+  }
+
+  .post__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 42rem) 13rem;
+    gap: 3.5rem;
+    margin-top: 2.5rem;
+  }
+
+  /* TOC */
+  .toc {
+    position: sticky;
+    top: 6.5rem;
+    align-self: start;
+    height: max-content;
+  }
+  .toc__label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--color-faint);
+    margin-bottom: 1rem;
+  }
+  .toc nav { display: flex; flex-direction: column; gap: 0.7rem; border-left: 1px solid var(--color-border); }
+  .toc__link {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    padding-left: 1rem;
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .toc__link--sub { padding-left: 2rem; }
+  .toc__link:hover { color: var(--color-ink); }
+  .toc__link--active {
+    color: var(--color-accent);
+    border-left-color: var(--color-accent);
+  }
+
+  /* Cierre */
+  .post__foot {
+    max-width: 42rem;
+  }
+  .authorcard {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    background: var(--color-surface);
+    margin-top: 3.5rem;
+    flex-wrap: wrap;
+  }
+  .authorcard__pic {
+    width: 60px; height: 60px; border-radius: 999px; object-fit: cover;
+    border: 1px solid var(--color-border);
+  }
+  .authorcard__text { flex: 1; min-width: 12rem; }
+  .authorcard__name { font-weight: 600; }
+  .authorcard__bio {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin-top: 0.25rem;
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+  .pager__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    transition: border-color 0.15s ease;
+  }
+  .pager__item:hover { border-color: #2b3646; }
+  .pager__item--next { text-align: right; }
+  .pager__dir {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+  .pager__title { font-weight: 600; }
+
+  .related { margin-top: 3.5rem; }
+  .related__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+  }
+  .rcard {
+    display: block;
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    transition: border-color 0.15s ease;
+  }
+  .rcard:hover { border-color: #2b3646; }
+  .rcard__title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-top: 0.6rem;
+    line-height: 1.25;
+  }
+
+  @media (max-width: 62rem) {
+    .post__grid { grid-template-columns: 1fr; gap: 0; }
+    .toc { display: none; }
+    .related__grid { grid-template-columns: 1fr; }
+    .pager { grid-template-columns: 1fr; }
+    .post__foot { max-width: none; }
+  }
+</style>

@@ -1,0 +1,222 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostRow from '../../components/PostRow.astro';
+import {
+  getPublishedPosts,
+  collectTags,
+  formatDate,
+  isoDate,
+  readingMinutes,
+  postUrl,
+} from '../../lib/blog';
+
+const posts = await getPublishedPosts();
+const tags = collectTags(posts);
+const featured = posts.find((p) => p.data.featured) ?? posts[0];
+const PAGE_SIZE = 8;
+---
+<BaseLayout title="El blog" description="Lo que voy aprendiendo construyendo, en cristiano. Código, arquitectura, IA y el negocio de hacer producto.">
+  <section class="container-site blog">
+    <header class="blog__head">
+      <p class="kicker">blog</p>
+      <h1 class="blog__title">El blog</h1>
+      <p class="blog__intro">
+        Lo que voy aprendiendo construyendo, en cristiano. Código, arquitectura, IA
+        y el negocio de hacer producto.
+      </p>
+    </header>
+
+    {
+      featured && (
+        <a class="feat" href={postUrl(featured)}>
+          <div class="feat__body">
+            <span class="feat__label">DESTACADO</span>
+            <p class="meta">
+              <time datetime={isoDate(featured.data.pubDate)}>{formatDate(featured.data.pubDate)}</time>
+              <span aria-hidden="true">·</span> {readingMinutes(featured.body, featured.data.readingTime)} min
+              <span aria-hidden="true">·</span> <span class="tag">{featured.data.tags[0]}</span>
+            </p>
+            <h2 class="feat__title">{featured.data.title}</h2>
+            <p class="feat__excerpt">{featured.data.description}</p>
+            <span class="feat__cta">leer <span aria-hidden="true">→</span></span>
+          </div>
+          <div class="feat__media placeholder-stripes">
+            {featured.data.heroImage && <img src={featured.data.heroImage} alt="" />}
+            <span class="feat__file">{featured.id}.md</span>
+          </div>
+        </a>
+      )
+    }
+
+    <div class="filters" role="group" aria-label="Filtrar por tag">
+      <button class="chip chip--active" data-filter="todos" aria-pressed="true">todos</button>
+      {tags.map((t) => <button class="chip" data-filter={t} aria-pressed="false">{t}</button>)}
+    </div>
+
+    <div class="list" data-list>
+      {
+        posts.map((post, i) => (
+          <div class="list__item" data-tags={post.data.tags.join(',')} data-index={i} hidden={i >= PAGE_SIZE}>
+            <PostRow post={post} thumb />
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="more">
+      <button class="chip more__btn" data-more hidden={posts.length <= PAGE_SIZE}>
+        cargar más <span aria-hidden="true">↓</span>
+      </button>
+    </div>
+  </section>
+</BaseLayout>
+
+<script define:vars={{ PAGE_SIZE }}>
+  const list = document.querySelector('[data-list]');
+  const items = Array.from(list?.querySelectorAll('.list__item') ?? []);
+  const filterBtns = document.querySelectorAll('[data-filter]');
+  const moreBtn = document.querySelector('[data-more]');
+  let activeTag = 'todos';
+  let shown = PAGE_SIZE;
+
+  function render() {
+    const matches = items.filter(
+      (el) => activeTag === 'todos' || (el.dataset.tags || '').split(',').includes(activeTag)
+    );
+    items.forEach((el) => (el.hidden = true));
+    matches.slice(0, shown).forEach((el) => (el.hidden = false));
+    if (moreBtn) moreBtn.hidden = matches.length <= shown;
+  }
+
+  filterBtns.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      activeTag = btn.dataset.filter;
+      shown = PAGE_SIZE;
+      filterBtns.forEach((b) => {
+        const on = b === btn;
+        b.classList.toggle('chip--active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      render();
+    })
+  );
+  moreBtn?.addEventListener('click', () => {
+    shown += PAGE_SIZE;
+    render();
+  });
+  render();
+</script>
+
+<style>
+  .blog {
+    padding-block: 3.5rem 2rem;
+  }
+  .blog__title {
+    font-size: clamp(2.6rem, 6vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0.5rem 0 1rem;
+  }
+  .blog__intro {
+    color: var(--color-muted);
+    font-size: 1.15rem;
+    max-width: 52ch;
+  }
+
+  /* Destacado */
+  .feat {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-top: 2.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+    transition: border-color 0.15s ease;
+  }
+  .feat:hover {
+    border-color: #2b3646;
+  }
+  .feat__body {
+    padding: 2.25rem;
+  }
+  .feat__label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    color: var(--color-accent);
+  }
+  .feat .meta {
+    margin: 1rem 0 0.75rem;
+  }
+  .feat__title {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .feat__excerpt {
+    color: var(--color-muted);
+    margin: 1rem 0 1.5rem;
+    max-width: 46ch;
+  }
+  .feat__cta {
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    font-size: 0.95rem;
+  }
+  .feat__media {
+    position: relative;
+    min-height: 320px;
+  }
+  .feat__media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .feat__file {
+    position: absolute;
+    left: 1.25rem;
+    bottom: 1.1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-faint);
+  }
+
+  /* Filtros */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 2.5rem 0 0.5rem;
+  }
+  .chip {
+    cursor: pointer;
+  }
+
+  .list {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .more {
+    display: flex;
+    justify-content: center;
+    margin-top: 2.5rem;
+  }
+  .more__btn {
+    cursor: pointer;
+  }
+
+  @media (max-width: 46rem) {
+    .feat {
+      grid-template-columns: 1fr;
+    }
+    .feat__media {
+      min-height: 180px;
+      order: -1;
+    }
+  }
+</style>

@@ -1,0 +1,220 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* Tokens de marca — dark-tech, acento cian #37D5E7                    */
+/* ------------------------------------------------------------------ */
+@theme {
+  --color-bg: #0b0e14;
+  --color-surface: #121722;
+  --color-surface-2: #0f131b;
+  --color-ink: #e6e9ef;
+  --color-muted: #8a93a6;
+  --color-faint: #5b6474;
+  --color-border: #1e2530;
+  --color-accent: #37d5e7;
+  --color-accent-deep: #22b8cc;
+  --color-accent-soft: rgba(55, 213, 231, 0.12);
+
+  --font-sans: "Outfit Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --breakpoint-xs: 30rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.6;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #06131a;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: #1a2130;
+  border: 3px solid var(--color-bg);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #26303f;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Utilidades / patrones de marca                                      */
+/* ------------------------------------------------------------------ */
+
+/* Kicker de sección: // texto en mono */
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  color: var(--color-faint);
+}
+.kicker::before {
+  content: "// ";
+  color: var(--color-faint);
+}
+.kicker--accent {
+  color: var(--color-accent);
+}
+
+/* Metadata en mono (fecha · min · tag) */
+.meta {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  letter-spacing: 0.01em;
+}
+.meta .tag {
+  color: var(--color-accent);
+}
+
+/* Chip / tag */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.chip:hover {
+  color: var(--color-ink);
+  border-color: #2b3646;
+}
+.chip[data-active="true"],
+.chip--active {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+/* Botón pill de acento */
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: #06131a;
+  font-weight: 600;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.btn-accent:hover {
+  background: var(--color-accent-deep);
+}
+
+/* Botón outline */
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  color: var(--color-ink);
+  font-weight: 500;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.btn-outline:hover {
+  border-color: #2b3646;
+  background: var(--color-surface);
+}
+
+/* Contenedor */
+.container-site {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/* Placeholder de imagen (rayas diagonales) mientras no hay assets */
+.placeholder-stripes {
+  background-color: var(--color-surface);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.02) 0,
+    rgba(255, 255, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 12px
+  );
+  border: 1px solid var(--color-border);
+}
+
+/* Reveal al hacer scroll.
+   Seguro por defecto: sin JS o con reduced-motion, el contenido SÍ se ve.
+   El estado oculto solo aplica cuando <html> tiene la clase .js. */
+.reveal {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+html.js .reveal {
+  opacity: 0;
+  transform: translateY(12px);
+}
+html.js .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

@@ -1,0 +1,38 @@
+---
+interface Props {
+  src?: string;
+  alt?: string;
+  caption?: string;
+  ratio?: string;
+}
+const { src, alt = '', caption, ratio = '16 / 9' } = Astro.props;
+---
+<figure class="figura">
+  {
+    src ? (
+      <img src={src} alt={alt} loading="lazy" style={`aspect-ratio:${ratio}`} />
+    ) : (
+      <div class="figura__ph placeholder-stripes" style={`aspect-ratio:${ratio}`} />
+    )
+  }
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .figura {
+    margin: 2rem 0;
+  }
+  .figura img,
+  .figura__ph {
+    width: 100%;
+    border-radius: 12px;
+    display: block;
+    object-fit: cover;
+  }
+  figcaption {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin-top: 0.6rem;
+  }
+</style>

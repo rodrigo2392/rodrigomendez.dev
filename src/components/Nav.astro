@@ -1,0 +1,134 @@
+---
+import { NAV, SOCIALS } from '../consts';
+import Wordmark from './Wordmark.astro';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => {
+  if (href === '/blog') return path === '/blog' || path.startsWith('/blog/');
+  if (href === '/') return path === '/';
+  return false;
+};
+---
+<header class="nav">
+  <div class="container-site nav__inner">
+    <a href="/" class="nav__brand" aria-label="Inicio">
+      <Wordmark />
+    </a>
+
+    <button class="nav__toggle" aria-label="Abrir menú" aria-expanded="false" data-nav-toggle>
+      <span></span><span></span>
+    </button>
+
+    <nav class="nav__links" aria-label="Principal" data-nav-links>
+      {
+        NAV.map((item) => (
+          <a
+            href={item.href}
+            class:list={['nav__link', { 'nav__link--active': isActive(item.href) }]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      <a href={SOCIALS.youtube} class="btn-accent nav__cta" target="_blank" rel="noopener">
+        Suscríbete <span aria-hidden="true">→</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector('[data-nav-toggle]');
+  const links = document.querySelector('[data-nav-links]');
+  toggle?.addEventListener('click', () => {
+    const open = links?.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', String(!!open));
+  });
+  links?.querySelectorAll('a').forEach((a) =>
+    a.addEventListener('click', () => {
+      links.classList.remove('is-open');
+      toggle?.setAttribute('aria-expanded', 'false');
+    })
+  );
+</script>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--color-bg) 82%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4.5rem;
+  }
+  .nav__brand {
+    font-size: 1.15rem;
+    z-index: 2;
+  }
+  .nav__links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+  .nav__link {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    transition: color 0.15s ease;
+  }
+  .nav__link:hover {
+    color: var(--color-ink);
+  }
+  .nav__link--active {
+    color: var(--color-ink);
+  }
+  .nav__cta {
+    margin-left: 0.5rem;
+  }
+  .nav__toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .nav__toggle span {
+    width: 22px;
+    height: 2px;
+    background: var(--color-ink);
+    border-radius: 2px;
+  }
+
+  @media (max-width: 52rem) {
+    .nav__toggle {
+      display: flex;
+    }
+    .nav__links {
+      position: fixed;
+      inset: 4.5rem 0 auto 0;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+      padding: 1.5rem;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      transform: translateY(-120%);
+      transition: transform 0.25s ease;
+    }
+    .nav__links.is-open {
+      transform: none;
+    }
+    .nav__cta {
+      margin-left: 0;
+    }
+  }
+</style>

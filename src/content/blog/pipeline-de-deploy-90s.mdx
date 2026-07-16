@@ -1,0 +1,33 @@
+---
+title: "Mi pipeline de deploy: de git push a producción en 90s"
+description: "No es magia, es quitar del camino todo lo que no aporta."
+pubDate: 2026-05-28
+tags: ["devops"]
+readingTime: 8
+---
+
+Mi deploy tarda hora y media... perdón, noventa segundos. Llegué ahí no agregando
+herramientas, sino quitando pasos que no aportaban nada.
+
+## La regla: cada paso se gana su lugar
+
+Cada cosa en el pipeline tiene que justificar el tiempo que cuesta. Si un paso no
+atrapa errores reales, se va. Me quedé con lo mínimo que de verdad protege producción.
+
+```txt title="pipeline"
+git push
+  → typecheck + lint   (rápido, atrapa lo tonto)
+  → build              (si rompe, aquí se ve)
+  → deploy estático    (Cloudflare Pages)
+```
+
+## Lo que borré sin culpa
+
+- Tests end-to-end en cada push: los muevo a un cron nocturno.
+- Un paso de "aprobación manual" que en realidad nadie miraba.
+- Cachés que ahorraban 5 segundos y me costaban una hora cuando fallaban.
+
+<Nota>
+Un pipeline lento no se arregla con más máquinas; se arregla borrando pasos. Mide qué
+tarda cada uno y ataca el más caro que menos te protege.
+</Nota>

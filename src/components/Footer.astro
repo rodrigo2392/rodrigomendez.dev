@@ -1,0 +1,51 @@
+---
+import { SITE, SOCIALS } from '../consts';
+import Wordmark from './Wordmark.astro';
+---
+<footer class="footer">
+  <div class="container-site footer__inner">
+    <div>
+      <a href="/" class="footer__brand"><Wordmark /></a>
+      <p class="footer__tag">{SITE.tagline}</p>
+    </div>
+    <nav class="footer__links" aria-label="Redes">
+      <a href={SOCIALS.youtube} target="_blank" rel="noopener">YouTube</a>
+      <a href={SOCIALS.github} target="_blank" rel="noopener">GitHub</a>
+      <a href={SOCIALS.x} target="_blank" rel="noopener">X</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-border);
+    margin-top: 5rem;
+    padding-block: 2.25rem;
+  }
+  .footer__inner {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .footer__brand {
+    font-size: 1.1rem;
+  }
+  .footer__tag {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--color-muted);
+    margin-top: 0.4rem;
+  }
+  .footer__links {
+    display: flex;
+    gap: 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+  .footer__links a:hover {
+    color: var(--color-accent);
+  }
+</style>

@@ -1,0 +1,144 @@
+/* Tipografía de artículo del blog. Global (el HTML viene de <Content/>). */
+
+.prose {
+  font-size: 1.12rem;
+  line-height: 1.75;
+  color: var(--color-ink);
+}
+
+.prose > * + * {
+  margin-top: 1.25rem;
+}
+
+.prose p {
+  color: #cfd5e0;
+}
+
+.prose strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+.prose a:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.prose h2,
+.prose h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  scroll-margin-top: 6rem;
+}
+.prose h2 {
+  font-size: 1.7rem;
+  margin-top: 2.75rem;
+}
+.prose h3 {
+  font-size: 1.3rem;
+  margin-top: 2rem;
+}
+.prose h2::before {
+  content: "## ";
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.9em;
+  color: var(--color-accent);
+}
+.prose h3::before {
+  content: "### ";
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.9em;
+  color: var(--color-accent);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 0;
+  list-style: none;
+}
+.prose li {
+  position: relative;
+  padding-left: 1.5rem;
+  color: #cfd5e0;
+  margin-top: 0.6rem;
+}
+.prose ul li::before {
+  content: "";
+  position: absolute;
+  left: 0.15rem;
+  top: 0.75em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-accent);
+}
+.prose ol {
+  counter-reset: li;
+}
+.prose ol li::before {
+  counter-increment: li;
+  content: counter(li);
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-accent);
+}
+
+/* Inline code (no en bloques de Expressive Code) */
+.prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  padding: 0.12em 0.42em;
+  border-radius: 6px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding: 1.1rem 1.5rem;
+  border-radius: 0 10px 10px 0;
+  background: color-mix(in srgb, var(--color-accent) 4%, var(--color-surface));
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.prose blockquote p {
+  color: var(--color-ink);
+  margin: 0;
+}
+
+/* Bloques de código (Expressive Code) */
+.prose .expressive-code {
+  margin-block: 1.75rem;
+}
+
+/* Traffic-lights en el marco de Expressive Code con título de archivo */
+.prose .expressive-code .frame.has-title .header::before {
+  content: "";
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 11px;
+  background:
+    radial-gradient(circle 5.5px at 5.5px 5.5px, #2a3342 98%, transparent) 0 0 / 16px 100% no-repeat,
+    radial-gradient(circle 5.5px at 5.5px 5.5px, #2a3342 98%, transparent) 14px 0 / 16px 100% no-repeat,
+    radial-gradient(circle 5.5px at 5.5px 5.5px, #2a3342 98%, transparent) 28px 0 / 16px 100% no-repeat;
+}
+.prose .expressive-code .frame.has-title .title {
+  padding-left: 3.5rem;
+}

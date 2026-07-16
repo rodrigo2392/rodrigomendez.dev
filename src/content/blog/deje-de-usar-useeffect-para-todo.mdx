@@ -1,0 +1,50 @@
+---
+title: "Dejé de usar useEffect para todo (y tú deberías también)"
+description: "La mayoría de tus efectos no deberían existir. Te cuento cómo los fui borrando uno a uno."
+pubDate: 2026-07-14
+tags: ["react"]
+heroCaption: "fig. 1 — el árbol de dependencias antes y después"
+featured: true
+readingTime: 6
+---
+
+Durante años, `useEffect` fue mi martillo para todo: fetch de datos, sincronizar
+estado, transformar props. Y como todo se veía como un clavo, mis componentes se
+llenaron de efectos que no hacían falta.
+
+## La pregunta que lo cambió todo
+
+Antes de escribir un efecto me hago una sola pregunta: ¿esto ocurre por un evento
+del usuario o porque el componente apareció en pantalla? Si la respuesta es "por un
+evento", casi nunca necesito un efecto.
+
+Con el tiempo reduje mis efectos a tres casos reales:
+
+- Sincronizar con algo fuera de React (DOM, storage, una lib).
+- Suscripciones y timers que hay que limpiar.
+- Efectos secundarios de verdad: analítica, logs.
+
+<Nota>
+Transformar datos para el render **no** es un efecto: es un cálculo. Hazlo durante
+el render, o memoízalo con `useMemo` si de verdad pesa.
+</Nota>
+
+## El antes y el después
+
+El patrón que más borré: guardar en estado algo que puedo derivar. Mira la diferencia.
+
+```tsx title="useEffect.tsx"
+// antes: estado que en realidad es derivado
+const [full, setFull] = useState('');
+useEffect(() => {
+  setFull(first + ' ' + last);
+}, [first, last]);
+
+// después: un cálculo durante el render
+const full = first + ' ' + last;
+```
+
+> Regla de dedo: si puedes calcularlo durante el render, no lo metas en un efecto.
+
+No es dogma, es higiene. Cada efecto que borras es un re-render menos que perseguir
+y un bug menos que explicar. Empieza por el más sospechoso y tira del hilo.

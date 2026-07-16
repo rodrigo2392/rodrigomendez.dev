@@ -1,0 +1,54 @@
+---
+interface Props {
+  tipo?: 'nota' | 'aviso';
+  titulo?: string;
+}
+const { tipo = 'nota', titulo } = Astro.props;
+const label = titulo ?? (tipo === 'aviso' ? 'AVISO' : 'NOTA');
+---
+<aside class:list={['nota', `nota--${tipo}`]}>
+  <span class="nota__label">{label}</span>
+  <div class="nota__body"><slot /></div>
+</aside>
+
+<style>
+  .nota {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    margin: 1.75rem 0;
+    padding: 1.1rem 1.35rem;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 5%, var(--color-surface));
+  }
+  .nota--aviso {
+    border-left-color: #e7b737;
+    background: color-mix(in srgb, #e7b737 5%, var(--color-surface));
+  }
+  .nota__label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--color-accent);
+    flex-shrink: 0;
+  }
+  .nota--aviso .nota__label {
+    color: #e7b737;
+  }
+  .nota__body {
+    color: var(--color-ink);
+  }
+  .nota__body :global(p) {
+    margin: 0;
+  }
+  .nota__body :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    padding: 0.1em 0.4em;
+    border-radius: 5px;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+</style>

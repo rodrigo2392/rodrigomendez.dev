@@ -1,0 +1,266 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CodeCard from '../components/CodeCard.astro';
+import PostRow from '../components/PostRow.astro';
+import VideoCard from '../components/VideoCard.astro';
+import { AUTHOR, SOCIALS, STACK, VIDEOS } from '../consts';
+import { getPublishedPosts } from '../lib/blog';
+
+const posts = await getPublishedPosts();
+const latest = posts.slice(0, 3);
+---
+<BaseLayout>
+  <!-- HERO -->
+  <section class="hero container-site">
+    <div class="hero__text">
+      <p class="kicker kicker--accent hero__kicker">FULLSTACK PRODUCT DEVELOPER</p>
+      <h1 class="hero__name">Rodrigo<br />Méndez</h1>
+      <p class="hero__lead">{AUTHOR.oneLiner}</p>
+      <div class="hero__cta">
+        <a href={SOCIALS.youtube} class="btn-accent" target="_blank" rel="noopener">
+          Suscríbete en YouTube
+        </a>
+        <a href="/blog" class="btn-outline">Lee el blog</a>
+      </div>
+      <p class="hero__meta meta">
+        {AUTHOR.location} <span class="sep">|</span> +{AUTHOR.years} años construyendo
+        <span class="sep">|</span> <span class="tag">{AUTHOR.handle}</span>
+      </p>
+    </div>
+    <div class="hero__card reveal">
+      <CodeCard />
+    </div>
+  </section>
+
+  <!-- SOBRE MÍ -->
+  <section id="sobre" class="section container-site">
+    <p class="kicker">sobre-mi</p>
+    <div class="about reveal">
+      <div class="about__photo placeholder-stripes">
+        <img src={AUTHOR.photo} alt="Rodrigo Méndez" loading="lazy" />
+      </div>
+      <div class="about__text">
+        <h2 class="about__title">Once años escribiendo código. Y contando el proceso.</h2>
+        <p>
+          Empecé copiando tutoriales y rompiendo cosas. Hoy sigo rompiendo cosas, pero las
+          documento. Construyo <strong>Piclink</strong> y comparto cada decisión: las buenas y
+          las vergonzosas.
+        </p>
+        <p>
+          Lo explico <span class="accent">en cristiano</span>: como se lo contaría a un amigo
+          que también está construyendo su producto a las 11 de la noche.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section class="section container-site">
+    <p class="kicker">stack</p>
+    <div class="stack reveal">
+      {STACK.map((s) => <span class="chip">{s}</span>)}
+    </div>
+  </section>
+
+  <!-- BLOG -->
+  <section class="section container-site">
+    <div class="section__head">
+      <p class="kicker">blog — últimos posts</p>
+      <a href="/blog" class="section__more">ver todos <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="rows">
+      {latest.map((post) => <PostRow post={post} />)}
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section id="videos" class="section container-site">
+    <p class="kicker">videos</p>
+    <div class="videos reveal">
+      {VIDEOS.map((v) => <VideoCard title={v.title} duration={v.duration} url={v.url} />)}
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contacto" class="section container-site contact">
+    <p class="kicker">contacto</p>
+    <h2 class="contact__title">¿Construyes algo? Escríbeme.</h2>
+    <p class="contact__lead">Respondo mejor por correo o X. Si es sobre colaboraciones, mejor aún.</p>
+    <a href={`mailto:${AUTHOR.email}`} class="contact__email">{AUTHOR.email}</a>
+    <div class="contact__socials">
+      <a href={SOCIALS.youtube} class="chip" target="_blank" rel="noopener">YouTube</a>
+      <a href={SOCIALS.instagram} class="chip" target="_blank" rel="noopener">Instagram</a>
+      <a href={SOCIALS.tiktok} class="chip" target="_blank" rel="noopener">TikTok</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section {
+    padding-block: 4rem;
+  }
+  .section__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .section__more {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-accent);
+  }
+  .section__more:hover {
+    color: var(--color-accent-deep);
+  }
+  .accent { color: var(--color-accent); }
+
+  /* Hero */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3.5rem;
+    align-items: center;
+    padding-block: 5.5rem 4rem;
+  }
+  .hero__kicker {
+    margin-bottom: 1.75rem;
+  }
+  .hero__name {
+    font-size: clamp(3.2rem, 7vw, 5.5rem);
+    font-weight: 700;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+  }
+  .hero__lead {
+    font-size: 1.2rem;
+    color: var(--color-muted);
+    max-width: 30ch;
+    margin-top: 1.6rem;
+  }
+  .hero__cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+  .hero__meta {
+    margin-top: 2.5rem;
+  }
+  .hero__meta .sep {
+    color: var(--color-border);
+    margin-inline: 0.5rem;
+  }
+
+  /* About */
+  .about {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-top: 1.75rem;
+  }
+  .about__photo {
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+  }
+  .about__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .about__title {
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+  .about__text p {
+    color: var(--color-muted);
+    font-size: 1.1rem;
+    max-width: 60ch;
+    margin-bottom: 1rem;
+  }
+  .about__text strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  /* Stack */
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 1.5rem;
+  }
+
+  /* Blog rows */
+  .rows {
+    margin-top: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* Videos */
+  .videos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.75rem;
+    margin-top: 1.75rem;
+  }
+
+  /* Contact */
+  .contact {
+    text-align: center;
+    padding-block: 5rem;
+  }
+  .contact .kicker::before,
+  .contact .kicker {
+    display: inline-block;
+  }
+  .contact__title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 1.25rem 0 1rem;
+  }
+  .contact__lead {
+    color: var(--color-muted);
+    max-width: 42ch;
+    margin: 0 auto 2rem;
+  }
+  .contact__email {
+    font-family: var(--font-mono);
+    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+    color: var(--color-accent);
+  }
+  .contact__email:hover {
+    color: var(--color-accent-deep);
+  }
+  .contact__socials {
+    display: flex;
+    gap: 0.9rem;
+    justify-content: center;
+    margin-top: 2.25rem;
+  }
+
+  @media (max-width: 52rem) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      padding-block: 3.5rem 2.5rem;
+    }
+    .about {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+    .about__photo {
+      max-width: 240px;
+    }
+    .videos {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
