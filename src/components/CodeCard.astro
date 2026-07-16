@@ -1,7 +1,9 @@
 ---
-// Code-card estático del hero (rodrigo.ts). Estilo editor, no ejecuta nada.
+import { AUTHOR } from '../consts';
+
+// Code-card del hero (rodrigo.ts): se teclea, y con "Ejecutar" renderiza una
+// tarjeta de perfil viva construida con el objeto rodrigo.
 const lines = [
-  { c: [{ t: "// un poco sobre mí", k: "com" }] },
   { c: [{ t: "const ", k: "kw" }, { t: "rodrigo ", k: "var" }, { t: "= {", k: "pun" }] },
   { c: [{ t: "  rol", k: "key" }, { t: ": ", k: "pun" }, { t: "'Fullstack Product Developer'", k: "str" }, { t: ",", k: "pun" }] },
   { c: [{ t: "  base", k: "key" }, { t: ": ", k: "pun" }, { t: "'Guadalajara, MX'", k: "str" }, { t: ",", k: "pun" }] },
@@ -9,45 +11,96 @@ const lines = [
   { c: [{ t: "  construyendo", k: "key" }, { t: ": ", k: "pun" }, { t: "'Piclink'", k: "str" }, { t: ",", k: "pun" }] },
   { c: [{ t: "  comparte", k: "key" }, { t: ": ", k: "pun" }, { t: "'lo que aprende'", k: "str" }, { t: ",", k: "pun" }] },
   { c: [{ t: "}", k: "pun" }] },
+  {
+    c: [
+      { t: "render", k: "fn" },
+      { t: "(", k: "pun" },
+      { t: "<Profile ", k: "tag" },
+      { t: "{", k: "pun" },
+      { t: "...rodrigo", k: "var" },
+      { t: "}", k: "pun" },
+      { t: " />", k: "tag" },
+      { t: ")", k: "pun" },
+    ],
+  },
 ];
 ---
-<div class="cc cc-type" data-typewriter role="img" aria-label="Perfil de Rodrigo en formato de objeto de código">
+<div class="cc cc-type" data-typewriter role="img" aria-label="Perfil de Rodrigo en formato de objeto de código, ejecutable">
   <div class="cc__bar">
     <span class="cc__dots"><i></i><i></i><i></i></span>
     <span class="cc__file">rodrigo.ts</span>
+    <button class="cc__run" type="button" data-run aria-label="Ejecutar el código" hidden>
+      <span class="cc__run-ico" aria-hidden="true">▶</span><span data-run-label>Ejecutar</span>
+    </button>
   </div>
+
   <pre class="cc__code"><code>{lines.map((line, i) => (
     <span class="cc__line"><span class="cc__ln">{i + 1}</span><span class="cc__content">{line.c.map((s) => (<span class={`tok tok--${s.k}`}>{s.t.split('').map((ch) => (<span class="ch">{ch}</span>))}</span>))}</span></span>
   ))}</code></pre>
+
+  <div class="cc__output" data-output>
+    <div class="cc__output-inner">
+      <p class="cc__output-label">▸ preview</p>
+      <div class="cc__preview">
+        <img class="cc__avatar" src={AUTHOR.avatar} alt="Rodrigo Méndez" width="52" height="52" />
+        <div class="cc__pinfo">
+          <p class="cc__pname">Rodrigo Méndez</p>
+          <p class="cc__prole">Fullstack Product Developer</p>
+          <div class="cc__pchips">
+            <span>Guadalajara, MX</span>
+            <span>+11 años</span>
+            <span class="cc__pchip--accent">Piclink</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
   const card = document.querySelector('[data-typewriter]');
   if (card) {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const lines = Array.from(card.querySelectorAll('.cc__line'));
+    const runBtn = card.querySelector('[data-run]') as HTMLButtonElement | null;
+    const runLabel = card.querySelector('[data-run-label]');
+    const output = card.querySelector('[data-output]');
+
+    const lineEls = Array.from(card.querySelectorAll('.cc__line'));
     const seq: { ch: Element; num: Element | null }[] = [];
-    for (const line of lines) {
+    for (const line of lineEls) {
       const num = line.querySelector('.cc__ln');
       const chs = Array.from(line.querySelectorAll('.ch'));
       chs.forEach((ch, idx) => seq.push({ ch, num: idx === 0 ? num : null }));
     }
+
+    const resetChars = () => {
+      for (const { ch, num } of seq) {
+        ch.classList.remove('is-on', 'caret');
+        num?.classList.remove('is-on');
+      }
+    };
     const revealAll = () => {
-      seq.forEach(({ ch, num }) => {
+      for (const { ch, num } of seq) {
         ch.classList.add('is-on');
         num?.classList.add('is-on');
-      });
+      }
       seq[seq.length - 1]?.ch.classList.add('caret');
     };
-    if (reduce || !seq.length) {
-      revealAll();
-    } else {
+    const showRun = () => {
+      if (!runBtn) return;
+      runBtn.hidden = false;
+      runBtn.disabled = false;
+      requestAnimationFrame(() => runBtn.classList.add('is-ready'));
+    };
+
+    const type = (onDone: () => void) => {
       let i = 0;
       let prev: Element | null = null;
       const step = () => {
         if (prev) prev.classList.remove('caret');
         if (i >= seq.length) {
           seq[seq.length - 1].ch.classList.add('caret');
+          onDone();
           return;
         }
         const { ch, num } = seq[i++];
@@ -58,10 +111,41 @@ const lines = [
         const base = c === ' ' ? 8 : 14 + Math.random() * 34;
         setTimeout(step, num ? base + 80 : base);
       };
+      step();
+    };
+
+    // Botón: 1er clic ejecuta (muestra el preview); 2º clic reinicia (reteclea).
+    runBtn?.addEventListener('click', () => {
+      const open = output?.classList.contains('is-open');
+      if (!open) {
+        runBtn.disabled = true;
+        if (runLabel) runLabel.textContent = 'Ejecutando…';
+        setTimeout(() => {
+          output?.classList.add('is-open');
+          runBtn.disabled = false;
+          runBtn.classList.add('cc__run--replay');
+          runBtn.querySelector('.cc__run-ico')!.textContent = '↻';
+          if (runLabel) runLabel.textContent = 'Correr de nuevo';
+        }, 550);
+      } else {
+        output?.classList.remove('is-open');
+        runBtn.hidden = true;
+        runBtn.classList.remove('is-ready', 'cc__run--replay');
+        runBtn.querySelector('.cc__run-ico')!.textContent = '▶';
+        if (runLabel) runLabel.textContent = 'Ejecutar';
+        resetChars();
+        type(showRun);
+      }
+    });
+
+    if (reduce || !seq.length) {
+      revealAll();
+      showRun();
+    } else {
       const io = new IntersectionObserver((entries, obs) => {
         if (entries[0].isIntersecting) {
           obs.disconnect();
-          setTimeout(step, 400);
+          setTimeout(() => type(showRun), 400);
         }
       }, { threshold: 0.25 });
       io.observe(card);
@@ -102,6 +186,48 @@ const lines = [
     font-size: 0.85rem;
     color: var(--color-muted);
   }
+
+  /* Botón ejecutar */
+  .cc__run {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-accent);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(-2px);
+    transition: opacity 0.3s ease, transform 0.3s ease, background 0.15s ease;
+  }
+  .cc__run.is-ready {
+    opacity: 1;
+    transform: none;
+    animation: cc-run-pulse 1.6s ease-in-out 3;
+  }
+  .cc__run--replay {
+    animation: none;
+  }
+  .cc__run:hover {
+    background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  }
+  .cc__run:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+  .cc__run-ico {
+    font-size: 0.7rem;
+  }
+  @keyframes cc-run-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 45%, transparent); }
+    50% { box-shadow: 0 0 0 5px transparent; }
+  }
+
   .cc__code {
     margin: 0;
     padding: 1.1rem 1.1rem 1.3rem;
@@ -109,6 +235,10 @@ const lines = [
     font-size: 0.92rem;
     line-height: 1.9;
     overflow-x: auto;
+    /* Cada carácter va en su propio span: sin ligaduras (…, />, //) que dejen
+       celdas en blanco. */
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
   }
   .cc__line {
     display: flex;
@@ -129,4 +259,78 @@ const lines = [
   .tok--str { color: #98c8b0; }
   .tok--num { color: #e0b070; }
   .tok--pun { color: var(--color-muted); }
+  .tok--fn  { color: #61afef; }
+  .tok--tag { color: #e5c07b; }
+
+  /* Preview "renderizado" */
+  .cc__output {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    border-top: 1px solid transparent;
+    background: color-mix(in srgb, var(--color-accent) 3.5%, transparent);
+    transition: max-height 0.45s ease, opacity 0.4s ease, border-color 0.4s ease;
+  }
+  .cc__output.is-open {
+    max-height: 260px;
+    opacity: 1;
+    border-top-color: var(--color-border);
+  }
+  .cc__output-inner {
+    padding: 1.05rem 1.1rem 1.25rem;
+  }
+  .cc__output-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: 0.75rem;
+  }
+  .cc__preview {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-bg);
+  }
+  .cc__avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    object-fit: cover;
+    border: 1px solid var(--color-border);
+    flex-shrink: 0;
+  }
+  .cc__pname {
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+  }
+  .cc__prole {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    margin-top: 0.1rem;
+  }
+  .cc__pchips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+  }
+  .cc__pchips span {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    color: var(--color-muted);
+  }
+  .cc__pchips .cc__pchip--accent {
+    color: var(--color-accent);
+    border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+    background: var(--color-accent-soft);
+  }
 </style>
