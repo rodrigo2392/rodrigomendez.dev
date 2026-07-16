@@ -152,6 +152,12 @@ const videos = videosData.slice(0, 6);
     align-items: center;
     padding-block: 5.5rem 4rem;
   }
+  /* Permite que las columnas se encojan: el code-card hace scroll interno,
+     no empuja el ancho de la página (evita overflow horizontal en mobile). */
+  .hero__text,
+  .hero__card {
+    min-width: 0;
+  }
   .hero__kicker {
     margin-bottom: 1.75rem;
   }
@@ -276,7 +282,7 @@ const videos = videosData.slice(0, 6);
 
   @media (max-width: 52rem) {
     .hero {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       gap: 2.5rem;
       padding-block: 3.5rem 2.5rem;
     }
