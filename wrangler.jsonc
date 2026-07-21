@@ -1,0 +1,19 @@
+{
+  // El sitio es ESTÁTICO (astro build → dist/). Sin este archivo, el autoconfig de
+  // wrangler lo trata como Worker/SSR y bundlea canvaskit-wasm (dependencia de
+  // astro-og-canvas, CommonJS): al convertirlo a ESM revienta con
+  // "__dirname is not defined" y el deploy falla. Declarar solo `assets`, sin `main`,
+  // mantiene el build estático que corre en Node.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rodrigomendezdev",
+  "compatibility_date": "2026-07-16",
+  "build": {
+    "command": "npm run build"
+  },
+  "assets": {
+    "directory": "./dist"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
