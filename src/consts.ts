@@ -28,7 +28,6 @@ export const AUTHOR = {
 export const SOCIALS = {
   youtube: 'https://youtube.com/@rodrigomendezdev',
   github: 'https://github.com/rodrigo2392',
-  x: 'https://x.com/rodrigomendezdev',
   instagram: 'https://instagram.com/rodrigomendezdev',
   tiktok: 'https://tiktok.com/@rodrigomendezdev',
 } as const;
