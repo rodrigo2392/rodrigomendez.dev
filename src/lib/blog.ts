@@ -25,9 +25,9 @@ export function readingMinutes(body: string | undefined, override?: number): num
   return Math.max(1, Math.round(words / 200));
 }
 
-/** Posts publicados, ordenados por fecha desc. */
+/** Posts publicados, ordenados por fecha desc. En dev incluye drafts para previsualizarlos. */
 export async function getPublishedPosts(): Promise<Post[]> {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const posts = await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft);
   return posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 }
 
