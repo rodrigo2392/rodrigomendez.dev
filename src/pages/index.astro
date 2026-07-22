@@ -412,14 +412,78 @@ const jsonLd = {
       font-size: clamp(2.6rem, 13vw, 4rem);
     }
     .about {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       gap: 1.75rem;
     }
     .about__photo {
       max-width: 240px;
     }
     .videos {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .section {
+      padding-block: 3rem;
+    }
+    .section__head {
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.35rem 1rem;
+    }
+    .section__more {
+      font-size: 0.9rem;
+    }
+    .hero {
+      padding-block: 2.5rem 2rem;
+      gap: 2rem;
+    }
+    .hero__kicker {
+      font-size: 0.95rem;
+      margin-bottom: 1.1rem;
+    }
+    .hero__lead {
+      font-size: 1.2rem;
+      margin-top: 1.25rem;
+    }
+    .hero__cta {
+      margin-top: 1.75rem;
+      gap: 0.75rem;
+    }
+    .hero__cta :global(.btn-accent),
+    .hero__cta :global(.btn-outline) {
+      font-size: 0.98rem;
+      padding: 0.75rem 1.35rem;
+    }
+    .hero__meta {
+      font-size: 0.85rem;
+      margin-top: 2rem;
+    }
+    .hero__meta .sep {
+      margin-inline: 0.35rem;
+    }
+    .about__title {
+      font-size: 1.9rem;
+      margin-bottom: 1.1rem;
+    }
+    .about__text p {
+      font-size: 1.08rem;
+    }
+    .videos {
+      gap: 1.5rem;
+    }
+    .contact {
+      padding-block: 3.5rem;
+    }
+    .contact__lead {
+      font-size: 1.05rem;
+    }
+    .terminal {
+      padding: 1rem;
+    }
+    .contact__email {
+      overflow-wrap: anywhere;
     }
   }
 </style>

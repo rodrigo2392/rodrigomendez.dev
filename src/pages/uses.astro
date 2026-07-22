@@ -115,7 +115,17 @@ const groups = [
   }
   @media (max-width: 46rem) {
     .uses__groups {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+  }
+  @media (max-width: 40rem) {
+    .uses {
+      padding-block: 2.25rem 1.5rem;
+    }
+    .uses__intro {
+      font-size: 1.08rem;
     }
   }
 </style>

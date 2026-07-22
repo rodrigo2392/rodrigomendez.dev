@@ -151,7 +151,37 @@ import { PROJECTS } from '../consts';
   }
   @media (max-width: 46rem) {
     .proyectos__grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+      margin-top: 2rem;
+    }
+  }
+  @media (max-width: 40rem) {
+    .proyectos {
+      padding-block: 2.25rem 1.5rem;
+    }
+    .proyectos__intro {
+      font-size: 1.08rem;
+    }
+    .pcard {
+      padding: 1.35rem;
+    }
+    /* El nombre y el estado no caben en una línea en pantallas chicas */
+    .pcard__top {
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.35rem 0.75rem;
+    }
+    .pcard__name {
+      font-size: 1.5rem;
+    }
+    .pcard__links {
+      flex-wrap: wrap;
+      padding-top: 1.35rem;
+    }
+    .pcard__links :global(.btn-accent),
+    .pcard__links :global(.btn-outline) {
+      flex: 1 1 auto;
+      justify-content: center;
     }
   }
 </style>

@@ -50,5 +50,15 @@ const label = titulo ?? (tipo === 'aviso' ? 'AVISO' : 'NOTA');
     border-radius: 5px;
     background: var(--color-accent-soft);
     color: var(--color-accent);
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 34rem) {
+    .nota {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.45rem;
+      padding: 1rem 1.1rem;
+      margin: 1.35rem 0;
+    }
   }
 </style>

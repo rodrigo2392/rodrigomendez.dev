@@ -77,7 +77,7 @@ const jsonLd = {
         <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
         <span aria-hidden="true">·</span> {min} min
         {tags.map((t) => (
-          <><span aria-hidden="true">·</span> <a href={`/blog/tag/${t}`} class="tag post__tag">{t}</a></>
+          <>{' '}<span aria-hidden="true">·</span> <a href={`/blog/tag/${t}`} class="tag post__tag">{t}</a></>
         ))}
       </p>
       <h1 class="post__title">{title}</h1>
@@ -445,10 +445,42 @@ const jsonLd = {
   }
 
   @media (max-width: 62rem) {
-    .post__grid { grid-template-columns: 1fr; gap: 0; }
+    /* minmax(0, …) y no 1fr: si no, la columna crece al min-content del
+       contenido (bloques de código) y desborda la página en móvil. */
+    .post__grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
     .toc { display: none; }
-    .related__grid { grid-template-columns: 1fr; }
-    .pager { grid-template-columns: 1fr; }
+    .related__grid { grid-template-columns: minmax(0, 1fr); }
+    .pager { grid-template-columns: minmax(0, 1fr); }
     .post__foot { max-width: none; }
+  }
+
+  @media (max-width: 40rem) {
+    .post { padding-block: 1.75rem 0.5rem; }
+    .post__meta { margin-top: 1.1rem; }
+    .post__title { font-size: clamp(1.95rem, 8.2vw, 2.6rem); }
+    .post__dek { font-size: 1.1rem; margin-top: 1rem; }
+    .author { margin-top: 1.5rem; }
+    .post__hero { margin-top: 1.75rem; }
+    .post__hero img,
+    .post__hero-ph { border-radius: 10px; }
+    .post__grid { margin-top: 1.75rem; }
+
+    .authorcard {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.35rem;
+      margin-top: 2.5rem;
+    }
+    .authorcard__text { min-width: 0; }
+    .authorcard__cta { width: 100%; justify-content: center; }
+
+    .pager { gap: 0.85rem; }
+    .pager__item { padding: 1rem; }
+    /* Apilado, alinear a la derecha se ve como un error */
+    .pager__item--next { text-align: left; }
+
+    .related { margin-top: 2.5rem; }
+    .rcard { padding: 1rem; }
   }
 </style>

@@ -34,6 +34,13 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Red de seguridad contra el scroll horizontal en móvil. `clip` y no `hidden`:
+   `hidden` rompería el `position: sticky` del nav. */
+html,
+body {
+  overflow-x: clip;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -183,6 +190,11 @@ a {
   max-width: 90rem; /* 1440px */
   margin-inline: auto;
   padding-inline: 1.5rem;
+}
+@media (max-width: 26rem) {
+  .container-site {
+    padding-inline: 1.15rem;
+  }
 }
 
 /* Placeholder de imagen (rayas diagonales) mientras no hay assets */

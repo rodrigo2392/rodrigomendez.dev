@@ -4,6 +4,8 @@
   font-size: 1.15rem;
   line-height: 1.8;
   color: var(--color-ink);
+  /* Una URL o un identificador largo no debe empujar el ancho de la página */
+  overflow-wrap: break-word;
 }
 
 .prose > * + * {
@@ -172,4 +174,50 @@
 .prose .heading-anchor.is-copied::after {
   content: " copiado";
   font-size: 0.85em;
+}
+
+/* ------------------------------------------------------------------ */
+/* Móvil                                                               */
+/* ------------------------------------------------------------------ */
+@media (max-width: 46rem) {
+  .prose {
+    font-size: 1.08rem;
+    line-height: 1.75;
+  }
+  .prose h2 {
+    font-size: 1.45rem;
+    margin-top: 2.25rem;
+  }
+  .prose h3 {
+    font-size: 1.2rem;
+    margin-top: 1.75rem;
+  }
+  .prose blockquote {
+    padding: 0.9rem 1.1rem;
+    font-size: 1.08rem;
+  }
+  /* El código inline largo debe poder partirse, no desbordar */
+  .prose :not(pre) > code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* Expressive Code: más compacto y con wrap. En una pantalla de teléfono,
+     hacer scroll horizontal dentro de cada bloque se siente roto. */
+  .prose .expressive-code {
+    --ec-codeFontSize: 0.78rem;
+    --ec-codeLineHt: 1.6;
+    --ec-codePadBlk: 0.85rem;
+    --ec-codePadInl: 0.85rem;
+    --ec-uiFontSize: 0.78rem;
+    --ec-uiPadInl: 0.85rem;
+    margin-block: 1.35rem;
+  }
+  .prose .expressive-code .ec-line .code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .prose .expressive-code .frame.has-title .title {
+    padding-left: 3.25rem;
+  }
 }
