@@ -1,0 +1,265 @@
+---
+// Política de privacidad de Lizt (ES + EN en una sola página).
+// La app enlaza aquí desde "Acerca de" (About.tsx → PRIVACY_URL) y Play
+// Console la exige. Fuente original: repo lizt → docs/privacy/index.html;
+// esta versión añade la sección de Lizt Online (cuenta + respaldo opcional).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const CONTACT = 'itic.rodrigomg@gmail.com';
+---
+
+<BaseLayout
+  title="Privacidad — Lizt"
+  description="Política de privacidad de la app Lizt (listas, recordatorios y hábitos)."
+>
+  <section class="container-site legal">
+    <header>
+      <p class="kicker">lizt</p>
+      <h1>Política de privacidad</h1>
+      <p class="muted">
+        Vigente desde el 22 de julio de 2026 · Aplica a la app <strong>Lizt</strong>
+        (com.indexceed.lizt) para Android e iOS.
+      </p>
+    </header>
+
+    <h2>Lo esencial</h2>
+    <p>
+      <strong>Lizt funciona 100% en tu dispositivo y no requiere cuenta.</strong>
+      Por defecto la app <strong>no recolecta, transmite ni vende ningún dato
+      personal</strong>: tus listas, notas, recordatorios, hábitos y alarmas se
+      guardan únicamente en el almacenamiento local de tu teléfono.
+    </p>
+    <p>
+      Existe un modo opcional, <strong>Lizt Online</strong>, que respalda tus
+      datos en la nube. Solo aplica si tú lo activas; se describe más abajo.
+    </p>
+
+    <h2>Permisos que usa la app y para qué</h2>
+    <ul>
+      <li>
+        <strong>Notificaciones y alarmas exactas:</strong> solo para disparar los
+        recordatorios y alarmas que tú creas. Nada se envía fuera del dispositivo.
+      </li>
+      <li>
+        <strong>Cámara:</strong> solo para escanear códigos QR generados por otra
+        instalación de Lizt al compartir una lista. No se toman ni guardan
+        fotografías.
+      </li>
+      <li>
+        <strong>Galería / fotos:</strong> solo para elegir una portada de lista o
+        adjuntar fotos a tus notas. Las imágenes se copian localmente dentro de la
+        app; no se suben a ningún lado (los adjuntos de notas tampoco viajan en los
+        respaldos).
+      </li>
+    </ul>
+
+    <h2>Lizt Online (opcional, de pago)</h2>
+    <p>
+      Si activas Lizt Online — una suscripción opcional — la app crea una cuenta con
+      tu inicio de sesión de Google y respalda automáticamente tu contenido en la
+      nube. En ese caso, y solo en ese caso, se tratan estos datos:
+    </p>
+    <ul>
+      <li>
+        <strong>Identificador de cuenta:</strong> el correo de la cuenta de Google
+        con la que inicias sesión (vía Firebase Authentication). Se usa únicamente
+        para identificar tus respaldos.
+      </li>
+      <li>
+        <strong>Contenido respaldado:</strong> tus listas, notas (solo texto y
+        tareas), hábitos y rachas, recordatorios, alarmas y portadas. Se guarda en
+        Firebase Cloud Storage (Google Cloud), cifrado en tránsito y en reposo, en
+        un espacio accesible solo con tu cuenta.
+      </li>
+      <li>
+        <strong>Pago:</strong> la suscripción se procesa por Google Play / App
+        Store con apoyo de RevenueCat para validar el estado de la suscripción.
+        <strong>Nunca vemos ni almacenamos datos de tu tarjeta.</strong>
+      </li>
+    </ul>
+    <p>
+      No usamos tu contenido para nada más: sin analítica sobre él, sin perfilado,
+      sin publicidad, sin venderlo. Puedes <strong>eliminar tu cuenta y todos tus
+      respaldos</strong> en cualquier momento desde la app (Ajustes → Lizt Online →
+      Eliminar cuenta) o siguiendo la
+      <a href="/lizt/delete-account">página de borrado de cuenta</a>. Si no activas
+      Lizt Online, nada de esta sección aplica.
+    </p>
+
+    <h2>Servicios de terceros</h2>
+    <p>
+      La app incluye <strong>Firebase Cloud Messaging</strong> únicamente para
+      poder avisarte cuando hay una actualización disponible. Esto usa un token
+      anónimo de dispositivo; no se asocia a tu identidad ni se usa para perfilado
+      o publicidad.
+    </p>
+    <p>
+      Si usas los tipos de lista de entretenimiento, las búsquedas de títulos
+      consultan catálogos públicos (TMDB, TVMaze, iTunes, Open Library) enviando
+      solo el texto que escribes en el buscador; ningún dato tuyo viaja con la
+      consulta.
+    </p>
+
+    <h2>Tus datos</h2>
+    <ul>
+      <li>
+        Sin Lizt Online: viven solo en tu dispositivo y se eliminan al desinstalar
+        la app.
+      </li>
+      <li>
+        Los respaldos por archivo (<code>.lizt</code>) los generas y compartes tú;
+        nosotros nunca los recibimos.
+      </li>
+      <li>
+        Con Lizt Online: tus respaldos viven en tu espacio de la nube hasta que los
+        borres tú o elimines la cuenta.
+      </li>
+      <li>No usamos analítica, rastreadores ni publicidad.</li>
+    </ul>
+
+    <h2>Contacto</h2>
+    <p>
+      Dudas sobre esta política:
+      <a href={`mailto:${CONTACT}`}>{CONTACT}</a>
+    </p>
+
+    <hr />
+
+    <h1>Privacy Policy</h1>
+    <p class="muted">
+      Effective July 22, 2026 · Applies to the <strong>Lizt</strong> app
+      (com.indexceed.lizt) for Android and iOS.
+    </p>
+
+    <h2>The essentials</h2>
+    <p>
+      <strong>Lizt runs 100% on your device and requires no account.</strong> By
+      default the app <strong>does not collect, transmit or sell any personal
+      data</strong>: your lists, notes, reminders, habits and alarms are stored
+      only in your phone's local storage.
+    </p>
+    <p>
+      There is an optional mode, <strong>Lizt Online</strong>, that backs up your
+      data to the cloud. It only applies if you turn it on; it is described below.
+    </p>
+
+    <h2>Permissions and their only use</h2>
+    <ul>
+      <li>
+        <strong>Notifications and exact alarms:</strong> only to fire the
+        reminders and alarms you create. Nothing leaves the device.
+      </li>
+      <li>
+        <strong>Camera:</strong> only to scan QR codes generated by another Lizt
+        installation when sharing a list. No photos are taken or stored.
+      </li>
+      <li>
+        <strong>Gallery / photos:</strong> only to pick a list cover or attach
+        photos to your notes. Images are copied locally inside the app and never
+        uploaded (note attachments don't travel in backups either).
+      </li>
+    </ul>
+
+    <h2>Lizt Online (optional, paid)</h2>
+    <p>
+      If you enable Lizt Online — an optional subscription — the app creates an
+      account with your Google sign-in and automatically backs up your content to
+      the cloud. In that case, and only in that case, this data is processed:
+    </p>
+    <ul>
+      <li>
+        <strong>Account identifier:</strong> the email of the Google account you
+        sign in with (via Firebase Authentication), used solely to identify your
+        backups.
+      </li>
+      <li>
+        <strong>Backed-up content:</strong> your lists, notes (text and tasks
+        only), habits and streaks, reminders, alarms and covers. Stored in
+        Firebase Cloud Storage (Google Cloud), encrypted in transit and at rest,
+        in a space accessible only with your account.
+      </li>
+      <li>
+        <strong>Payment:</strong> the subscription is processed by Google Play /
+        the App Store with RevenueCat validating subscription status.
+        <strong>We never see or store your card details.</strong>
+      </li>
+    </ul>
+    <p>
+      We use your content for nothing else: no analytics on it, no profiling, no
+      ads, no selling. You can <strong>delete your account and all your
+      backups</strong> at any time from the app (Settings → Lizt Online → Delete
+      account) or via the <a href="/lizt/delete-account">account deletion page</a>.
+      If you never enable Lizt Online, nothing in this section applies.
+    </p>
+
+    <h2>Third-party services</h2>
+    <p>
+      The app includes <strong>Firebase Cloud Messaging</strong> solely to notify
+      you when an update is available, using an anonymous device token — never
+      tied to your identity, never used for profiling or ads.
+    </p>
+    <p>
+      Entertainment list searches query public catalogs (TMDB, TVMaze, iTunes,
+      Open Library) sending only the text you type; no personal data travels with
+      the request.
+    </p>
+
+    <h2>Your data</h2>
+    <ul>
+      <li>
+        Without Lizt Online: it lives only on your device and is deleted when you
+        uninstall the app.
+      </li>
+      <li>
+        File backups (<code>.lizt</code>) are generated and shared by you; we
+        never receive them.
+      </li>
+      <li>
+        With Lizt Online: your backups live in your cloud space until you delete
+        them or delete the account.
+      </li>
+      <li>No analytics, trackers or advertising.</li>
+    </ul>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about this policy:
+      <a href={`mailto:${CONTACT}`}>{CONTACT}</a>
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal {
+    max-width: 46rem;
+    padding-block: 3.5rem 4rem;
+  }
+  .legal h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin: 0.4rem 0 0.6rem;
+  }
+  .legal h2 {
+    font-size: 1.15rem;
+    margin: 2rem 0 0.6rem;
+  }
+  .legal p,
+  .legal li {
+    line-height: 1.65;
+  }
+  .legal ul {
+    padding-left: 1.2rem;
+  }
+  .legal li + li {
+    margin-top: 0.35rem;
+  }
+  .legal hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 3rem 0;
+  }
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+</style>

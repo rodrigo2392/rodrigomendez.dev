@@ -1,0 +1,140 @@
+---
+// Página de borrado de cuenta de Lizt Online (ES + EN). Google Play exige una
+// URL pública de borrado de cuenta para apps con cuentas; esta es la que se
+// declara en Play Console. Fuente original: repo lizt → docs/delete-account/.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const CONTACT = 'itic.rodrigomg@gmail.com';
+---
+
+<BaseLayout
+  title="Eliminar cuenta — Lizt"
+  description="Cómo eliminar tu cuenta de Lizt Online y todos tus respaldos en la nube."
+>
+  <section class="container-site legal">
+    <header>
+      <p class="kicker">lizt</p>
+      <h1>Eliminar tu cuenta de Lizt Online</h1>
+      <p class="muted">
+        Aplica a la app <strong>Lizt</strong> (com.indexceed.lizt). La cuenta es
+        opcional: solo existe si activaste <strong>Lizt Online</strong> (respaldo
+        en la nube).
+      </p>
+    </header>
+
+    <h2>Desde la app (recomendado)</h2>
+    <ol>
+      <li>Abre <strong>Ajustes → Lizt Online</strong>.</li>
+      <li>Toca <strong>Eliminar cuenta</strong> y confirma dos veces.</li>
+    </ol>
+    <p>
+      El borrado es inmediato y definitivo: se eliminan <strong>tu cuenta y todos
+      tus respaldos en la nube</strong>. Los datos locales de tu teléfono (listas,
+      notas, hábitos, recordatorios, alarmas) <strong>no se tocan</strong> — la
+      app sigue funcionando en modo local.
+    </p>
+
+    <h2>Si ya no tienes la app instalada</h2>
+    <p>
+      Escríbenos a <a href={`mailto:${CONTACT}`}>{CONTACT}</a> desde el correo de
+      Google con el que creaste la cuenta, con el asunto «Eliminar cuenta Lizt».
+      Procesamos la solicitud en un máximo de 7 días.
+    </p>
+
+    <h2>Qué datos se eliminan</h2>
+    <ul>
+      <li>Tu identificador de cuenta (correo de Google asociado).</li>
+      <li>Todos los respaldos guardados en la nube.</li>
+    </ul>
+    <p>
+      La suscripción se gestiona por separado en Google Play: cancélala en
+      <a href="https://play.google.com/store/account/subscriptions">Play Store →
+      Suscripciones</a>. Eliminar la cuenta no genera cargos nuevos, pero no
+      cancela automáticamente una suscripción activa.
+    </p>
+
+    <p class="muted">
+      Más detalles en la <a href="/lizt/privacy">política de privacidad</a>.
+    </p>
+
+    <hr />
+
+    <h1>Delete your Lizt Online account</h1>
+    <p class="muted">
+      Applies to the <strong>Lizt</strong> app (com.indexceed.lizt). The account
+      is optional: it only exists if you enabled <strong>Lizt Online</strong>
+      (cloud backup).
+    </p>
+
+    <h2>From the app (recommended)</h2>
+    <ol>
+      <li>Open <strong>Settings → Lizt Online</strong>.</li>
+      <li>Tap <strong>Delete account</strong> and confirm twice.</li>
+    </ol>
+    <p>
+      Deletion is immediate and permanent: <strong>your account and all your
+      cloud backups</strong> are removed. The local data on your phone (lists,
+      notes, habits, reminders, alarms) is <strong>not touched</strong> — the app
+      keeps working in local mode.
+    </p>
+
+    <h2>If you no longer have the app installed</h2>
+    <p>
+      Email <a href={`mailto:${CONTACT}`}>{CONTACT}</a> from the Google account
+      you signed up with, subject "Delete Lizt account". We process requests
+      within 7 days.
+    </p>
+
+    <h2>What gets deleted</h2>
+    <ul>
+      <li>Your account identifier (the associated Google email).</li>
+      <li>All backups stored in the cloud.</li>
+    </ul>
+    <p>
+      The subscription is managed separately by Google Play: cancel it at
+      <a href="https://play.google.com/store/account/subscriptions">Play Store →
+      Subscriptions</a>. Deleting the account creates no new charges, but it does
+      not automatically cancel an active subscription.
+    </p>
+
+    <p class="muted">
+      More details in the <a href="/lizt/privacy">privacy policy</a>.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal {
+    max-width: 46rem;
+    padding-block: 3.5rem 4rem;
+  }
+  .legal h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin: 0.4rem 0 0.6rem;
+  }
+  .legal h2 {
+    font-size: 1.15rem;
+    margin: 2rem 0 0.6rem;
+  }
+  .legal p,
+  .legal li {
+    line-height: 1.65;
+  }
+  .legal ul,
+  .legal ol {
+    padding-left: 1.2rem;
+  }
+  .legal li + li {
+    margin-top: 0.35rem;
+  }
+  .legal hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 3rem 0;
+  }
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+</style>
