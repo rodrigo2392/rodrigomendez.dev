@@ -4,7 +4,7 @@ import { PROJECTS } from '../consts';
 ---
 <BaseLayout
   title="Proyectos"
-  description="Los productos que construyo en público: Piclink y Cronowork."
+  description="Los productos que construyo en público: Piclink, Cronowork y Cross The Chicken."
 >
   <section class="container-site proyectos">
     <header class="proyectos__head">
@@ -115,6 +115,11 @@ import { PROJECTS } from '../consts';
   .pcard__status--oss .pcard__dot {
     background: #8fb8c9;
     box-shadow: 0 0 8px color-mix(in srgb, #8fb8c9 70%, transparent);
+  }
+  /* Los experimentos no son producto: se distinguen del punto de "en producción". */
+  .pcard__status--lab .pcard__dot {
+    background: #66bb6a;
+    box-shadow: 0 0 8px color-mix(in srgb, #66bb6a 70%, transparent);
   }
   .pcard__tagline {
     font-family: var(--font-mono);

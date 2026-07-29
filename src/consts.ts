@@ -65,6 +65,17 @@ export const PROJECTS = [
     status: 'Live · Open source',
     accent: 'oss',
   },
+  {
+    name: 'Cross The Chicken',
+    tagline: 'Un Crossy Road en 3D',
+    description:
+      'Juego 3D que corre en el navegador y se instala como app. Ranking global y los demás jugadores moviéndose en tiempo real.',
+    url: 'https://crossthechicken.rodrigomendez.dev',
+    repo: null,
+    stack: ['React', 'Three.js', 'Firebase', 'PWA'],
+    status: 'Live · Juego',
+    accent: 'lab',
+  },
 ] as const;
 
 // Stack mostrado en el home.
