@@ -36,6 +36,7 @@ export const NAV = [
   { label: 'inicio.tsx', href: '/' },
   { label: 'sobre.md', href: '/#sobre' },
   { label: 'proyectos/', href: '/proyectos' },
+  { label: 'demos/', href: '/demos' },
   { label: 'blog/', href: '/blog' },
   { label: 'videos/', href: '/#videos' },
   { label: 'contacto', href: '/#contacto' },
@@ -75,6 +76,60 @@ export const PROJECTS = [
     stack: ['React', 'Three.js', 'Firebase', 'PWA'],
     status: 'Live · Juego',
     accent: 'lab',
+  },
+] as const;
+
+// Demos de landings para negocios locales, mostrados en /demos.
+// Los sitios estáticos se generan con dev-templates/scripts/build-demos.mjs
+// y viven en public/demos/<slug>/. Los colores son la paleta de cada plantilla.
+export const DEMOS = [
+  {
+    slug: 'restaurante',
+    giro: 'restaurante',
+    nombre: 'La Braza',
+    lema: 'Cocina al carbón',
+    descripcion: 'Menú por secciones, platillo estrella y reservas directo a WhatsApp.',
+    colores: { fondo: '#F7F1E3', tinta: '#261D15', marca: '#BC4B26', acento: '#E89A3C' },
+  },
+  {
+    slug: 'clinica',
+    giro: 'clínica dental',
+    nombre: 'Clínica Dental Sonría',
+    lema: 'Odontología sin miedo',
+    descripcion: 'Servicios, doctores y respuestas para el paciente que llega nervioso.',
+    colores: { fondo: '#F3FAFB', tinta: '#123B53', marca: '#1793A6', acento: '#F26B5E' },
+  },
+  {
+    slug: 'boutique',
+    giro: 'boutique de ropa',
+    nombre: 'Alma',
+    lema: 'Moda mexicana hecha a mano',
+    descripcion: 'Colección de temporada, catálogo y pedidos pieza por pieza.',
+    colores: { fondo: '#F6F1E9', tinta: '#33261E', marca: '#C2255C', acento: '#B4633A' },
+  },
+  {
+    slug: 'estetica',
+    giro: 'estética y salón',
+    nombre: 'Studio Valentina',
+    lema: 'Salón de belleza',
+    descripcion: 'Servicios del salón, galería de resultados y promo del mes.',
+    colores: { fondo: '#FAF5F8', tinta: '#3B2140', marca: '#A3489B', acento: '#C6913B' },
+  },
+  {
+    slug: 'farmacia',
+    giro: 'farmacia',
+    nombre: 'Farmacia San Rafael',
+    lema: 'La farmacia del barrio',
+    descripcion: 'Entregas a domicilio, recetas y consultorio adjunto.',
+    colores: { fondo: '#F3F9F4', tinta: '#14332B', marca: '#178A58', acento: '#2E5FB0' },
+  },
+  {
+    slug: 'mascotas',
+    giro: 'veterinaria y spa',
+    nombre: 'Peludos',
+    lema: 'Clínica veterinaria y estética canina',
+    descripcion: 'Consulta, estética canina, paquetes mensuales y urgencias.',
+    colores: { fondo: '#FFF6E9', tinta: '#33356B', marca: '#E2611B', acento: '#2E9DC4' },
   },
 ] as const;
 

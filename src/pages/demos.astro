@@ -1,0 +1,319 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { AUTHOR, DEMOS } from '../consts';
+
+// Los sitios de /demos/<slug>/ son estáticos (public/demos/), generados con
+// dev-templates/scripts/build-demos.mjs. Esta página solo es el índice.
+const mailto = `mailto:${AUTHOR.email}?subject=${encodeURIComponent(
+  'Quiero una página para mi negocio'
+)}`;
+---
+<BaseLayout
+  title="Demos"
+  description="Así se vería la página de tu negocio: seis demos navegables de landings para restaurante, clínica dental, boutique, estética, farmacia y veterinaria."
+>
+  <section class="container-site demos">
+    <header class="demos__head">
+      <p class="kicker">demos</p>
+      <h1 class="demos__title">Así se vería la página de tu negocio</h1>
+      <p class="demos__intro">
+        Seis landings completas y navegables, una por giro. Cada una se adapta con
+        los colores, fotos y WhatsApp de tu negocio, lista en unos días.
+      </p>
+      <p class="demos__note">
+        * negocios de demostración: nombres, direcciones y teléfonos son ficticios
+      </p>
+    </header>
+
+    <div class="demos__grid">
+      {
+        DEMOS.map((d) => (
+          <a
+            class="dcard reveal"
+            href={`/demos/${d.slug}/`}
+            target="_blank"
+            rel="noopener"
+            style={`--d-fondo:${d.colores.fondo};--d-tinta:${d.colores.tinta};--d-marca:${d.colores.marca};--d-acento:${d.colores.acento}`}
+          >
+            <div class="dcard__preview" aria-hidden="true">
+              <div class="dcard__chrome">
+                <span /><span /><span />
+                <i class="dcard__url">/demos/{d.slug}/</i>
+              </div>
+              <div class="dcard__page">
+                <div class="dcard__pnav">
+                  <i class="dcard__plogo" />
+                  <i class="dcard__pmenu" />
+                  <i class="dcard__pbtn dcard__pbtn--sm" />
+                </div>
+                <i class="dcard__ptitle" />
+                <i class="dcard__pline" />
+                <i class="dcard__pline dcard__pline--short" />
+                <div class="dcard__prow">
+                  <i class="dcard__pbtn" />
+                  <i class="dcard__pchip" />
+                </div>
+              </div>
+            </div>
+            <div class="dcard__body">
+              <p class="dcard__giro">{d.giro}</p>
+              <h2 class="dcard__name">{d.nombre}</h2>
+              <p class="dcard__desc">{d.descripcion}</p>
+              <span class="dcard__cta">
+                Ver demo <span aria-hidden="true">↗</span>
+              </span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+
+    <!-- TODO: swap a wa.me cuando haya número RM Estudio -->
+    <div class="demos__cta reveal">
+      <p class="kicker">contacto</p>
+      <h2 class="demos__cta-title">¿Quieres una así para tu negocio?</h2>
+      <p class="demos__cta-lead">
+        Escríbeme y la armamos con tu marca: mismo cuidado, tu giro y tu WhatsApp.
+      </p>
+      <div class="demos__cta-row">
+        <a class="btn-accent" href={mailto}>Escríbeme <span aria-hidden="true">→</span></a>
+        <span class="demos__cta-mail">{AUTHOR.email}</span>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .demos {
+    padding-block: 3.5rem 2rem;
+  }
+  .demos__title {
+    font-size: clamp(2.6rem, 6vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0.5rem 0 1rem;
+    max-width: 22ch;
+  }
+  .demos__intro {
+    color: var(--color-muted);
+    font-size: 1.25rem;
+    max-width: 54ch;
+  }
+  .demos__note {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-faint);
+    margin-top: 0.9rem;
+  }
+
+  .demos__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  /* Tarjeta = mini ventana del demo con la paleta real de cada plantilla */
+  .dcard {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+    overflow: hidden;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .dcard:hover {
+    border-color: color-mix(in srgb, var(--color-accent) 30%, var(--color-border));
+    transform: translateY(-2px);
+  }
+
+  .dcard__chrome {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0.55rem 0.8rem;
+    background: var(--color-surface-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .dcard__chrome span {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--color-border);
+  }
+  .dcard__url {
+    font-family: var(--font-mono);
+    font-style: normal;
+    font-size: 0.68rem;
+    color: var(--color-faint);
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dcard__page {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.9rem 1rem 1.1rem;
+    background: var(--d-fondo);
+  }
+  .dcard__page i {
+    display: block;
+    border-radius: 4px;
+  }
+  .dcard__pnav {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.35rem;
+  }
+  .dcard__plogo {
+    width: 14px;
+    height: 14px;
+    border-radius: 5px;
+    background: var(--d-marca);
+  }
+  .dcard__pmenu {
+    flex: 1;
+    height: 4px;
+    max-width: 42%;
+    background: color-mix(in srgb, var(--d-tinta) 22%, transparent);
+  }
+  .dcard__pbtn {
+    width: 30%;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--d-marca);
+  }
+  .dcard__pbtn--sm {
+    width: 17%;
+    height: 9px;
+    margin-left: auto;
+  }
+  .dcard__ptitle {
+    width: 62%;
+    height: 11px;
+    background: color-mix(in srgb, var(--d-tinta) 78%, transparent);
+  }
+  .dcard__pline {
+    width: 88%;
+    height: 5px;
+    background: color-mix(in srgb, var(--d-tinta) 24%, transparent);
+  }
+  .dcard__pline--short {
+    width: 64%;
+  }
+  .dcard__prow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+  }
+  .dcard__pchip {
+    width: 22%;
+    height: 12px;
+    border-radius: 999px;
+    border: 1.5px solid var(--d-acento);
+  }
+
+  .dcard__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.35rem 1.5rem 1.5rem;
+  }
+  .dcard__giro {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-accent);
+  }
+  .dcard__name {
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-top: 0.25rem;
+  }
+  .dcard__desc {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin-top: 0.5rem;
+  }
+  .dcard__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    color: var(--color-accent);
+    margin-top: auto;
+    padding-top: 1.1rem;
+  }
+  .dcard__cta span {
+    transition: transform 0.15s ease;
+  }
+  .dcard:hover .dcard__cta span {
+    transform: translate(2px, -2px);
+  }
+
+  /* CTA de contacto */
+  .demos__cta {
+    margin-top: 3.5rem;
+    padding: 2.25rem 2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+  }
+  .demos__cta-title {
+    font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0.5rem 0 0.5rem;
+  }
+  .demos__cta-lead {
+    color: var(--color-muted);
+    max-width: 52ch;
+  }
+  .demos__cta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .demos__cta-mail {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+
+  @media (max-width: 64rem) {
+    .demos__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 46rem) {
+    .demos__grid {
+      grid-template-columns: minmax(0, 1fr);
+      margin-top: 2rem;
+    }
+  }
+  @media (max-width: 40rem) {
+    .demos {
+      padding-block: 2.25rem 1.5rem;
+    }
+    .demos__intro {
+      font-size: 1.08rem;
+    }
+    .demos__cta {
+      padding: 1.5rem 1.35rem;
+    }
+    .demos__cta-row :global(.btn-accent) {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+  }
+</style>

@@ -6,6 +6,7 @@ const path = Astro.url.pathname;
 const isActive = (href: string) => {
   if (href === '/blog') return path === '/blog' || path.startsWith('/blog/');
   if (href === '/proyectos') return path === '/proyectos';
+  if (href === '/demos') return path === '/demos';
   if (href === '/') return path === '/';
   return false;
 };
@@ -61,6 +62,7 @@ const isActive = (href: string) => {
       if (url.hash) active = false;
       else if (url.pathname === '/blog') active = path === '/blog' || path.startsWith('/blog/');
       else if (url.pathname === '/proyectos') active = path === '/proyectos';
+      else if (url.pathname === '/demos') active = path === '/demos';
       else if (url.pathname === '/') active = path === '/';
       a.classList.toggle('nav__link--active', active);
     });
