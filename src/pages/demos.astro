@@ -7,6 +7,9 @@ import { AUTHOR, DEMOS } from '../consts';
 const mailto = `mailto:${AUTHOR.email}?subject=${encodeURIComponent(
   'Quiero una página para mi negocio'
 )}`;
+const whatsapp = `https://wa.me/523318800659?text=${encodeURIComponent(
+  'Hola, vi los demos y quiero una página para mi negocio'
+)}`;
 ---
 <BaseLayout
   title="Demos"
@@ -68,7 +71,6 @@ const mailto = `mailto:${AUTHOR.email}?subject=${encodeURIComponent(
       }
     </div>
 
-    <!-- TODO: swap a wa.me cuando haya número RM Estudio -->
     <div class="demos__cta reveal">
       <p class="kicker">contacto</p>
       <h2 class="demos__cta-title">¿Quieres una así para tu negocio?</h2>
@@ -76,8 +78,8 @@ const mailto = `mailto:${AUTHOR.email}?subject=${encodeURIComponent(
         Escríbeme y la armamos con tu marca: mismo cuidado, tu giro y tu WhatsApp.
       </p>
       <div class="demos__cta-row">
-        <a class="btn-accent" href={mailto}>Escríbeme <span aria-hidden="true">→</span></a>
-        <span class="demos__cta-mail">{AUTHOR.email}</span>
+        <a class="btn-accent" href={whatsapp}>Escríbeme por WhatsApp <span aria-hidden="true">→</span></a>
+        <a class="demos__cta-mail" href={mailto}>{AUTHOR.email}</a>
       </div>
     </div>
   </section>
