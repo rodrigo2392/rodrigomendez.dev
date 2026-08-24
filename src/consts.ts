@@ -198,7 +198,7 @@ export const SERVICIOS = [
   {
     id: 'software',
     nombre: 'Sistema a la medida',
-    precio: 'desde $45,000',
+    precio: 'desde $30,000',
     entrega: 'por alcance',
     lead: 'Cuando Excel ya no alcanza: inventario, pedidos, clientes y reportes.',
     incluye: [
