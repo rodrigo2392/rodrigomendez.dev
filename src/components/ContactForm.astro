@@ -1,0 +1,165 @@
+---
+// Formulario de contacto: postea al CRM en crm.rodrigomendez.dev.
+//
+// NO lleva secreto compartido, y es a propósito: este sitio es estático, así que
+// cualquier valor que llegue al navegador aparece en "ver código fuente". Un
+// PUBLIC_CRM_SECRET habría sido un candado con la llave pegada. El CRM se
+// defiende del otro lado con una trampa oculta (el campo `empresa` de abajo),
+// validación del origen y un límite de envíos por IP.
+const endpoint = 'https://crm.rodrigomendez.dev/api/hooks/sitio';
+---
+<form class="news" data-crm data-endpoint={endpoint} aria-label="Contacto CRM">
+  <p class="news__title">Cuéntame de tu proyecto</p>
+  <div class="contact-form">
+    <div class="news__row">
+      <input class="news__input" type="text" name="nombre" required placeholder="Tu nombre" data-crm-input="nombre" />
+    </div>
+    <div class="news__row">
+      <input class="news__input" type="email" name="email" required placeholder="tu@correo.com" data-crm-input="email" />
+    </div>
+    <div class="news__row">
+      <input class="news__input" type="tel" name="whatsapp" placeholder="WhatsApp (opcional)" data-crm-input="whatsapp" />
+    </div>
+    <div class="news__row" style="border-radius: 12px; align-items: start;">
+      <textarea class="news__input" name="mensaje" required placeholder="¿Qué necesitas?" data-crm-input="mensaje" rows="3" style="resize: vertical;"></textarea>
+    </div>
+    <!-- Trampa para bots: invisible y fuera del recorrido del teclado. Una
+         persona nunca la llena; un bot que rellena todo lo que encuentra, sí.
+         El CRM descarta el envío si viene con algo. -->
+    <div aria-hidden="true" style="position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;">
+      <label for="empresa-extra">No llenar este campo</label>
+      <input id="empresa-extra" type="text" name="empresa" tabindex="-1" autocomplete="off" data-crm-input="empresa" />
+    </div>
+    <button class="news__btn btn-accent" type="submit" style="width: 100%; border-radius: 999px; margin-top: 0.5rem;">Enviar mensaje</button>
+  </div>
+  <p class="news__msg" data-crm-msg aria-live="polite"></p>
+</form>
+
+<script>
+  function initCrm() {
+    const form = document.querySelector('[data-crm]') as HTMLFormElement | null;
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = '1';
+    
+    const endpoint = form.dataset.endpoint || '';
+    const btn = form.querySelector('button') as HTMLButtonElement;
+    const msg = form.querySelector('[data-crm-msg]') as HTMLElement;
+
+    const inputs = {
+      nombre: form.querySelector('[data-crm-input="nombre"]') as HTMLInputElement,
+      email: form.querySelector('[data-crm-input="email"]') as HTMLInputElement,
+      whatsapp: form.querySelector('[data-crm-input="whatsapp"]') as HTMLInputElement,
+      mensaje: form.querySelector('[data-crm-input="mensaje"]') as HTMLTextAreaElement,
+      empresa: form.querySelector('[data-crm-input="empresa"]') as HTMLInputElement
+    };
+
+    const set = (text: string, ok = false) => {
+      msg.textContent = text;
+      msg.classList.toggle('is-ok', ok);
+      msg.classList.toggle('is-err', !ok && !!text);
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const payload = {
+        nombre: inputs.nombre.value.trim(),
+        email: inputs.email.value.trim(),
+        whatsapp: inputs.whatsapp.value.trim(),
+        mensaje: inputs.mensaje.value.trim(),
+        // La trampa viaja tal cual: el CRM decide qué hacer con ella.
+        empresa: inputs.empresa ? inputs.empresa.value : ''
+      };
+
+      if (!payload.nombre || !payload.email || !payload.mensaje) return;
+
+      if (!endpoint) {
+        set('Escríbeme a contacto@rodrigomendez.dev y te respondo.', true);
+        return;
+      }
+
+      btn.disabled = true;
+      set('Enviando…', true);
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          form.reset();
+          set('¡Mensaje enviado! Te responderé pronto.', true);
+        } else if (res.status === 429) {
+          set('Ya enviaste varios mensajes. Espera un rato o escríbeme por WhatsApp.');
+        } else {
+          set('No se pudo enviar. Escríbeme a contacto@rodrigomendez.dev.');
+        }
+      } catch {
+        set('No se pudo enviar. Escríbeme a contacto@rodrigomendez.dev.');
+      }
+      btn.disabled = false;
+    });
+  }
+  document.addEventListener('astro:page-load', initCrm);
+</script>
+
+<style>
+  .news {
+    max-width: 30rem;
+    margin: 0 auto;
+    text-align: left;
+  }
+  .news__title {
+    font-size: 1.05rem;
+    color: var(--color-ink);
+    margin-bottom: 0.9rem;
+    text-align: center;
+  }
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .news__row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    transition: border-color 0.15s ease;
+  }
+  .news__row:focus-within {
+    border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  }
+  .news__input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+  }
+  .news__input::placeholder {
+    color: var(--color-faint);
+  }
+  .news__btn {
+    padding: 0.6rem 1.1rem;
+    cursor: pointer;
+  }
+  .news__msg {
+    min-height: 1.2rem;
+    margin-top: 0.7rem;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--color-muted);
+  }
+  .news__msg.is-ok { color: var(--color-accent); }
+  .news__msg.is-err { color: #e5868c; }
+</style>

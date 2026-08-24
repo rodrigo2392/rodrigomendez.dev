@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import CodeCard from '../components/CodeCard.astro';
 import PostRow from '../components/PostRow.astro';
 import VideoCard from '../components/VideoCard.astro';
-import NewsletterForm from '../components/NewsletterForm.astro';
+import ContactForm from '../components/ContactForm.astro';
 import { AUTHOR, SITE, SOCIALS, STACK } from '../consts';
 import { getPublishedPosts } from '../lib/blog';
 import videosData from '../data/videos.json';
@@ -143,7 +143,7 @@ const jsonLd = {
     <p class="contact__lead">Respondo mejor por correo o X. Si es sobre colaboraciones, mejor aún.</p>
 
     <div class="contact__news">
-      <NewsletterForm />
+      <ContactForm />
     </div>
     <p class="contact__or">o escríbeme directo</p>
 
