@@ -1,0 +1,218 @@
+---
+// Política de privacidad de WakeOnHome (ES + EN en una sola página).
+// La exige el account linking de la skill de Alexa (perfil LWA) y las
+// tiendas cuando salga la app móvil. Producto en desarrollo: actualizar
+// antes del lanzamiento público.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const CONTACT = 'itic.rodrigomg@gmail.com';
+---
+
+<BaseLayout
+  title="Privacidad — WakeOnHome"
+  description="Política de privacidad de WakeOnHome (controla tu PC desde tu casa inteligente)."
+>
+  <section class="container-site legal">
+    <header>
+      <p class="kicker">wakeonhome</p>
+      <h1>Política de privacidad</h1>
+      <p class="muted">
+        Vigente desde el 6 de agosto de 2026 · Aplica a <strong>WakeOnHome</strong>
+        (app de escritorio para Windows, skill de Alexa y app móvil). Producto en
+        desarrollo: esta política se actualizará antes del lanzamiento público.
+      </p>
+    </header>
+
+    <h2>Lo esencial</h2>
+    <p>
+      WakeOnHome conecta tu PC con tu casa inteligente: encenderla, apagarla,
+      lanzar acciones y ver su estado desde Alexa o desde el celular. Para eso
+      necesita una cuenta y unos pocos datos técnicos, descritos abajo.
+      <strong>No vendemos datos, no mostramos publicidad y no usamos tu
+      información para perfilado.</strong> El video de tu webcam o pantalla
+      <strong>nunca pasa por nuestros servidores</strong>.
+    </p>
+
+    <h2>Datos que tratamos</h2>
+    <ul>
+      <li>
+        <strong>Cuenta:</strong> el correo con el que inicias sesión (email, Google
+        o Amazon). Se usa solo para identificarte y vincular tus equipos.
+      </li>
+      <li>
+        <strong>Tus equipos:</strong> nombre del equipo y dirección MAC del
+        adaptador de red. La MAC es necesaria para el encendido por Wake-on-LAN y
+        se comparte con Alexa para que tu propio Echo pueda emitir la señal de
+        encendido dentro de tu red.
+      </li>
+      <li>
+        <strong>Tu configuración:</strong> las acciones rápidas y sensores que tú
+        defines (por ejemplo "abrir Steam"), para poder mostrarlos en tu app de
+        casa.
+      </li>
+      <li>
+        <strong>Estado técnico básico:</strong> encendido/apagado y conexión del
+        agente, para reflejarlo en Alexa y en la app móvil. No registramos qué
+        haces en tu PC.
+      </li>
+    </ul>
+
+    <h2>Webcam y pantalla</h2>
+    <p>
+      Si activas la cámara o la vista de pantalla, la transmisión viaja
+      <strong>directamente de tu PC a tu dispositivo</strong> (por ejemplo un Echo
+      Show) dentro de tu red local. Nuestros servidores solo intercambian la
+      señalización técnica para establecer la conexión;
+      <strong>nunca ven, procesan ni almacenan tu video o audio</strong>.
+    </p>
+
+    <h2>Pagos</h2>
+    <p>
+      La licencia se procesa a través de un tercero especializado (Paddle), que
+      actúa como comercio registrado. <strong>Nunca vemos ni almacenamos datos de
+      tu tarjeta.</strong>
+    </p>
+
+    <h2>Servicios de terceros</h2>
+    <ul>
+      <li>
+        <strong>Amazon Alexa:</strong> al vincular la skill, tus comandos de voz
+        los procesa Amazon bajo sus propias políticas; nosotros solo recibimos la
+        orden ya interpretada (por ejemplo "encender").
+      </li>
+      <li>
+        <strong>Infraestructura:</strong> usamos Cloudflare y AWS para operar el
+        servicio, con los datos cifrados en tránsito.
+      </li>
+    </ul>
+
+    <h2>Tus datos</h2>
+    <ul>
+      <li>Puedes eliminar equipos individuales o tu cuenta completa cuando quieras.</li>
+      <li>Al eliminar la cuenta se borran tus datos de nuestros sistemas.</li>
+      <li>No usamos analítica invasiva, rastreadores ni publicidad.</li>
+    </ul>
+
+    <h2>Contacto</h2>
+    <p>
+      Dudas sobre esta política:
+      <a href={`mailto:${CONTACT}`}>{CONTACT}</a>
+    </p>
+
+    <hr />
+
+    <h1>Privacy Policy</h1>
+    <p class="muted">
+      Effective August 6, 2026 · Applies to <strong>WakeOnHome</strong> (Windows
+      desktop app, Alexa skill and mobile app). Product in development: this
+      policy will be updated before public launch.
+    </p>
+
+    <h2>The essentials</h2>
+    <p>
+      WakeOnHome connects your PC to your smart home: turn it on or off, run
+      actions and see its status from Alexa or your phone. That requires an
+      account and a few technical data points, described below.
+      <strong>We don't sell data, show ads or profile you.</strong> Your webcam
+      or screen video <strong>never passes through our servers</strong>.
+    </p>
+
+    <h2>Data we process</h2>
+    <ul>
+      <li>
+        <strong>Account:</strong> the email you sign in with (email, Google or
+        Amazon), used only to identify you and link your computers.
+      </li>
+      <li>
+        <strong>Your computers:</strong> computer name and network adapter MAC
+        address. The MAC is required for Wake-on-LAN power-on and is shared with
+        Alexa so your own Echo can send the wake signal inside your network.
+      </li>
+      <li>
+        <strong>Your configuration:</strong> the quick actions and sensors you
+        define (e.g. "open Steam"), so they can appear in your home app.
+      </li>
+      <li>
+        <strong>Basic technical state:</strong> power and agent connectivity, to
+        reflect it in Alexa and the mobile app. We do not log what you do on your
+        PC.
+      </li>
+    </ul>
+
+    <h2>Webcam and screen</h2>
+    <p>
+      If you enable the camera or screen view, the stream travels
+      <strong>directly from your PC to your device</strong> (e.g. an Echo Show)
+      inside your local network. Our servers only exchange the technical
+      signaling to establish the connection; <strong>they never see, process or
+      store your video or audio</strong>.
+    </p>
+
+    <h2>Payments</h2>
+    <p>
+      Licenses are processed by a specialized third party (Paddle) acting as
+      merchant of record. <strong>We never see or store your card details.</strong>
+    </p>
+
+    <h2>Third-party services</h2>
+    <ul>
+      <li>
+        <strong>Amazon Alexa:</strong> when you link the skill, your voice
+        commands are processed by Amazon under its own policies; we only receive
+        the already-interpreted request (e.g. "turn on").
+      </li>
+      <li>
+        <strong>Infrastructure:</strong> we run on Cloudflare and AWS, with data
+        encrypted in transit.
+      </li>
+    </ul>
+
+    <h2>Your data</h2>
+    <ul>
+      <li>You can delete individual computers or your whole account at any time.</li>
+      <li>Deleting the account removes your data from our systems.</li>
+      <li>No invasive analytics, trackers or advertising.</li>
+    </ul>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about this policy:
+      <a href={`mailto:${CONTACT}`}>{CONTACT}</a>
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal {
+    max-width: 46rem;
+    padding-block: 3.5rem 4rem;
+  }
+  .legal h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin: 0.4rem 0 0.6rem;
+  }
+  .legal h2 {
+    font-size: 1.15rem;
+    margin: 2rem 0 0.6rem;
+  }
+  .legal p,
+  .legal li {
+    line-height: 1.65;
+  }
+  .legal ul {
+    padding-left: 1.2rem;
+  }
+  .legal li + li {
+    margin-top: 0.35rem;
+  }
+  .legal hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 3rem 0;
+  }
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+</style>

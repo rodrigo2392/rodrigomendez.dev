@@ -1,0 +1,168 @@
+---
+/**
+ * Aviso de privacidad de la línea de negocio.
+ *
+ * Meta EXIGE una URL de aviso de privacidad para poder publicar un formulario
+ * instantáneo, y el sitio solo tenía avisos por app (lizt, wakeonhome). Este
+ * cubre los datos que entran por el formulario de Facebook, por WhatsApp y por
+ * la página /pyme.
+ *
+ * OJO: es un aviso base redactado con la estructura que pide la LFPDPPP, no es
+ * asesoría legal. Para montos grandes conviene que un abogado lo revise una vez
+ * y a partir de ahí se reusa.
+ */
+import PymeLayout from '../../layouts/PymeLayout.astro';
+import { AUTHOR, WHATSAPP } from '../../consts';
+
+const ACTUALIZADO = '23 de agosto de 2026';
+---
+
+<PymeLayout
+  title="Aviso de privacidad"
+  description="Aviso de privacidad para los datos que se recaban a través de los anuncios, el formulario de contacto y WhatsApp de Rodrigo Méndez."
+>
+  <article class="container-site legal">
+    <p class="kicker">aviso de privacidad</p>
+    <h1>Aviso de privacidad</h1>
+    <p class="legal__fecha">Última actualización: {ACTUALIZADO}</p>
+
+    <h2>Quién es responsable de tus datos</h2>
+    <p>
+      Rodrigo Méndez Gallegos, persona física con actividad empresarial, con domicilio en
+      Guadalajara, Jalisco, México, es responsable del uso y protección de los datos
+      personales que nos proporcionas. Puedes contactarnos en <a
+        href={`mailto:${AUTHOR.email}`}>{AUTHOR.email}</a
+      > o al WhatsApp {WHATSAPP.display}.
+    </p>
+
+    <h2>Qué datos recabamos</h2>
+    <p>
+      Solo los que necesitamos para cotizarte y darte seguimiento: tu nombre, tu teléfono,
+      tu correo electrónico, el nombre y giro de tu negocio, y lo que nos cuentes sobre lo
+      que necesitas. Los recabamos cuando llenas el formulario de nuestros anuncios en
+      Facebook, cuando nos escribes por WhatsApp o cuando nos mandas un correo.
+    </p>
+    <p>
+      <strong>No recabamos datos sensibles</strong> ni datos financieros o patrimoniales a
+      través de estos medios. Si llegamos a facturarte, tus datos fiscales se tratan solo
+      para emitir el comprobante.
+    </p>
+
+    <h2>Para qué los usamos</h2>
+    <ul>
+      <li>Contactarte y responder lo que nos preguntaste.</li>
+      <li>Preparar y enviarte una cotización.</li>
+      <li>Prestarte el servicio si decides contratarlo, y darle seguimiento.</li>
+      <li>Emitir facturas y llevar el registro contable que la ley nos exige.</li>
+    </ul>
+    <p>
+      No vendemos, rentamos ni compartimos tus datos con terceros para que te vendan algo.
+      Si en algún momento quisiéramos usarlos para enviarte promociones, te lo pediremos
+      antes y podrás negarte sin que eso afecte el servicio.
+    </p>
+
+    <h2>Con quién los compartimos</h2>
+    <p>
+      Únicamente con los proveedores que hacen falta para operar: la plataforma de
+      publicidad por la que llegó tu solicitud (Meta), los servicios de mensajería y correo
+      con los que te contactamos, y nuestro proveedor de facturación cuando pides factura.
+      Cada uno trata tus datos bajo sus propias políticas.
+    </p>
+
+    <h2>Cuánto tiempo los conservamos</h2>
+    <p>
+      Si no llegamos a trabajar juntos, conservamos tus datos de contacto hasta por 12
+      meses y después los eliminamos. Si sí contratas, los conservamos mientras dure la
+      relación y el tiempo que la ley exija para efectos fiscales y contables.
+    </p>
+
+    <h2>Tus derechos ARCO</h2>
+    <p>
+      Tienes derecho a conocer qué datos tuyos tenemos y para qué los usamos
+      (<strong>Acceso</strong>), a pedir que los corrijamos si están mal
+      (<strong>Rectificación</strong>), a que los eliminemos cuando consideres que no se
+      están usando bien (<strong>Cancelación</strong>) y a oponerte a que los usemos para
+      fines específicos (<strong>Oposición</strong>).
+    </p>
+    <p>
+      Para ejercerlos, escríbenos a <a href={`mailto:${AUTHOR.email}`}>{AUTHOR.email}</a> con
+      el asunto "Derechos ARCO", diciéndonos tu nombre, un medio para responderte y qué es
+      lo que quieres. Te contestamos en un máximo de 20 días hábiles. También puedes
+      pedirnos en cualquier momento que dejemos de contactarte, y lo hacemos de inmediato.
+    </p>
+
+    <h2>Cookies y tecnologías de rastreo</h2>
+    <p>
+      Esta sección del sitio usa el pixel de Meta para medir cuánta gente llega desde
+      nuestros anuncios y para mostrar anuncios a quien ya nos visitó. Esa herramienta
+      guarda información en tu navegador y la comparte con Meta. Puedes desactivarla desde
+      la configuración de anuncios de tu cuenta de Facebook o bloqueando las cookies desde
+      tu navegador; la página sigue funcionando igual.
+    </p>
+    <p>El resto del sitio (el blog, los proyectos y los videos) no lleva ningún rastreador.</p>
+
+    <h2>Cambios a este aviso</h2>
+    <p>
+      Si cambiamos algo, la versión nueva queda publicada en esta misma dirección con su
+      fecha de actualización. Te recomendamos revisarla de vez en cuando.
+    </p>
+
+    <p class="legal__volver"><a href="/pyme">Volver a la página</a></p>
+  </article>
+</PymeLayout>
+
+<style>
+  .legal {
+    max-width: 46rem;
+    padding-block: clamp(2.5rem, 6vw, 4.5rem) 4rem;
+  }
+  .legal h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0.5rem 0 0.4rem;
+  }
+  .legal__fecha {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--color-faint);
+    margin: 0 0 2.5rem;
+  }
+  .legal h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 2.25rem 0 0.75rem;
+  }
+  .legal p,
+  .legal li {
+    color: var(--color-muted);
+    line-height: 1.7;
+  }
+  .legal p {
+    margin: 0 0 1rem;
+  }
+  .legal ul {
+    margin: 0 0 1rem;
+    padding-left: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .legal strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+  .legal a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .legal__volver {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+</style>

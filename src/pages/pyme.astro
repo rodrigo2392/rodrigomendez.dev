@@ -1,0 +1,644 @@
+---
+/**
+ * Landing de la línea de negocio: páginas, tiendas, sistemas y apps para pymes.
+ *
+ * NO es el destino de la pauta (ese es el formulario instantáneo de Facebook).
+ * Es el activo de medición y retargeting, el link de la pantalla final del
+ * formulario, y la página que el lead abre antes de que Rodrigo le escriba.
+ * Por eso vive fuera del layout del canal: aquí no hay blog, videos ni nav.
+ */
+import PymeLayout from '../layouts/PymeLayout.astro';
+import { DEMOS, SERVICIOS, WHATSAPP, waLink } from '../consts';
+
+const waHero = waLink('Hola, quiero una página para mi negocio.');
+const waFinal = waLink('Hola, vi tu página y quiero cotizar. Mi negocio es:');
+
+const PRUEBAS = [
+  { dato: '2,500+', etiqueta: 'usuarios en Piclink, la plataforma que construí y opero' },
+  { dato: '1M+', etiqueta: 'descargas sumadas de las apps que he publicado' },
+  { dato: '11', etiqueta: 'años construyendo software, de junior a líder técnico' },
+];
+
+const PASOS = [
+  {
+    n: '1',
+    titulo: 'Me cuentas de tu negocio',
+    texto:
+      'Por WhatsApp, en diez minutos. A qué te dedicas, qué quieres que haga la página y si ya tienes fotos y textos. Si no los tienes, te ayudo con eso.',
+  },
+  {
+    n: '2',
+    titulo: 'Te la armo con tu marca',
+    texto:
+      'Tus colores, tus fotos, tu WhatsApp y tu dominio. Te la muestro terminada antes de que pagues el resto, y tienes dos rondas de ajustes incluidas.',
+  },
+  {
+    n: '3',
+    titulo: 'Queda en línea a tu nombre',
+    texto:
+      'El dominio y el hosting quedan a tu nombre, no al mío. Si algún día quieres irte con otro, te llevas todo sin pedirme permiso.',
+  },
+];
+---
+
+<PymeLayout
+  title="Páginas y software para tu negocio"
+  description="Tu página web lista en 7 días desde $3,490. Tiendas en línea, sistemas a la medida y apps para pymes en México. Precios claros y trato directo con quien hace el trabajo."
+>
+  <!-- ── Hero ───────────────────────────────────────────────────────── -->
+  <section class="container-site hero">
+    <p class="kicker">páginas y software para negocios</p>
+    <h1 class="hero__title">
+      Tu negocio necesita una página.<br />
+      <span class="hero__accent">Te la entrego en 7 días.</span>
+    </h1>
+    <p class="hero__lead">
+      Diseño profesional, dominio, hosting y botón de WhatsApp incluidos. Precio cerrado,
+      sin sorpresas y sin mensualidades escondidas. La construye un ingeniero con 11 años
+      de experiencia, no una plantilla al aventón.
+    </p>
+
+    <div class="hero__row">
+      <div class="pricetag">
+        <span class="pricetag__amount">$3,490</span>
+        <span class="pricetag__sub">lista en 7 días</span>
+      </div>
+      <a class="btn-accent hero__cta" href={waHero} data-fb-lead="hero">
+        Escríbeme por WhatsApp <span aria-hidden="true">→</span>
+      </a>
+    </div>
+
+    <ul class="hero__marks">
+      <li>Dominio y hosting el primer año</li>
+      <li>Factura disponible</li>
+      <li>Trato directo con quien la hace</li>
+    </ul>
+  </section>
+
+  <!-- ── Demos reales ───────────────────────────────────────────────── -->
+  <section class="container-site demos" id="demos">
+    <header class="sec__head reveal">
+      <p class="kicker">demos reales</p>
+      <h2 class="sec__title">Así se vería la página de tu negocio</h2>
+      <p class="sec__lead">
+        Seis páginas completas y navegables, una por giro. No son imágenes: ábrelas en tu
+        celular y muévete por ellas como lo haría tu cliente.
+      </p>
+      <p class="sec__note">
+        * negocios de demostración: nombres, direcciones y teléfonos son inventados
+      </p>
+    </header>
+
+    <div class="demos__grid">
+      {
+        DEMOS.map((d) => (
+          <a
+            class="demo reveal"
+            href={`/demos/${d.slug}/`}
+            target="_blank"
+            rel="noopener"
+            data-fb-demo={d.slug}
+          >
+            <div class="demo__shot">
+              <img
+                src={`/pyme/${d.slug}-phone.jpg`}
+                width="390"
+                height="844"
+                loading="lazy"
+                decoding="async"
+                alt={`Página de demostración para ${d.giro}: ${d.nombre}`}
+              />
+            </div>
+            <div class="demo__body">
+              <p class="demo__giro">{d.giro}</p>
+              <h3 class="demo__name">{d.nombre}</h3>
+              <p class="demo__desc">{d.descripcion}</p>
+              <span class="demo__cta">
+                Abrir el demo <span aria-hidden="true">↗</span>
+              </span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+
+    <p class="demos__foot reveal">
+      ¿Tu giro no está en la lista? Da igual: estas son muestras, la tuya se hace desde
+      cero con lo que tú vendes.
+    </p>
+  </section>
+
+  <!-- ── Prueba ─────────────────────────────────────────────────────── -->
+  <section class="container-site prueba">
+    <div class="prueba__box reveal">
+      <p class="kicker">quién la hace</p>
+      <h2 class="sec__title">No es una agencia que subcontrata</h2>
+      <p class="sec__lead">
+        Soy Rodrigo Méndez, ingeniero de software. Construyo y opero mi propia plataforma,
+        he publicado apps que usan cientos de miles de personas, y este sitio que estás
+        viendo también es mío. El mismo nivel de trabajo, al alcance de tu negocio.
+      </p>
+      <dl class="pruebas">
+        {
+          PRUEBAS.map((p) => (
+            <div class="pruebas__item">
+              <dt class="pruebas__dato">{p.dato}</dt>
+              <dd class="pruebas__label">{p.etiqueta}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <!-- ── Servicios y precios ────────────────────────────────────────── -->
+  <section class="container-site servicios" id="precios">
+    <header class="sec__head reveal">
+      <p class="kicker">precios</p>
+      <h2 class="sec__title">Todo con precio, desde el primer mensaje</h2>
+      <p class="sec__lead">
+        Nada de "depende" ni de cotizaciones que tardan una semana. Si algo se sale de
+        estos paquetes, te lo digo y te lo cotizo por escrito.
+      </p>
+    </header>
+
+    <div class="servicios__grid">
+      {
+        SERVICIOS.map((s) => (
+          <article class:list={['svc', 'reveal', s.destacado && 'svc--top']}>
+            {s.destacado && <span class="svc__chip">el más pedido</span>}
+            <h3 class="svc__name">{s.nombre}</h3>
+            <p class="svc__price">{s.precio}</p>
+            <p class="svc__entrega">{s.entrega}</p>
+            <p class="svc__lead">{s.lead}</p>
+            <ul class="svc__list">
+              {s.incluye.map((i) => (
+                <li>{i}</li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+
+    <p class="servicios__foot reveal">
+      Los precios son en pesos. Si necesitas factura se agrega el IVA. En todo lo de
+      $3,490 en adelante se trabaja con 50% de anticipo y el resto contra entrega.
+    </p>
+  </section>
+
+  <!-- ── Proceso ────────────────────────────────────────────────────── -->
+  <section class="container-site proceso">
+    <header class="sec__head reveal">
+      <p class="kicker">cómo trabajamos</p>
+      <h2 class="sec__title">Tres pasos y ya estás en línea</h2>
+    </header>
+    <ol class="pasos">
+      {
+        PASOS.map((p) => (
+          <li class="paso reveal">
+            <span class="paso__n">{p.n}</span>
+            <h3 class="paso__titulo">{p.titulo}</h3>
+            <p class="paso__texto">{p.texto}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <!-- ── Cierre ─────────────────────────────────────────────────────── -->
+  <section class="container-site cierre">
+    <div class="cierre__box reveal">
+      <h2 class="cierre__title">Cuéntame de tu negocio y te digo qué te conviene</h2>
+      <p class="cierre__lead">
+        Te contesto yo, el mismo día. Si lo que necesitas no es una página, te lo digo
+        también: no me sirve venderte algo que no vas a usar.
+      </p>
+      <a class="btn-accent cierre__cta" href={waFinal} data-fb-lead="cierre">
+        Escríbeme por WhatsApp <span aria-hidden="true">→</span>
+      </a>
+      <p class="cierre__num">{WHATSAPP.display}</p>
+    </div>
+  </section>
+
+  <footer class="container-site pie">
+    <p>Rodrigo Méndez · Guadalajara, México</p>
+    <p><a href="/">rodrigomendez.dev</a></p>
+  </footer>
+</PymeLayout>
+
+<style>
+  /* ── Bloques compartidos ─────────────────────────────────────────── */
+  .sec__head {
+    max-width: 60ch;
+  }
+  .sec__title {
+    font-size: clamp(2rem, 4.4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    margin: 0.5rem 0 1rem;
+  }
+  .sec__lead {
+    color: var(--color-muted);
+    font-size: 1.15rem;
+    max-width: 58ch;
+  }
+  .sec__note {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-faint);
+    margin-top: 0.9rem;
+  }
+
+  /* ── Hero ────────────────────────────────────────────────────────── */
+  .hero {
+    padding-block: clamp(3rem, 8vw, 6rem) 3rem;
+  }
+  .hero__title {
+    font-size: clamp(2.5rem, 6.4vw, 4.4rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.03;
+    margin: 0.6rem 0 1.4rem;
+    max-width: 20ch;
+  }
+  .hero__accent {
+    color: var(--color-accent);
+  }
+  .hero__lead {
+    color: var(--color-muted);
+    font-size: clamp(1.05rem, 2vw, 1.3rem);
+    max-width: 56ch;
+  }
+  .hero__row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2.2rem;
+  }
+  .pricetag {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    background: var(--color-surface);
+  }
+  .pricetag__amount {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .pricetag__sub {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin-top: 0.35rem;
+  }
+  .hero__cta {
+    font-size: 1.05rem;
+    padding: 0.95rem 1.8rem;
+  }
+  .hero__marks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.6rem;
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--color-faint);
+  }
+  .hero__marks li::before {
+    content: '✓ ';
+    color: var(--color-accent);
+  }
+
+  /* ── Demos ───────────────────────────────────────────────────────── */
+  .demos {
+    padding-block: 3rem;
+  }
+  .demos__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+  .demo {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: 1.1rem;
+    background: var(--color-surface);
+    overflow: hidden;
+    transition:
+      border-color 0.18s ease,
+      transform 0.18s ease;
+  }
+  .demo:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-3px);
+  }
+  .demo__shot {
+    /* Captura real del demo, anclada arriba para que siempre se vea el
+       encabezado, el titular y el botón. A 21rem el corte cae debajo del
+       llamado a la acción en las seis; más bajo cortaba a media palabra. */
+    position: relative;
+    height: 21rem;
+    overflow: hidden;
+    background: var(--color-surface-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .demo__shot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+  }
+  /* El degradado hace que el recorte se lea como decisión y no como error. */
+  .demo__shot::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 4.5rem;
+    background: linear-gradient(180deg, transparent, var(--color-surface));
+    pointer-events: none;
+  }
+  .demo__body {
+    padding: 1.25rem 1.35rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .demo__giro {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+    margin: 0;
+  }
+  .demo__name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0.35rem 0 0.5rem;
+  }
+  .demo__desc {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    flex: 1;
+    margin: 0;
+  }
+  .demo__cta {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-top: 1rem;
+  }
+  .demos__foot {
+    color: var(--color-muted);
+    margin-top: 1.75rem;
+    max-width: 58ch;
+  }
+
+  /* ── Prueba ──────────────────────────────────────────────────────── */
+  .prueba {
+    padding-block: 3rem;
+  }
+  .prueba__box {
+    border: 1px solid var(--color-border);
+    border-radius: 1.25rem;
+    background: var(--color-surface);
+    padding: clamp(1.5rem, 4vw, 3rem);
+  }
+  .pruebas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin: 2.25rem 0 0;
+  }
+  .pruebas__item {
+    border-left: 2px solid var(--color-accent);
+    padding-left: 1rem;
+  }
+  .pruebas__dato {
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .pruebas__label {
+    color: var(--color-muted);
+    font-size: 0.92rem;
+    margin: 0.5rem 0 0;
+  }
+
+  /* ── Servicios ───────────────────────────────────────────────────── */
+  .servicios {
+    padding-block: 3rem;
+  }
+  .servicios__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+  }
+  .svc {
+    position: relative;
+    border: 1px solid var(--color-border);
+    border-radius: 1.1rem;
+    background: var(--color-surface);
+    padding: 1.6rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .svc--top {
+    border-color: var(--color-accent);
+    background: linear-gradient(180deg, var(--color-accent-soft), var(--color-surface) 42%);
+  }
+  .svc__chip {
+    position: absolute;
+    top: -0.7rem;
+    left: 1.4rem;
+    background: var(--color-accent);
+    color: #06131a;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
+  }
+  .svc__name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0;
+  }
+  .svc__price {
+    font-size: 1.85rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0.5rem 0 0;
+    line-height: 1.1;
+  }
+  .svc__entrega {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-faint);
+    margin: 0.2rem 0 0;
+  }
+  .svc__lead {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    margin: 1rem 0 0;
+  }
+  .svc__list {
+    list-style: none;
+    padding: 0;
+    margin: 1.1rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    font-size: 0.9rem;
+    color: var(--color-ink);
+  }
+  .svc__list li {
+    display: flex;
+    gap: 0.55rem;
+    line-height: 1.35;
+  }
+  .svc__list li::before {
+    content: '';
+    flex: 0 0 auto;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+    margin-top: 0.45rem;
+  }
+  .servicios__foot {
+    color: var(--color-faint);
+    font-size: 0.9rem;
+    margin-top: 1.75rem;
+    max-width: 64ch;
+  }
+
+  /* ── Proceso ─────────────────────────────────────────────────────── */
+  .proceso {
+    padding-block: 3rem;
+  }
+  .pasos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 2.5rem 0 0;
+  }
+  .paso {
+    border-top: 2px solid var(--color-border);
+    padding-top: 1.25rem;
+  }
+  .paso__n {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+  .paso__titulo {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0.4rem 0 0.6rem;
+  }
+  .paso__texto {
+    color: var(--color-muted);
+    font-size: 0.98rem;
+    margin: 0;
+  }
+
+  /* ── Cierre ──────────────────────────────────────────────────────── */
+  .cierre {
+    padding-block: 3rem 4rem;
+  }
+  .cierre__box {
+    border: 1px solid var(--color-accent);
+    border-radius: 1.25rem;
+    background: linear-gradient(180deg, var(--color-accent-soft), var(--color-surface) 55%);
+    padding: clamp(1.75rem, 5vw, 3.5rem);
+    text-align: center;
+  }
+  .cierre__title {
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0 auto 1rem;
+    max-width: 22ch;
+  }
+  .cierre__lead {
+    color: var(--color-muted);
+    max-width: 52ch;
+    margin: 0 auto;
+  }
+  .cierre__cta {
+    margin-top: 1.75rem;
+    font-size: 1.05rem;
+    padding: 0.95rem 1.8rem;
+  }
+  .cierre__num {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-faint);
+    margin-top: 1rem;
+  }
+
+  /* ── Pie ─────────────────────────────────────────────────────────── */
+  .pie {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-block: 2rem 3rem;
+    border-top: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-faint);
+  }
+  .pie a:hover {
+    color: var(--color-accent);
+  }
+
+  /* ── Responsivo ──────────────────────────────────────────────────── */
+  @media (max-width: 64rem) {
+    .demos__grid,
+    .servicios__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 48rem) {
+    .pasos,
+    .pruebas {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 40rem) {
+    .demos__grid,
+    .servicios__grid {
+      grid-template-columns: 1fr;
+    }
+    .hero__row {
+      gap: 1rem;
+    }
+    .hero__cta,
+    .cierre__cta {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>

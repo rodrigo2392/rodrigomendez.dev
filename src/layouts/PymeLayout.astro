@@ -1,0 +1,168 @@
+---
+/**
+ * Layout de la línea de negocio (/pyme).
+ *
+ * A propósito NO usa BaseLayout: quien llega aquí viene de un anuncio de
+ * Facebook y es dueño de una pyme, no alguien que viene por el contenido del
+ * canal. Nada de nav con "inicio.tsx / sobre.md", nada de command palette,
+ * nada de easter eggs. Solo la oferta y el WhatsApp.
+ *
+ * Es también la única página del sitio con el pixel de Meta: el resto del
+ * sitio (blog, videos, proyectos) sigue sin ningún rastreador.
+ */
+import '@fontsource-variable/outfit';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '@fontsource/jetbrains-mono/700.css';
+import '../styles/global.css';
+
+import { SITE, META_PIXEL_ID } from '../consts';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+}
+
+const { title, description, image = '/og-default.png' } = Astro.props;
+
+const pageTitle = `${title} — ${SITE.title}`;
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const ogImage = new URL(image, SITE.url).href;
+---
+
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="Rodrigo Méndez" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:site_name" content={SITE.title} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <meta name="theme-color" content="#0B0E14" />
+
+    {/* Pixel de Meta — SOLO en esta rama del sitio. Mide la pauta de la línea Dev
+        y arma la audiencia de retargeting. Los eventos ViewContent y Lead los
+        dispara la propia página en los clics (ver el script de abajo). */}
+    <script is:inline define:vars={{ pixelId: META_PIXEL_ID }}>
+      /* eslint-disable */
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', pixelId);
+      fbq('track', 'PageView');
+    </script>
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display:none"
+        src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+        alt=""
+      /></noscript
+    >
+  </head>
+  <body class="pyme-body">
+    <main id="contenido">
+      <slot />
+    </main>
+
+    <script>
+      // Eventos del embudo. Se leen de atributos data-* para no repetir el
+      // nombre del evento en cada botón del markup.
+      function initPixelEvents() {
+        const track = (name: string, params: Record<string, unknown>) => {
+          const fbq = (window as any).fbq;
+          if (typeof fbq === 'function') fbq('track', name, params);
+        };
+
+        for (const el of Array.from(document.querySelectorAll('[data-fb-demo]'))) {
+          if ((el as HTMLElement).dataset.bound) continue;
+          (el as HTMLElement).dataset.bound = '1';
+          el.addEventListener('click', () => {
+            track('ViewContent', {
+              content_name: (el as HTMLElement).dataset.fbDemo,
+              content_category: 'demo',
+            });
+          });
+        }
+
+        for (const el of Array.from(document.querySelectorAll('[data-fb-lead]'))) {
+          if ((el as HTMLElement).dataset.bound) continue;
+          (el as HTMLElement).dataset.bound = '1';
+          el.addEventListener('click', () => {
+            track('Lead', {
+              content_name: (el as HTMLElement).dataset.fbLead,
+              content_category: 'whatsapp',
+            });
+          });
+        }
+      }
+
+      // Reveal al hacer scroll (la animación real la controla global.css, que
+      // respeta prefers-reduced-motion).
+      function initReveal() {
+        const els = Array.from(document.querySelectorAll('.reveal'));
+        if (!els.length) return;
+        const io = new IntersectionObserver(
+          (entries, obs) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-visible');
+                obs.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px' }
+        );
+        for (const el of els) {
+          if (el.getBoundingClientRect().top < window.innerHeight * 0.95) {
+            el.classList.add('is-visible');
+          } else {
+            io.observe(el);
+          }
+        }
+      }
+
+      initPixelEvents();
+      initReveal();
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  /* El resto del sitio empuja el contenido bajo un nav sticky; aquí no hay nav. */
+  .pyme-body {
+    scroll-padding-top: 0;
+  }
+</style>
