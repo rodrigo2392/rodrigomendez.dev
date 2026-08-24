@@ -1,0 +1,150 @@
+---
+/**
+ * Pantalla de "gracias" para el tráfico que sale del formulario instantáneo.
+ *
+ * Existe porque Meta NO acepta enlaces de wa.me en la acción adicional de un
+ * formulario instantáneo ("Los formularios instantáneos no admiten enlaces de
+ * WhatsApp"). En vez de rodear la regla con un redirect, que es como te marcan
+ * la cuenta, esta es una página real con un solo trabajo: que la persona que
+ * acaba de dejar sus datos abra la conversación ella misma, mientras sigue
+ * caliente.
+ *
+ * Un solo botón arriba del pliegue. Todo lo demás es secundario.
+ */
+import PymeLayout from '../../layouts/PymeLayout.astro';
+import { DEMOS, WHATSAPP, waLink } from '../../consts';
+
+const wa = waLink('Hola, acabo de llenar el formulario. Mi negocio es:');
+---
+
+<PymeLayout
+  title="Gracias, ya tengo tus datos"
+  description="Recibí tus datos. Te escribo hoy mismo por WhatsApp para ver tu caso."
+>
+  <section class="container-site gracias">
+    <p class="kicker">recibido</p>
+    <h1 class="gracias__title">Listo, ya tengo tus datos</h1>
+    <p class="gracias__lead">
+      Te escribo hoy mismo por WhatsApp. Si quieres adelantarte y que lo veamos ahora,
+      ábreme la conversación de una vez: el mensaje ya va escrito, solo dime a qué se
+      dedica tu negocio.
+    </p>
+
+    <a class="btn-accent gracias__cta" href={wa} data-fb-lead="gracias">
+      Escríbeme por WhatsApp <span aria-hidden="true">→</span>
+    </a>
+    <p class="gracias__num">{WHATSAPP.display} · te contesto el mismo día</p>
+
+    <div class="gracias__demos">
+      <h2 class="gracias__sub">Mientras tanto, abre un demo</h2>
+      <p class="gracias__hint">
+        Son páginas reales y navegables, una por giro. Así ves exactamente el nivel de lo
+        que te voy a entregar.
+      </p>
+      <ul class="chips">
+        {
+          DEMOS.map((d) => (
+            <li>
+              <a href={`/demos/${d.slug}/`} target="_blank" rel="noopener" data-fb-demo={d.slug}>
+                {d.giro} <span aria-hidden="true">↗</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <p class="gracias__volver"><a href="/pyme">Ver precios y todo lo que incluye</a></p>
+  </section>
+</PymeLayout>
+
+<style>
+  .gracias {
+    max-width: 44rem;
+    padding-block: clamp(3rem, 9vw, 6rem) 4rem;
+  }
+  .gracias__title {
+    font-size: clamp(2.2rem, 6vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin: 0.5rem 0 1rem;
+  }
+  .gracias__lead {
+    color: var(--color-muted);
+    font-size: clamp(1.05rem, 2vw, 1.2rem);
+    max-width: 48ch;
+    margin: 0;
+  }
+  .gracias__cta {
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+  }
+  .gracias__num {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-faint);
+    margin-top: 0.9rem;
+  }
+
+  .gracias__demos {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .gracias__sub {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+  }
+  .gracias__hint {
+    color: var(--color-muted);
+    font-size: 0.98rem;
+    max-width: 50ch;
+    margin: 0;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    list-style: none;
+    padding: 0;
+    margin: 1.25rem 0 0;
+  }
+  .chips a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.95rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    font-size: 0.9rem;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .chips a:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .gracias__volver {
+    margin-top: 3rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+  .gracias__volver a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 40rem) {
+    .gracias__cta {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
