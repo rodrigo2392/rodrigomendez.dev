@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lolsito · portada B · La Grieta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<style>
+  /* Portada B: el minimapa de la partida, vivo. Los diez jugadores caminan por
+     sus calles y Lolsito canta lo que ve. */
+  .hero { height: 300vh; }
+  .hero__stick::before {
+    background: radial-gradient(56% 38% at 50% 24%, rgba(7, 7, 11, 0.92) 0%, rgba(7, 7, 11, 0.55) 46%, transparent 78%);
+  }
+  .hero__wrap { transform: translateY(-24vh); }
+
+  /* Lo que dice el coach, abajo a la izquierda, como los avisos de la app. */
+  .voz {
+    position: absolute;
+    left: clamp(20px, 5vw, 62px);
+    bottom: clamp(84px, 13vh, 132px);
+    z-index: 3;
+    width: min(30rem, 74vw);
+    display: grid;
+  }
+  .voz__i {
+    grid-area: 1/1;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    background: rgba(12, 12, 19, 0.78);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 2px solid var(--ind);
+    border-radius: 12px;
+    box-shadow: 0 24px 50px -30px rgba(0, 0, 0, 0.95);
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
+  }
+  .voz__i.on { opacity: 1; transform: none; }
+  .voz__i.urgente { border-left-color: #fb7185; }
+  .voz__ico {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex: none;
+    border-radius: 8px;
+    background: rgba(99, 102, 241, 0.18);
+    color: var(--ind-cl);
+    margin-top: 1px;
+  }
+  .voz__i.urgente .voz__ico { background: rgba(251, 113, 133, 0.16); color: #fb7185; }
+  .voz__ico svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .voz__t { font-size: 13.5px; line-height: 1.45; color: rgba(255, 255, 255, 0.86); }
+  .voz__t b { font-weight: 800; }
+  .voz__min {
+    display: block;
+    margin-top: 3px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.34);
+  }
+
+  .tag--reloj {
+    top: clamp(78px, 11vh, 110px);
+    right: clamp(20px, 5vw, 62px);
+    font-variant-numeric: tabular-nums;
+  }
+  .tag--reloj i {
+    width: 6px; height: 6px; border-radius: 999px; background: var(--pos);
+  }
+
+  @media (max-width: 900px) {
+    .voz { left: 50%; translate: -50% 0; width: min(30rem, 88vw); bottom: clamp(74px, 11vh, 110px); }
+    .hero__wrap { transform: translateY(-28vh); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="gl"></canvas>
+<div class="vig"></div>
+<div class="grain"></div>
+
+<header class="bar">
+  <span class="bar__mark">LOLSITO</span>
+  <a class="bar__cta" href="#">Descargar</a>
+</header>
+
+<main>
+  <section class="hero" id="hero">
+    <div class="hero__stick">
+      <div class="hero__wrap" id="heroWrap">
+        <p class="hero__eyebrow">Para League of Legends</p>
+        <h1 class="hero__title">LOLSITO</h1>
+        <p class="hero__sub">Alguien que sí sabe, viéndote jugar.</p>
+      </div>
+
+      <div class="tag tag--reloj" id="tagReloj"><i></i> Partida en curso <b id="reloj">12:40</b></div>
+
+      <div class="voz" id="voz">
+        <div class="voz__i" data-v="0">
+          <span class="voz__ico"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /></svg></span>
+          <span class="voz__t">
+            La jungla enemiga <b>lleva 12 segundos sin verse</b>. Juega pegado a tu torre.
+            <span class="voz__min">Minuto 12:40 · aviso por voz</span>
+          </span>
+        </div>
+        <div class="voz__i urgente" data-v="1">
+          <span class="voz__ico"><svg viewBox="0 0 24 24"><path d="M12 9v5" /><path d="M12 17h.01" /><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></svg></span>
+          <span class="voz__t">
+            Vienen tres al medio. <b>Retírate ya.</b>
+            <span class="voz__min">Minuto 13:02 · aviso por voz</span>
+          </span>
+        </div>
+        <div class="voz__i" data-v="2">
+          <span class="voz__ico"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg></span>
+          <span class="voz__t">
+            Dragón en 40 segundos y tu jungla ya va para allá. <b>Empuja tu línea.</b>
+            <span class="voz__min">Minuto 13:20 · aviso por voz</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="hero__beat" id="heroBeat">
+        <p>No es una guía.<br />Es un <em>coach</em> dentro de tu computadora.</p>
+      </div>
+      <div class="scrollhint"><span>Baja</span><i></i></div>
+    </div>
+  </section>
+
+  <section class="nota">
+    <p class="nota__k">portada B · la grieta</p>
+    <h2 class="nota__h">La partida, mientras pasa</h2>
+    <p class="nota__d">
+      Aquí la portada es el mapa del juego visto en perspectiva, con los diez jugadores
+      caminando por sus calles. Cuando la jungla enemiga se pierde de vista, su icono se
+      apaga, sale un ping donde se le vio por última vez y Lolsito lo canta con la misma
+      tarjeta que usa la app. <b>Es la función más difícil de explicar con palabras</b> y
+      aquí se ve sola. Al bajar, la cámara se hunde en el mapa.
+    </p>
+    <p class="nota__legal">
+      Lolsito es un proyecto de fan y no está avalado por Riot Games. League of Legends y
+      todo su arte son marcas registradas de Riot Games, Inc.
+    </p>
+  </section>
+</main>
+
+<nav class="switch">
+  <span class="switch__tag">portada</span>
+  <a href="../lolsito-v2/index.html">Actual</a>
+  <a href="draft.html">A · Draft</a>
+  <a class="on" href="grieta.html">B · Grieta</a>
+  <a href="retrato.html">C · Retrato</a>
+</nav>
+
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.180.0/build/three.module.js';
+import { reduce, lerp, clamp, version, icono, mapaGrieta, cargador, bucle } from './lol.js';
+
+await version();
+
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(46, innerWidth / innerHeight, 0.1, 120);
+
+const carga = cargador(THREE);
+const grupo = new THREE.Group();
+scene.add(grupo);
+
+/* ── El mapa ─────────────────────────────────────────────────────
+   La textura del minimapa, tumbada y teñida para que combine con la
+   página. Los bordes se difuminan para que no se vea el cuadrado. */
+const LADO = 16;
+const mapa = new THREE.Mesh(
+  new THREE.PlaneGeometry(LADO, LADO, 1, 1),
+  new THREE.ShaderMaterial({
+    transparent: true,
+    uniforms: { uTex: { value: null }, uT: { value: 0 } },
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main(){
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      uniform sampler2D uTex;
+      uniform float uT;
+      varying vec2 vUv;
+      void main(){
+        vec3 tex = texture2D(uTex, vUv).rgb;
+        float luma = dot(tex, vec3(0.299, 0.587, 0.114));
+        // Del verde original a un azul de noche: el mapa tiene que ser fondo.
+        // Se conserva el dibujo del mapa y solo se tiñe: si se aplana a dos
+        // colores, las calles y la jungla dejan de distinguirse.
+        vec3 tinte = tex * vec3(0.46, 0.56, 1.32) * 1.45;
+        vec3 col = mix(vec3(0.075, 0.08, 0.14), tinte, 0.9);
+        col += vec3(0.14, 0.15, 0.38) * smoothstep(0.35, 0.85, luma);
+
+        // Rejilla fina encima, como un tablero táctico.
+        vec2 g = abs(fract(vUv * 16.0) - 0.5);
+        float rej = 1.0 - smoothstep(0.0, 0.05, min(g.x, g.y));
+        col += vec3(0.30, 0.32, 0.62) * rej * 0.10;
+
+        // Los bordes se van apagando: nada de cuadro recortado.
+        vec2 b = min(vUv, 1.0 - vUv);
+        float marco = smoothstep(0.0, 0.16, min(b.x, b.y));
+        gl_FragColor = vec4(col, marco);
+      }
+    `,
+  })
+);
+carga(mapaGrieta(), (t) => (mapa.material.uniforms.uTex.value = t));
+mapa.rotation.x = -Math.PI / 2;
+// El orden manda: todo lo que va encima del mapa se dibuja después, si no el
+// mapa (que es opaco por dentro) los borra al pintarse.
+mapa.renderOrder = 0;
+grupo.add(mapa);
+
+/* ── Rutas ───────────────────────────────────────────────────────
+   Coordenadas en el cuadrado del mapa: (0,0) abajo a la izquierda,
+   (1,1) arriba a la derecha, igual que el minimapa del juego. */
+const uvXY = (u, v) => new THREE.Vector3((u - 0.5) * LADO, 0, -(v - 0.5) * LADO);
+
+const RUTAS = {
+  top: [[0.06, 0.34], [0.07, 0.62], [0.13, 0.84], [0.34, 0.93]],
+  mid: [[0.24, 0.24], [0.38, 0.4], [0.5, 0.5], [0.62, 0.6], [0.76, 0.76]],
+  bot: [[0.34, 0.06], [0.62, 0.08], [0.85, 0.15], [0.93, 0.36]],
+  jgAzul: [[0.2, 0.42], [0.32, 0.3], [0.44, 0.24], [0.36, 0.14], [0.2, 0.2]],
+  jgRojo: [[0.78, 0.6], [0.66, 0.7], [0.56, 0.78], [0.66, 0.86], [0.8, 0.8]],
+};
+
+const JUGADORES = [
+  { champ: 'Darius', ruta: 'top', equipo: 'rojo', v: 0.055, off: 0.15 },
+  { champ: 'LeeSin', ruta: 'jgRojo', equipo: 'rojo', v: 0.075, off: 0.0, esJungla: true },
+  { champ: 'Katarina', ruta: 'mid', equipo: 'rojo', v: 0.05, off: 0.62 },
+  { champ: 'Jhin', ruta: 'bot', equipo: 'rojo', v: 0.045, off: 0.78 },
+  { champ: 'Thresh', ruta: 'bot', equipo: 'rojo', v: 0.045, off: 0.72 },
+  { champ: 'Riven', ruta: 'top', equipo: 'azul', v: 0.05, off: 0.55 },
+  { champ: 'Vi', ruta: 'jgAzul', equipo: 'azul', v: 0.07, off: 0.3 },
+  { champ: 'Ahri', ruta: 'mid', equipo: 'azul', v: 0.05, off: 0.3 },
+  { champ: 'Jinx', ruta: 'bot', equipo: 'azul', v: 0.045, off: 0.16 },
+  { champ: 'Lux', ruta: 'bot', equipo: 'azul', v: 0.045, off: 0.1 },
+];
+
+/* Los caminos se dibujan finitos debajo de los iconos. */
+const curvas = {};
+for (const [k, pts] of Object.entries(RUTAS)) {
+  const curva = new THREE.CatmullRomCurve3(pts.map(([u, v]) => uvXY(u, v)));
+  curvas[k] = curva;
+  const geo = new THREE.BufferGeometry().setFromPoints(curva.getPoints(60));
+  const linea = new THREE.Line(
+    geo,
+    new THREE.LineBasicMaterial({
+      color: 0x5b5fd6,
+      transparent: true,
+      opacity: 0.2,
+      depthWrite: false,
+    })
+  );
+  linea.position.y = 0.03;
+  linea.renderOrder = 1;
+  grupo.add(linea);
+}
+
+/* ── Iconos de los diez ──────────────────────────────────────── */
+const fichaGeo = new THREE.PlaneGeometry(1.05, 1.05);
+const fichas = JUGADORES.map((j) => {
+  const mat = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      uTex: { value: null },
+      uColor: {
+        value:
+          j.equipo === 'rojo'
+            ? new THREE.Color(0.92, 0.36, 0.42)
+            : new THREE.Color(0.44, 0.72, 1.0),
+      },
+      uVivo: { value: 1 }, // baja a 0 cuando el jugador se pierde de vista
+    },
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main(){
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      uniform sampler2D uTex;
+      uniform vec3 uColor;
+      uniform float uVivo;
+      varying vec2 vUv;
+      void main(){
+        vec2 c = vUv - 0.5;
+        float r = length(c);
+        if (r > 0.5) discard;
+        vec3 tex = texture2D(uTex, vUv).rgb;
+        float luma = dot(tex, vec3(0.299, 0.587, 0.114));
+        // Al perderse de vista, la ficha se queda en gris apagado.
+        vec3 col = mix(vec3(luma) * 0.5, tex, uVivo);
+        float aro = smoothstep(0.5, 0.44, r) - smoothstep(0.44, 0.37, r);
+        col = mix(col, uColor, aro * (0.55 + uVivo * 0.45));
+        float dentro = smoothstep(0.5, 0.47, r);
+        gl_FragColor = vec4(col, dentro * (0.35 + uVivo * 0.65));
+      }
+    `,
+  });
+  carga(icono(j.champ), (t) => (mat.uniforms.uTex.value = t));
+  const m = new THREE.Mesh(fichaGeo, mat);
+  m.position.y = 0.5;
+  m.renderOrder = 3;
+  grupo.add(m);
+  return { ...j, mesh: m, mat };
+});
+
+/* ── Ping de alerta donde se vio por última vez a la jungla ──── */
+const ping = new THREE.Mesh(
+  new THREE.PlaneGeometry(6.2, 6.2),
+  new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    uniforms: { uT: { value: 0 } },
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main(){
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      uniform float uT;
+      varying vec2 vUv;
+      void main(){
+        float r = length(vUv - 0.5) * 2.0;
+        if (r > 1.0) discard;
+
+        // Aro fijo: aquí se le vio por última vez.
+        float aro = 1.0 - smoothstep(0.0, 0.045, abs(r - 0.42));
+        // Dos ondas que salen del centro, como el ping del juego.
+        float ondas = 0.0;
+        for (int i = 0; i < 2; i++){
+          float f = fract(uT * 0.55 - float(i) * 0.5);
+          ondas += (1.0 - smoothstep(0.0, 0.13, abs(r - f))) * (1.0 - f) * 0.9;
+        }
+        float punto = 1.0 - smoothstep(0.05, 0.09, r);
+        float a = (aro * 0.85 + ondas + punto) * step(0.001, uT);
+        gl_FragColor = vec4(vec3(1.0, 0.42, 0.5), clamp(a, 0.0, 1.0) * 0.95);
+      }
+    `,
+  })
+);
+ping.rotation.x = -Math.PI / 2;
+ping.position.y = 0.06;
+ping.visible = false;
+ping.renderOrder = 2;
+grupo.add(ping);
+
+/* ── Guion ───────────────────────────────────────────────────── */
+// Ciclo de 15 s: la jungla desaparece, sale el ping, cambian los avisos.
+const CICLO = 15;
+const avisos = [...document.querySelectorAll('.voz__i')];
+const tagReloj = document.getElementById('tagReloj');
+const reloj = document.getElementById('reloj');
+
+const heroEl = document.getElementById('hero');
+const heroWrap = document.getElementById('heroWrap');
+const heroBeat = document.getElementById('heroBeat');
+const hint = document.querySelector('.scrollhint');
+
+const mouse = { tx: 0, ty: 0 };
+addEventListener(
+  'pointermove',
+  (e) => {
+    mouse.tx = (e.clientX / innerWidth - 0.5) * 2;
+    mouse.ty = (e.clientY / innerHeight - 0.5) * 2;
+  },
+  { passive: true }
+);
+
+let scrollPs = 0;
+let camBase = 30;   // distancia de la cámara al mapa
+let miraY = 0;      // a qué altura apunta: sube el punto y el mapa baja en pantalla
+
+/* Coloca la cámara. `dive` es lo que ya se bajó con el scroll. */
+function colocar(dive, mx = 0, my = 0) {
+  camera.position.set(
+    mx,
+    grupo.position.y + camBase * (0.78 - dive * 0.5) - my,
+    camBase * (0.56 + dive * 0.16)
+  );
+  camera.lookAt(0, grupo.position.y + miraY, 0);
+}
+
+/* El mapa se encuadra solo: se prueba una distancia, se mide dónde caen sus
+   cuatro esquinas en pantalla y se corrige, hasta que cabe entero en la franja
+   de abajo. Así queda bien en cualquier monitor sin números a mano. */
+const ESQUINAS = [
+  new THREE.Vector3(-8, 0, -8),
+  new THREE.Vector3(8, 0, -8),
+  new THREE.Vector3(8, 0, 8),
+  new THREE.Vector3(-8, 0, 8),
+];
+const v = new THREE.Vector3();
+
+function medir() {
+  let x0 = 9, x1 = -9, y0 = 9, y1 = -9;
+  for (const e of ESQUINAS) {
+    v.copy(e).applyMatrix4(grupo.matrixWorld).project(camera);
+    x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x);
+    y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y);
+  }
+  return { w: x1 - x0, h: y1 - y0, cy: (y0 + y1) / 2 };
+}
+
+function encuadrar() {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+
+  const vertical = innerWidth / innerHeight < 1;
+  const ANCHO_MAX = vertical ? 1.9 : 1.68;  // en coordenadas de pantalla (-1 a 1)
+  const ALTO_MAX = vertical ? 1.06 : 1.12;
+  const CENTRO = vertical ? -0.3 : -0.34;   // el mapa vive por debajo del medio
+
+  grupo.updateMatrixWorld(true);
+  for (let k = 0; k < 8; k++) {
+    colocar(0);
+    let m = medir();
+    camBase *= Math.max(m.w / ANCHO_MAX, m.h / ALTO_MAX);
+    colocar(0);
+    m = medir();
+    // Un metro de mira mueve el mapa 2/altoVisible en pantalla.
+    const altoVisible = 2 * Math.tan((camera.fov * Math.PI) / 360) * camBase;
+    miraY += ((m.cy - CENTRO) * altoVisible) / 2;
+  }
+}
+encuadrar();
+
+const posTmp = new THREE.Vector3();
+
+bucle(heroEl, (t) => {
+  const hb = heroEl.getBoundingClientRect();
+  const p = clamp(-hb.top / (heroEl.offsetHeight - innerHeight));
+  scrollPs = lerp(scrollPs, p, 0.075);
+  const s = scrollPs;
+
+  const ct = reduce ? 4 : t % CICLO;
+
+  // Los diez caminan de ida y vuelta por su calle.
+  fichas.forEach((f, i) => {
+    // La jungla enemiga se mete al arbusto en el segundo 4 y sale en el 11.
+    // Mientras no se le ve, su ficha se queda clavada y en gris justo donde
+    // estaba: eso es lo que la app te dice, dónde se perdió de vista.
+    const oculto = f.esJungla && ct > 4 && ct < 11;
+
+    if (!oculto) {
+      const curva = curvas[f.ruta];
+      const u = (f.off + (reduce ? 0 : t * f.v)) % 2;
+      const d = u > 1 ? 2 - u : u;
+      curva.getPointAt(clamp(d, 0.001, 0.999), posTmp);
+      // Los de una misma calle no se encimen.
+      const lado = (i % 2 ? 1 : -1) * 0.34;
+      f.mesh.position.set(posTmp.x + lado, 0.55, posTmp.z + lado * 0.5);
+    }
+    // Siempre de frente: si se acuestan con el mapa se ven como óvalos.
+    f.mesh.quaternion.copy(camera.quaternion);
+
+    if (f.esJungla) {
+      f.mat.uniforms.uVivo.value = lerp(f.mat.uniforms.uVivo.value, oculto ? 0 : 1, 0.08);
+      if (!oculto) ping.position.set(f.mesh.position.x, 0.06, f.mesh.position.z);
+      ping.visible = oculto;
+    }
+  });
+
+  ping.material.uniforms.uT.value = ct > 4 && ct < 11 ? (ct - 4) / 2.6 : 0;
+
+  // Reloj de la partida, corriendo.
+  const seg = Math.floor(760 + t);
+  reloj.textContent = `${String(Math.floor(seg / 60)).padStart(2, '0')}:${String(seg % 60).padStart(2, '0')}`;
+  tagReloj.classList.toggle('on', s < 0.2);
+
+  // Los avisos entran en su momento del ciclo.
+  const cual = ct < 4.6 ? -1 : ct < 8.5 ? 0 : ct < 11.5 ? 1 : 2;
+  avisos.forEach((a, i) => a.classList.toggle('on', i === cual && s < 0.22));
+
+  // La cámara arranca alta y mirando en diagonal, y al bajar se hunde.
+  const dive = Math.pow(clamp((s - 0.15) / 0.6), 1.5);
+  grupo.rotation.y = -0.18 + Math.sin(t * 0.06) * 0.03 + s * 0.2;
+  grupo.position.y = -1.2 - dive * 1.2;
+  colocar(dive, mouse.tx * 1.4, mouse.ty * 0.6);
+
+  canvas.style.opacity = String(1 - clamp((s - 0.68) / 0.22) * 0.96);
+
+  const ti = clamp((s - 0.1) / 0.3);
+  heroWrap.style.transform = `translateY(${-24 - ti * 7}vh) scale(${1 + ti * 0.55})`;
+  heroWrap.style.opacity = String(1 - clamp(ti * 1.3));
+  heroWrap.style.filter = `blur(${ti * ti * 30}px)`;
+  hint.style.opacity = String(1 - clamp(ti * 1.6));
+
+  const b = clamp((s - 0.62) / 0.18) * (1 - clamp((s - 0.94) / 0.06));
+  heroBeat.style.opacity = String(b);
+  heroBeat.style.transform = `translateY(${(1 - b) * 38}px) scale(${0.955 + b * 0.045})`;
+  heroBeat.style.filter = `blur(${(1 - b) * 18}px)`;
+
+  if (hb.bottom > 0) renderer.render(scene, camera);
+});
+
+addEventListener(
+  'resize',
+  () => {
+    renderer.setSize(innerWidth, innerHeight);
+    encuadrar();
+  },
+  { passive: true }
+);
+</script>
+</body>
+</html>

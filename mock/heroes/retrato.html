@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lolsito · portada C · El retrato</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<style>
+  /* Portada C: un solo campeón a pantalla completa. Lolsito va descartando
+     candidatos y el arte se disuelve de uno a otro hasta quedarse con el bueno. */
+  .hero { height: 300vh; }
+  .hero__stick::before {
+    background:
+      linear-gradient(90deg, rgba(7, 7, 11, 0.95) 0%, rgba(7, 7, 11, 0.55) 42%, rgba(7, 7, 11, 0.2) 70%, rgba(7, 7, 11, 0.75) 100%),
+      radial-gradient(58% 52% at 46% 48%, rgba(7, 7, 11, 0.72), transparent 78%);
+  }
+
+  /* Aquí el título va a la izquierda: el arte del campeón manda a la derecha. */
+  .hero__wrap {
+    text-align: left;
+    justify-self: start;
+    padding-left: clamp(20px, 7vw, 110px);
+    max-width: min(46rem, 92vw);
+  }
+  .hero__wrap .hero__eyebrow { white-space: nowrap; }
+  .hero__title { font-size: clamp(64px, 12.5vw, 190px); }
+  .hero__sub { margin-inline: 0; max-width: 24ch; }
+
+  /* Ficha del candidato que se está evaluando. */
+  .ficha {
+    position: absolute;
+    right: clamp(20px, 5vw, 62px);
+    bottom: clamp(84px, 13vh, 132px);
+    z-index: 3;
+    width: min(21rem, 78vw);
+    padding: 16px 18px;
+    background: rgba(12, 12, 19, 0.72);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    box-shadow: 0 24px 50px -30px rgba(0, 0, 0, 0.95);
+  }
+  .ficha__k {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  .ficha__n {
+    font-family: var(--display);
+    font-size: clamp(26px, 3vw, 40px);
+    line-height: 1;
+    margin-top: 10px;
+    letter-spacing: 0.01em;
+  }
+  .ficha__d {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.62);
+    min-height: 2.6em;
+  }
+  .ficha__d b { color: #fff; font-weight: 700; }
+  .ficha__barra {
+    position: relative;
+    height: 3px;
+    margin-top: 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+  }
+  .ficha__barra i {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--ind), var(--ind-cl));
+  }
+  .ficha__wr[hidden] { display: none; }
+  .ficha__wr {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 13px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(52, 211, 153, 0.14);
+    color: var(--pos);
+    font-size: 11.5px;
+    font-weight: 800;
+  }
+  .ficha.veredicto {
+    border-color: rgba(99, 102, 241, 0.5);
+    background: linear-gradient(150deg, rgba(99, 102, 241, 0.18), rgba(12, 12, 19, 0.78) 62%);
+  }
+
+  @media (max-width: 900px) {
+    .hero__wrap { padding-left: 20px; transform: translateY(-14vh); }
+    .ficha { left: 20px; right: 20px; width: auto; bottom: clamp(74px, 11vh, 108px); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="gl"></canvas>
+<div class="vig"></div>
+<div class="grain"></div>
+
+<header class="bar">
+  <span class="bar__mark">LOLSITO</span>
+  <a class="bar__cta" href="#">Descargar</a>
+</header>
+
+<main>
+  <section class="hero" id="hero">
+    <div class="hero__stick">
+      <div class="hero__wrap" id="heroWrap">
+        <p class="hero__eyebrow">Para League of Legends</p>
+        <h1 class="hero__title">LOLSITO</h1>
+        <p class="hero__sub">Alguien que sí sabe, viéndote jugar.</p>
+      </div>
+
+      <aside class="ficha" id="ficha">
+        <p class="ficha__k" id="fichaK">Evaluando candidatos</p>
+        <p class="ficha__n" id="fichaN">Ahri</p>
+        <p class="ficha__d" id="fichaD">Le gana la línea, pero contra ese equipo se queda sin salida.</p>
+        <div class="ficha__barra"><i id="fichaBarra"></i></div>
+        <span class="ficha__wr" id="fichaWr" hidden>54% de victorias en tu elo</span>
+      </aside>
+
+      <div class="hero__beat" id="heroBeat">
+        <p>No es una guía.<br />Es un <em>coach</em> dentro de tu computadora.</p>
+      </div>
+      <div class="scrollhint"><span>Baja</span><i></i></div>
+    </div>
+  </section>
+
+  <section class="nota">
+    <p class="nota__k">portada C · el retrato</p>
+    <h2 class="nota__h">Un campeón a la vez</h2>
+    <p class="nota__d">
+      El arte del campeón ocupa toda la pantalla y se deshace en el siguiente con la misma
+      textura de ceniza, como si Lolsito fuera descartando candidatos en voz alta: le pone
+      una pega a cada uno hasta que se queda con el bueno y lo dice. El arte se mueve
+      apenas con el mouse, así que la portada respira aunque nadie baje.
+      <b>Es la más impactante de las tres y la más barata de mantener</b>: una imagen y un
+      shader.
+    </p>
+    <p class="nota__legal">
+      Lolsito es un proyecto de fan y no está avalado por Riot Games. League of Legends y
+      todo su arte son marcas registradas de Riot Games, Inc.
+    </p>
+  </section>
+</main>
+
+<nav class="switch">
+  <span class="switch__tag">portada</span>
+  <a href="../lolsito-v2/index.html">Actual</a>
+  <a href="draft.html">A · Draft</a>
+  <a href="grieta.html">B · Grieta</a>
+  <a class="on" href="retrato.html">C · Retrato</a>
+</nav>
+
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.180.0/build/three.module.js';
+import { reduce, lerp, clamp, version, artSplash, bonito, cargador, bucle, GLSL_NOISE } from './lol.js';
+
+await version();
+
+/* El desfile: cuatro descartes y el elegido. */
+const CANDIDATOS = [
+  { champ: 'Ahri', nota: 'Le gana la línea, pero contra ese equipo se queda <b>sin salida</b>.' },
+  { champ: 'Yasuo', nota: 'Escala bien, solo que enfrente hay <b>tres que lo castigan temprano</b>.' },
+  { champ: 'Jinx', nota: 'Pega muchísimo tarde, y esa partida <b>se acaba antes</b>.' },
+  { champ: 'Zed', nota: 'Su daño no sirve: el equipo de enfrente va <b>casi todo de armadura</b>.' },
+  {
+    champ: 'Vi',
+    nota: 'Limpia más rápido que su jungla y <b>su ulti cae justo sobre la mid enemiga</b>.',
+    elegido: true,
+    wr: '54% de victorias en tu elo',
+  },
+];
+
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 60);
+camera.position.z = 10;
+
+const carga = cargador(THREE);
+
+/* Un solo plano a pantalla completa con dos texturas: la que está y la que
+   entra. El shader las mezcla con ruido, así el cambio se ve como ceniza y no
+   como un cross fade de presentación. */
+const uni = {
+  uA: { value: null },
+  uB: { value: null },
+  uMezcla: { value: 0 },
+  uT: { value: 0 },
+  uMouse: { value: new THREE.Vector2(0, 0) },
+  uAspectoPlano: { value: 1 },
+  uAspectoTex: { value: 1215 / 717 },
+  uSalida: { value: 0 }, // sube al bajar: el arte se va en ceniza
+};
+
+const plano = new THREE.Mesh(
+  new THREE.PlaneGeometry(1, 1, 1, 1),
+  new THREE.ShaderMaterial({
+    transparent: true,
+    uniforms: uni,
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main(){
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      ${GLSL_NOISE}
+      uniform sampler2D uA, uB;
+      uniform float uMezcla, uT, uAspectoPlano, uAspectoTex, uSalida;
+      uniform vec2 uMouse;
+      varying vec2 vUv;
+
+      // Recorta la textura como object-fit: cover y la encuadra a la derecha,
+      // que es donde queda la cara en casi todos los splash.
+      vec2 encuadre(vec2 uv, float par){
+        vec2 c = uv - 0.5;
+        if (uAspectoPlano > uAspectoTex) c.y *= uAspectoTex / uAspectoPlano;
+        else c.x *= uAspectoPlano / uAspectoTex;
+        c += uMouse * 0.014 * par;   // el fondo se mueve menos que el frente
+        return c + vec2(0.60, 0.46);
+      }
+
+      void main(){
+        float n = lolFbm(vec3(vUv * 3.4, uT * 0.06)) * 0.5 + 0.5;
+        float grano = lolNoise(vec3(vUv * 90.0, uT * 0.7)) * 0.5 + 0.5;
+
+        // Frente de disolución: avanza según la mezcla, con el ruido de guía.
+        float f = smoothstep(n - 0.22, n + 0.22, uMezcla * 1.4 - 0.2);
+        vec3 a = texture2D(uA, encuadre(vUv, 1.0)).rgb;
+        vec3 b = texture2D(uB, encuadre(vUv, 1.35)).rgb;
+        vec3 col = mix(a, b, f) * 1.16;
+
+        // Chispas justo en el filo del cambio.
+        float filo = (1.0 - abs(f - 0.5) * 2.0) * step(0.01, uMezcla) * step(uMezcla, 0.99);
+        col += vec3(0.55, 0.58, 1.0) * pow(filo, 3.0) * grano * 1.6;
+
+        // Al bajar, el arte entero se va en ceniza hacia arriba.
+        float salida = smoothstep(n * 0.7 + vUv.y * 0.5, n * 0.7 + vUv.y * 0.5 + 0.3, uSalida * 1.6);
+        float alfa = 1.0 - salida;
+
+        // Viñeta propia del arte para pegarlo al fondo negro de la página.
+        vec2 d = abs(vUv - 0.5);
+        alfa *= smoothstep(0.5, 0.34, max(d.x * 0.82, d.y));
+        gl_FragColor = vec4(col, alfa);
+      }
+    `,
+  })
+);
+scene.add(plano);
+
+/* Las texturas se piden una por una y se guardan. */
+const texturas = new Array(CANDIDATOS.length).fill(null);
+CANDIDATOS.forEach((c, i) => {
+  carga(artSplash(c.champ), (t) => {
+    texturas[i] = t;
+    if (i === 0) uni.uA.value = t;
+    if (i === 1) uni.uB.value = t;
+  });
+});
+
+/* ── Guion del desfile ───────────────────────────────────────── */
+const PASO = 3.4; // segundos por candidato
+const fichaEl = document.getElementById('ficha');
+const fichaK = document.getElementById('fichaK');
+const fichaN = document.getElementById('fichaN');
+const fichaD = document.getElementById('fichaD');
+const fichaBarra = document.getElementById('fichaBarra');
+const fichaWr = document.getElementById('fichaWr');
+
+let actual = -1;
+function pintarFicha(i) {
+  if (i === actual) return;
+  actual = i;
+  const c = CANDIDATOS[i];
+  fichaN.textContent = bonito(c.champ);
+  fichaD.innerHTML = c.nota;
+  fichaK.textContent = c.elegido ? 'Te conviene escoger' : 'Descartado';
+  fichaEl.classList.toggle('veredicto', !!c.elegido);
+  fichaWr.hidden = !c.elegido;
+  if (c.elegido) fichaWr.textContent = c.wr;
+}
+pintarFicha(0);
+
+const heroEl = document.getElementById('hero');
+const heroWrap = document.getElementById('heroWrap');
+const heroBeat = document.getElementById('heroBeat');
+const hint = document.querySelector('.scrollhint');
+
+const mouse = { tx: 0, ty: 0 };
+addEventListener(
+  'pointermove',
+  (e) => {
+    mouse.tx = (e.clientX / innerWidth - 0.5) * 2;
+    mouse.ty = (e.clientY / innerHeight - 0.5) * 2;
+  },
+  { passive: true }
+);
+
+let scrollPs = 0;
+function encuadrar() {
+  // El plano cubre exactamente lo que ve la cámara a su distancia.
+  const h = 2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z;
+  const w = h * (innerWidth / innerHeight);
+  plano.scale.set(w * 1.06, h * 1.06, 1);
+  uni.uAspectoPlano.value = innerWidth / innerHeight;
+}
+encuadrar();
+
+bucle(heroEl, (t) => {
+  const hb = heroEl.getBoundingClientRect();
+  const p = clamp(-hb.top / (heroEl.offsetHeight - innerHeight));
+  scrollPs = lerp(scrollPs, p, 0.075);
+  const s = scrollPs;
+
+  uni.uT.value = t;
+  uni.uMouse.value.set(
+    lerp(uni.uMouse.value.x, mouse.tx, 0.05),
+    lerp(uni.uMouse.value.y, -mouse.ty, 0.05)
+  );
+
+  if (!reduce) {
+    // Índice del candidato y avance de la disolución hacia el siguiente.
+    const total = CANDIDATOS.length;
+    const bruto = t / PASO;
+    const i = Math.min(Math.floor(bruto), total - 1);
+    const dentro = bruto - i;
+    const ultimo = i >= total - 1;
+
+    // La mezcla solo corre en el último tercio de cada paso.
+    const m = ultimo ? 0 : clamp((dentro - 0.62) / 0.38);
+    uni.uMezcla.value = m * m * (3 - 2 * m);
+
+    // Cuando termina la mezcla, la que entraba pasa a ser la de base.
+    const iA = ultimo ? total - 1 : i;
+    const iB = Math.min(i + 1, total - 1);
+    if (texturas[iA]) uni.uA.value = texturas[iA];
+    if (texturas[iB]) uni.uB.value = texturas[iB];
+
+    pintarFicha(m > 0.55 ? iB : iA);
+    fichaBarra.style.width = `${(ultimo ? 1 : clamp(dentro)) * 100}%`;
+  } else {
+    if (texturas[CANDIDATOS.length - 1]) uni.uA.value = texturas[CANDIDATOS.length - 1];
+    uni.uMezcla.value = 0;
+    pintarFicha(CANDIDATOS.length - 1);
+    fichaBarra.style.width = '100%';
+  }
+
+  uni.uSalida.value = clamp((s - 0.44) / 0.34);
+  fichaEl.style.opacity = String(1 - clamp((s - 0.08) / 0.16));
+  fichaEl.style.transform = `translateY(${clamp((s - 0.08) / 0.16) * 26}px)`;
+
+  camera.position.x = lerp(camera.position.x, mouse.tx * 0.16, 0.05);
+  camera.position.y = lerp(camera.position.y, -mouse.ty * 0.12, 0.05);
+  camera.lookAt(0, 0, 0);
+  plano.position.z = -s * 4;
+
+  canvas.style.opacity = String(1 - clamp((s - 0.72) / 0.2) * 0.98);
+
+  const ti = clamp((s - 0.1) / 0.3);
+  heroWrap.style.transform = `translateY(${-ti * 70}px) scale(${1 + ti * 0.55})`;
+  heroWrap.style.opacity = String(1 - clamp(ti * 1.3));
+  heroWrap.style.filter = `blur(${ti * ti * 30}px)`;
+  hint.style.opacity = String(1 - clamp(ti * 1.6));
+
+  const b = clamp((s - 0.62) / 0.18) * (1 - clamp((s - 0.94) / 0.06));
+  heroBeat.style.opacity = String(b);
+  heroBeat.style.transform = `translateY(${(1 - b) * 38}px) scale(${0.955 + b * 0.045})`;
+  heroBeat.style.filter = `blur(${(1 - b) * 18}px)`;
+
+  if (hb.bottom > 0) renderer.render(scene, camera);
+});
+
+addEventListener(
+  'resize',
+  () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    encuadrar();
+  },
+  { passive: true }
+);
+</script>
+</body>
+</html>

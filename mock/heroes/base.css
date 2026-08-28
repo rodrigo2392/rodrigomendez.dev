@@ -1,0 +1,359 @@
+/* ═══════════════════════════════════════════════════════════════
+   Base compartida por las tres pruebas de portada.
+   Son los mismos tokens y el mismo aire de mock/lolsito-v2: cambia
+   nada más lo que pasa detrás del título.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --neg: #07070b;
+  --neg-2: #0c0c13;
+  --bl: #ffffff;
+  --ind: #6366f1;
+  --ind-fondo: #221e52;
+  --ind-cl: #9599f0;
+  --app: #0e0e14;
+  --sf: #15151d;
+  --ln: #262633;
+  --mu: #9797ac;
+  --pos: #34d399;
+  --gold: #e9b949;
+  --display: 'Anton', Impact, sans-serif;
+  --body: 'Manrope', system-ui, sans-serif;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  background: var(--neg);
+  color: var(--bl);
+  font-family: var(--body);
+  line-height: 1.5;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+img {
+  display: block;
+  max-width: 100%;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+::selection {
+  background: var(--ind);
+  color: #fff;
+}
+
+#gl {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+}
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.15;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  animation: grain 700ms steps(4) infinite;
+}
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-3%, 2%); }
+  50% { transform: translate(2%, -3%); }
+  75% { transform: translate(-2%, -2%); }
+  100% { transform: translate(3%, 1%); }
+}
+.vig {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(120% 85% at 50% 45%, transparent 35%, rgba(7, 7, 11, 0.72) 78%, var(--neg) 100%);
+}
+
+.bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px clamp(20px, 4vw, 52px);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.6);
+}
+.bar__mark {
+  font-family: var(--display);
+  font-size: 20px;
+  letter-spacing: 0.06em;
+}
+.bar__cta {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ind-cl);
+}
+
+main {
+  position: relative;
+  z-index: 10;
+}
+
+/* ── Portada ─────────────────────────────────────────────── */
+.hero {
+  position: relative;
+}
+.hero__stick {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.hero__stick::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(48% 46% at 50% 50%, rgba(7, 7, 11, 0.9) 0%, rgba(7, 7, 11, 0.62) 38%, rgba(7, 7, 11, 0.18) 68%, transparent 84%);
+}
+.hero__wrap {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding-inline: 20px;
+  will-change: transform, opacity, filter;
+}
+.hero__eyebrow {
+  font-size: clamp(10px, 1.1vw, 12px);
+  font-weight: 800;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--ind-cl);
+  margin-bottom: clamp(14px, 2vw, 22px);
+  text-shadow: 0 2px 20px rgba(7, 7, 11, 1);
+}
+.hero__title {
+  font-family: var(--display);
+  line-height: 0.82;
+  letter-spacing: -0.015em;
+  font-size: clamp(74px, 17.5vw, 270px);
+  text-shadow: 0 0 90px rgba(7, 7, 11, 0.9);
+}
+.hero__sub {
+  margin-top: clamp(18px, 2.4vw, 30px);
+  font-size: clamp(15px, 1.55vw, 22px);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 34ch;
+  margin-inline: auto;
+  text-shadow: 0 2px 24px rgba(7, 7, 11, 0.95);
+}
+.hero__beat {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  padding-inline: 24px;
+  opacity: 0;
+  pointer-events: none;
+}
+.hero__beat p {
+  font-family: var(--display);
+  font-size: clamp(30px, 5.6vw, 84px);
+  line-height: 1.02;
+  text-align: center;
+  max-width: 16ch;
+}
+.hero__beat em {
+  font-style: normal;
+  color: var(--ind-cl);
+}
+.scrollhint {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 3;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-shadow: 0 2px 18px rgba(7, 7, 11, 1);
+}
+.scrollhint i {
+  display: block;
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(var(--ind), transparent);
+  animation: drop 2s var(--ease) infinite;
+}
+@keyframes drop {
+  0% { transform: scaleY(0); transform-origin: top; }
+  45% { transform: scaleY(1); transform-origin: top; }
+  55% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+/* Etiqueta que cuelga del arte: nombre del campeón, dato del parche. */
+.tag {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  background: rgba(12, 12, 19, 0.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  font-size: 12.5px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.tag.on {
+  opacity: 1;
+  transform: none;
+}
+.tag b {
+  font-weight: 800;
+}
+.tag span {
+  color: rgba(255, 255, 255, 0.55);
+}
+.tag em {
+  font-style: normal;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.16);
+  color: var(--pos);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* ── Lo que sigue después de la portada ──────────────────── */
+.nota {
+  position: relative;
+  z-index: 10;
+  background: var(--neg);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: clamp(60px, 9vh, 110px) clamp(20px, 7vw, 110px) clamp(120px, 16vh, 190px);
+}
+.nota__k {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--ind-cl);
+}
+.nota__h {
+  font-family: var(--display);
+  font-size: clamp(30px, 4.6vw, 66px);
+  line-height: 1;
+  margin-top: 16px;
+  letter-spacing: -0.01em;
+}
+.nota__d {
+  margin-top: 20px;
+  max-width: 60ch;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 15.5px;
+  line-height: 1.75;
+}
+.nota__d b {
+  color: #fff;
+  font-weight: 700;
+}
+.nota__legal {
+  margin-top: 34px;
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1.6;
+  max-width: 70ch;
+}
+
+/* ── Selector entre las pruebas ──────────────────────────── */
+.switch {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  z-index: 80;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px;
+  background: rgba(12, 12, 19, 0.86);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.95);
+}
+.switch__tag {
+  padding-inline: 12px 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+}
+.switch a {
+  padding: 8px 15px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  transition: color 0.3s var(--ease), background 0.3s var(--ease);
+}
+.switch a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+}
+.switch a.on {
+  color: #07070b;
+  background: #fff;
+}
+
+@media (max-width: 620px) {
+  .switch__tag {
+    display: none;
+  }
+  .switch a {
+    padding: 7px 11px;
+    font-size: 11.5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grain,
+  .scrollhint i {
+    animation: none;
+  }
+}

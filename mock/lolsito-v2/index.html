@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lolsito · v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   LOLSITO v2
+   La pieza central es el RECORRIDO: la ventana de la app se queda
+   clavada al centro y su contenido cambia pantalla por pantalla,
+   con una palabra gigante detrás que la ventana parte a la mitad.
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --neg:#07070B;
+  --neg-2:#0C0C13;
+  --bl:#FFFFFF;
+  --ind:#6366F1;        /* acento: botones, pills, líneas finas */
+  --ind-fondo:#221E52;  /* mismo índigo pero para llenar pantallas enteras:
+                           el acento a pantalla completa deslumbra */
+  --ind-cl:#9599F0;  /* lila de acento, un punto más apagado que el original */
+  /* tokens de la app, para que las pantallas se vean como el producto */
+  --app:#0E0E14; --sf:#15151D; --sf2:#1C1C26; --sf3:#232330;
+  --ln:#262633; --lns:#1E1E29;
+  --tx:#EDEDF4; --mu:#9797AC; --fa:#6A6A80;
+  --pos:#34D399; --neg-c:#FB7185; --warn:#FBBF24;
+  --display:'Anton', Impact, sans-serif;
+  --body:'Manrope', system-ui, sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--neg);color:var(--bl);font-family:var(--body);line-height:1.5;
+  overflow-x:clip;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+::selection{background:var(--ind);color:#fff}
+
+#gl{position:fixed;inset:0;z-index:0;display:block}
+.grain{
+  position:fixed;inset:-50%;z-index:60;pointer-events:none;opacity:.15;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  animation:grain 700ms steps(4) infinite;
+}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}
+  50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-2%)}100%{transform:translate(3%,1%)}}
+.vig{position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(120% 85% at 50% 45%,transparent 35%,rgba(7,7,11,.72) 78%,var(--neg) 100%)}
+
+.bar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;
+  justify-content:space-between;padding:22px clamp(20px,4vw,52px);
+  color:#fff;text-shadow:0 1px 14px rgba(0,0,0,.6)}
+.bar__mark{font-family:var(--display);font-size:20px;letter-spacing:.06em}
+.bar__cta{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  opacity:0;transform:translateY(-8px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.bar__cta.on{opacity:1;transform:none}
+.prog{position:fixed;top:0;left:0;height:2px;width:0;background:var(--ind);z-index:70}
+
+.rv{opacity:0;filter:blur(14px);transform:translateY(34px);
+  transition:opacity 1.05s var(--ease),filter 1.05s var(--ease),transform 1.05s var(--ease)}
+.rv.on{opacity:1;filter:blur(0);transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.18s}.d3{transition-delay:.3s}
+main{position:relative;z-index:10}
+
+/* ═══════════ 1. PORTADA 3D ═══════════ */
+.hero{height:280vh;position:relative}
+.hero__stick{position:sticky;top:0;height:100vh;display:grid;place-items:center;overflow:hidden}
+/* El velo cubre la mitad de arriba, que es donde vive el título: el mapa
+   queda abajo y nunca compite con las letras. */
+.hero__stick::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(56% 38% at 50% 24%,rgba(7,7,11,.92) 0%,rgba(7,7,11,.55) 46%,transparent 78%)}
+.hero__wrap{position:relative;z-index:2;text-align:center;padding-inline:20px;
+  transform:translateY(-24vh);will-change:transform,opacity,filter}
+.hero__eyebrow{font-size:clamp(10px,1.1vw,12px);font-weight:800;letter-spacing:.42em;
+  text-transform:uppercase;color:var(--ind-cl);margin-bottom:clamp(14px,2vw,22px);
+  text-shadow:0 2px 20px rgba(7,7,11,1)}
+.hero__title{font-family:var(--display);line-height:.82;letter-spacing:-.015em;
+  font-size:clamp(74px,17.5vw,270px);text-shadow:0 0 90px rgba(7,7,11,.9)}
+.hero__sub{margin-top:clamp(18px,2.4vw,30px);font-size:clamp(15px,1.55vw,22px);font-weight:500;
+  color:rgba(255,255,255,.9);max-width:34ch;margin-inline:auto;text-shadow:0 2px 24px rgba(7,7,11,.95)}
+.hero__beat{position:absolute;inset:0;z-index:2;display:grid;place-items:center;padding-inline:24px;
+  opacity:0;pointer-events:none}
+.hero__beat p{font-family:var(--display);font-size:clamp(30px,5.6vw,84px);line-height:1.02;
+  text-align:center;max-width:16ch}
+.hero__beat em{font-style:normal;color:var(--ind-cl)}
+.scrollhint{position:absolute;bottom:30px;left:50%;translate:-50% 0;z-index:3;font-size:10px;
+  font-weight:800;letter-spacing:.34em;text-transform:uppercase;color:rgba(255,255,255,.62);
+  display:flex;flex-direction:column;align-items:center;gap:10px;text-shadow:0 2px 18px rgba(7,7,11,1)}
+.scrollhint i{display:block;width:1px;height:40px;background:linear-gradient(var(--ind),transparent);
+  animation:drop 2s var(--ease) infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}
+  55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+
+/* ── Portada: lo que dice el coach ─────────────────────────── */
+.voz{position:absolute;left:clamp(20px,5vw,62px);bottom:clamp(84px,13vh,132px);z-index:3;
+  width:min(30rem,74vw);display:grid}
+.voz__i{grid-area:1/1;display:flex;align-items:flex-start;gap:12px;padding:13px 16px;
+  background:rgba(12,12,19,.78);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.1);border-left:2px solid var(--ind);border-radius:12px;
+  box-shadow:0 24px 50px -30px rgba(0,0,0,.95);
+  opacity:0;transform:translateY(14px);
+  transition:opacity .55s var(--ease),transform .55s var(--ease);pointer-events:none}
+.voz__i.on{opacity:1;transform:none}
+.voz__i.urgente{border-left-color:#FB7185}
+.voz__ico{display:grid;place-items:center;width:28px;height:28px;flex:none;border-radius:8px;
+  background:rgba(99,102,241,.18);color:var(--ind-cl);margin-top:1px}
+.voz__i.urgente .voz__ico{background:rgba(251,113,133,.16);color:#FB7185}
+.voz__ico svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.voz__t{font-size:13.5px;line-height:1.45;color:rgba(255,255,255,.86)}
+.voz__t b{font-weight:800}
+.voz__min{display:block;margin-top:3px;font-size:10.5px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(255,255,255,.34)}
+
+/* Reloj de la partida */
+.reloj{position:absolute;top:clamp(78px,11vh,110px);right:clamp(20px,5vw,62px);z-index:3;
+  display:flex;align-items:center;gap:10px;padding:9px 14px;
+  background:rgba(12,12,19,.72);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.1);border-radius:12px;
+  font-size:12.5px;white-space:nowrap;font-variant-numeric:tabular-nums;
+  opacity:0;transform:translateY(8px);
+  transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.reloj.on{opacity:1;transform:none}
+.reloj b{font-weight:800}
+.reloj span{color:rgba(255,255,255,.55)}
+.reloj i{width:6px;height:6px;border-radius:999px;background:var(--pos)}
+
+/* ═══════════ 2. GOLPES ═══════════ */
+/* Tres planos que corren a velocidades distintas: el arte del campeón atrás,
+   el número fantasma en medio y el texto al frente en sentido contrario. Eso
+   es lo que da la sensación de profundidad, no un solo fondo moviéndose. */
+.golpe{height:100vh;position:relative;overflow:hidden;display:grid;place-items:center;isolation:isolate}
+.golpe__bg{position:absolute;inset:-34% 0;background-size:cover;background-position:center;
+  will-change:transform;z-index:-3}
+/* Velo de color: viaja más rápido que el arte y le da atmósfera al plano medio */
+.golpe__velo{position:absolute;inset:-30% -14%;z-index:-2;pointer-events:none;
+  will-change:transform;
+  background:radial-gradient(46% 52% at 62% 44%,rgba(79,70,229,.22),transparent 68%)}
+.golpe::after{content:'';position:absolute;inset:0;z-index:-1;
+  background:
+    linear-gradient(180deg,rgba(7,7,11,.62) 0%,transparent 26%,transparent 70%,rgba(7,7,11,.88) 100%),
+    linear-gradient(90deg,rgba(7,7,11,.96) 0%,rgba(7,7,11,.9) 32%,rgba(7,7,11,.58) 72%,rgba(7,7,11,.88) 100%),
+    rgba(7,7,11,.3)}
+.golpe--r::after{
+  background:
+    linear-gradient(180deg,rgba(7,7,11,.62) 0%,transparent 26%,transparent 70%,rgba(7,7,11,.88) 100%),
+    linear-gradient(270deg,rgba(7,7,11,.96) 0%,rgba(7,7,11,.9) 32%,rgba(7,7,11,.58) 72%,rgba(7,7,11,.88) 100%),
+    rgba(7,7,11,.3)}
+/* Mancha oscura que acompaña al texto: es el plano más cercano */
+.golpe__sombra{position:absolute;inset:-16% -20%;z-index:-1;pointer-events:none;
+  will-change:transform;
+  background:radial-gradient(44% 48% at 26% 52%,rgba(7,7,11,.82),transparent 74%)}
+.golpe--r .golpe__sombra{background:radial-gradient(44% 48% at 74% 52%,rgba(7,7,11,.82),transparent 74%)}
+.golpe__txt{position:relative;padding-inline:clamp(20px,7vw,110px);width:100%;max-width:1500px;
+  will-change:transform}
+.golpe__n{font-family:var(--display);font-size:clamp(12px,1.2vw,15px);letter-spacing:.3em;
+  color:var(--ind-cl);margin-bottom:18px}
+.golpe__h{font-family:var(--display);font-size:clamp(38px,7vw,104px);line-height:1;
+  max-width:15ch;letter-spacing:-.01em}
+.golpe--r .golpe__txt{margin-left:auto;text-align:right}
+.golpe--r .golpe__h{margin-left:auto}
+
+/* ═══════════════════════════════════════════════════════════════
+   3. RECORRIDO — la ventana clavada
+   ═══════════════════════════════════════════════════════════════ */
+.tour{position:relative}
+.tour__pages{height:660vh}
+.tour__stick{
+  position:sticky;top:0;height:100vh;overflow:clip;
+  display:grid;grid-template-columns:minmax(0,100%);grid-template-rows:1fr auto;
+  place-items:center;
+  background:var(--neg);
+  transition:background 1.4s var(--ease);
+}
+/* Dos beats van sobre índigo pleno: son el golpe de color de la página. */
+.tour__stick[data-tono="ind"]{background:var(--ind-fondo)}
+
+/* Palabra gigante: vive detrás de la ventana, que la parte a la mitad.
+   Las letras se reparten a lo ancho de la pantalla (justificadas), así una
+   palabra de tres letras asoma igual que una de ocho. */
+.tour__word{
+  position:absolute;top:50%;left:50%;z-index:1;
+  width:104vw;translate:-50% -50%;
+  display:flex;justify-content:space-between;
+  font-family:var(--display);font-size:clamp(88px,15.5vw,215px);line-height:.78;
+  color:rgba(255,255,255,.13);
+  opacity:0;pointer-events:none;will-change:transform,opacity;
+  transition:opacity .8s var(--ease);
+}
+.tour__word.on{opacity:1}
+.tour__word span{display:block}
+.tour__stick[data-tono="ind"] .tour__word{color:rgba(7,7,11,.34)}
+
+/* Hilo fino que baja hasta la ventana, como el del sitio de referencia */
+.tour__hilo{
+  position:absolute;top:0;left:50%;width:1px;height:14vh;z-index:1;
+  transform-origin:top center;will-change:transform;
+  background:linear-gradient(rgba(255,255,255,.28),transparent);
+}
+.tour__stick[data-tono="ind"] .tour__hilo{background:linear-gradient(rgba(255,255,255,.34),transparent)}
+
+.tour__mid{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;
+  gap:clamp(16px,2.4vh,30px);width:100%;min-width:0}
+
+/* ── La ventana de la app ─────────────────────────────────── */
+.win{
+  position:relative;width:min(1010px,74vw);
+  /* El alto lo pone la captura que se esté viendo: las de la app cambiaron de
+     tamaño entre sesiones y forzar un aspecto único recortaría contenido. */
+  aspect-ratio:var(--aspecto,1.37);
+  transition:aspect-ratio .9s var(--ease),height .9s var(--ease),
+             transform 1.2s var(--ease),box-shadow 1s var(--ease);
+  background:var(--app);border:1px solid var(--ln);border-radius:16px;overflow:hidden;
+  box-shadow:0 60px 120px -50px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.04),
+             0 0 90px -40px rgba(99,102,241,.55);
+  transform-style:preserve-3d;
+  will-change:transform;
+}
+/* En pantalla apaisada manda el ALTO, no el ancho: si no, la captura más alta
+   (aspecto 1.37) se sale de la pantalla y se le corta la barra de título. */
+@media (orientation:landscape) and (min-width:901px){
+  .win{height:clamp(360px,67vh,760px);width:auto;max-width:90vw}
+}
+
+/* Las capturas se apilan y solo una está encendida. */
+.win__foto{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;
+  opacity:0;transform:scale(1.02);
+  transition:opacity .8s var(--ease),transform 1.1s var(--ease);
+}
+.win__foto.on{opacity:1;transform:none}
+.tour__stick[data-tono="ind"] .win{box-shadow:0 60px 120px -48px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.07)}
+/* ── Texto que se mueve bajo la ventana ───────────────────── */
+.tour__copy{position:relative;height:clamp(70px,9.5vh,96px);width:min(1000px,86vw);
+  display:grid;place-items:center}
+.tour__copy p{
+  grid-area:1/1;text-align:center;max-width:46ch;font-size:clamp(14px,1.5vw,20px);
+  line-height:1.5;color:rgba(255,255,255,.72);
+  opacity:0;filter:blur(10px);transform:translateY(24px);
+  transition:opacity .7s var(--ease),filter .7s var(--ease),transform .7s var(--ease);
+}
+.tour__copy p.on{opacity:1;filter:blur(0);transform:translateX(var(--dx,0))}
+.tour__copy p b{color:#fff;font-weight:800}
+
+/* ── Barra de pasos ───────────────────────────────────────── */
+.chips{position:relative;z-index:5;display:flex;align-items:center;gap:8px;
+  margin-bottom:clamp(14px,2.6vh,26px);padding-inline:16px;max-width:100%;min-width:0}
+.chips__in{display:flex;align-items:center;gap:2px;padding:6px;border-radius:999px;
+  background:rgba(255,255,255,.07);backdrop-filter:blur(14px);overflow-x:auto;
+  scrollbar-width:none;min-width:0}
+.chips__in::-webkit-scrollbar{display:none}
+.chips__in button{padding:8px 15px;border-radius:999px;font-size:12.5px;font-weight:700;
+  color:rgba(255,255,255,.45);white-space:nowrap;
+  transition:color .45s var(--ease),background .45s var(--ease)}
+.chips__in button.on{color:#07070B;background:#fff}
+.chips__skip{flex:none;padding:10px 18px;border-radius:999px;background:#fff;color:#07070B;
+  font-size:12.5px;font-weight:800;transition:transform .4s var(--ease)}
+.chips__skip:hover{transform:translateY(-2px)}
+
+/* ═══════════ 4. API KEY ═══════════ */
+/* El alto lo fija el JS según cuánto tenga que correr el riel. Este valor es
+   solo el respaldo por si el JS no llega a correr. */
+.key{height:100vh;position:relative;background:var(--neg-2)}
+.key__stick{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;
+  flex-direction:column;justify-content:center}
+.key__head{padding:0 clamp(20px,7vw,110px);margin-bottom:clamp(28px,5vh,58px)}
+.key__k{font-size:11px;font-weight:800;letter-spacing:.4em;text-transform:uppercase;color:var(--ind-cl)}
+.key__h{font-family:var(--display);font-size:clamp(30px,4.8vw,72px);line-height:1;margin-top:16px;
+  letter-spacing:-.01em}
+.key__sub{margin-top:16px;color:rgba(255,255,255,.55);max-width:46ch;font-size:15px}
+.key__rail{display:flex;gap:clamp(16px,2vw,30px);padding-inline:clamp(20px,7vw,110px);
+  will-change:transform}
+/* Cuando los cinco pasos caben de una (pantallas anchas) se reparten el ancho
+   y la sección deja de retener el scroll: no hay nada que correr. */
+.key__rail--fijo{justify-content:center}
+.key__rail--fijo .paso{flex:1 1 0;min-width:0;max-width:380px}
+.paso{flex:0 0 clamp(255px,25vw,360px);min-height:clamp(230px,32vh,310px);
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.025);
+  padding:clamp(22px,2.2vw,32px);display:flex;flex-direction:column}
+.paso__n{font-family:var(--display);font-size:clamp(46px,5vw,76px);line-height:.8;color:var(--ind);opacity:.85}
+.paso__t{font-family:var(--display);font-size:clamp(19px,1.6vw,25px);margin-top:22px;line-height:1.1}
+.paso__d{margin-top:14px;font-size:14px;color:rgba(255,255,255,.6);line-height:1.68}
+.paso__d code{font-family:ui-monospace,'SF Mono',monospace;font-size:.9em;
+  background:rgba(99,102,241,.16);color:var(--ind-cl);padding:.12em .4em}
+.paso a{margin-top:auto;padding-top:20px;font-size:12px;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ind-cl);display:inline-flex;gap:8px;align-items:center}
+.paso--fin{background:var(--ind-fondo);border-color:rgba(99,102,241,.5)}
+.paso--fin .paso__n{color:rgba(255,255,255,.42)}
+.paso--fin .paso__d{color:rgba(255,255,255,.8)}
+
+/* ═══════════ 5. DESCARGA ═══════════ */
+.dl{height:100vh;position:relative;display:grid;place-items:center;overflow:hidden;background:var(--neg)}
+.dl__mosaic{position:absolute;inset:-18% 0;display:grid;grid-template-columns:repeat(8,1fr);
+  opacity:.62;filter:saturate(.75);will-change:transform}
+.dl__mosaic i{background-size:cover;background-position:center top;aspect-ratio:308/560}
+.dl::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(78% 68% at 50% 50%,rgba(7,7,11,.8) 14%,rgba(7,7,11,.93) 58%,var(--neg) 100%)}
+.dl__in{position:relative;z-index:3;text-align:center;padding-inline:20px}
+.dl__h{font-family:var(--display);font-size:clamp(46px,9.4vw,152px);line-height:.94;letter-spacing:-.015em}
+.dl__h em{font-style:normal;display:block;margin-top:.22em;color:var(--ind-cl)}
+.dl__btn{display:inline-flex;align-items:center;gap:16px;margin-top:clamp(30px,4.4vw,54px);
+  padding:clamp(20px,2.1vw,28px) clamp(34px,4.4vw,62px);background:var(--bl);color:var(--neg);
+  font-family:var(--display);font-size:clamp(17px,1.85vw,27px);letter-spacing:.02em;
+  transition:transform .55s var(--ease),background .4s var(--ease),color .4s var(--ease),box-shadow .55s var(--ease)}
+.dl__btn:hover{transform:translateY(-4px) scale(1.02);background:var(--ind);color:#fff;
+  box-shadow:0 26px 70px -26px var(--ind)}
+.dl__btn svg{width:1em;height:1em;stroke:currentColor;stroke-width:2.4;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.dl__fine{margin-top:24px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.42)}
+.dl__legal{position:absolute;bottom:22px;left:0;right:0;z-index:3;text-align:center;
+  font-size:10.5px;color:rgba(255,255,255,.3);padding-inline:24px;line-height:1.6}
+
+/* ═══════════ Responsivo ═══════════ */
+@media(max-width:900px){
+  .hero__stick::before{background:radial-gradient(76% 34% at 50% 22%,rgba(7,7,11,.95) 0%,rgba(7,7,11,.7) 48%,transparent 82%)}
+  .hero__wrap{transform:translateY(-28vh)}
+  .voz{left:50%;translate:-50% 0;width:min(30rem,88vw);bottom:clamp(74px,11vh,110px)}
+  .golpe--r .golpe__txt{text-align:left;margin-left:0}
+  .golpe--r .golpe__h{margin-left:0}
+  .golpe::after{background:linear-gradient(180deg,rgba(7,7,11,.6),rgba(7,7,11,.9))}
+  .dl__mosaic{grid-template-columns:repeat(4,1fr)}
+  .key__rail{gap:14px}
+  .paso{flex:0 0 min(76vw,320px);min-height:auto}
+
+  /* El recorrido en vertical: la ventana se angosta y el menú lateral se va. */
+  .tour__mid{padding-top:2vh;gap:14px}
+  /* En vertical la ventana se hace alta: si no, el contenido no cabe y
+     la palabra del fondo no alcanza a asomar por los lados. */
+  .win{width:94vw;aspect-ratio:var(--aspecto,1.37);height:auto}
+  .tour__word{width:112vw;font-size:clamp(56px,19vw,128px)}
+  .tour__copy{height:auto;min-height:96px;padding-block:8px}
+  .chips{margin-bottom:14px;width:100%}
+  .chips__in{flex:1;min-width:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .rv{opacity:1;filter:none;transform:none}
+  .grain,.scrollhint i{animation:none}
+  .win{transition:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="gl"></canvas>
+<div class="vig"></div>
+<div class="grain"></div>
+<div class="prog" id="prog"></div>
+
+<header class="bar">
+  <span class="bar__mark">LOLSITO</span>
+  <a class="bar__cta" id="barcta" href="#descargar">Descargar</a>
+</header>
+
+<main>
+
+  <!-- ═══ 1. PORTADA ═══ -->
+  <section class="hero" id="hero">
+    <div class="hero__stick">
+      <div class="hero__wrap" id="heroWrap">
+        <p class="hero__eyebrow">Para League of Legends</p>
+        <h1 class="hero__title">LOLSITO</h1>
+        <p class="hero__sub">Alguien que sí sabe, viéndote jugar.</p>
+      </div>
+
+      <div class="reloj" id="reloj"><i></i> <span>Partida en curso</span> <b id="relojN">12:40</b></div>
+
+      <!-- Lo que Lolsito va diciendo mientras corre la partida del mapa.
+           Solo uno visible a la vez; el guion los prende desde el JS. -->
+      <div class="voz" id="voz" aria-hidden="true">
+        <div class="voz__i">
+          <span class="voz__ico"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg></span>
+          <span class="voz__t">
+            La jungla enemiga <b>lleva 12 segundos sin verse</b>. Juega pegado a tu torre.
+            <span class="voz__min">Minuto 12:40 · aviso por voz</span>
+          </span>
+        </div>
+        <div class="voz__i urgente">
+          <span class="voz__ico"><svg viewBox="0 0 24 24"><path d="M12 9v5"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>
+          <span class="voz__t">
+            Vienen tres al medio. <b>Retírate ya.</b>
+            <span class="voz__min">Minuto 13:02 · aviso por voz</span>
+          </span>
+        </div>
+        <div class="voz__i">
+          <span class="voz__ico"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg></span>
+          <span class="voz__t">
+            Dragón en 40 segundos y tu jungla ya va para allá. <b>Empuja tu línea.</b>
+            <span class="voz__min">Minuto 13:20 · aviso por voz</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="hero__beat" id="heroBeat">
+        <p>No es una guía.<br />Es un <em>coach</em> dentro de tu computadora.</p>
+      </div>
+      <div class="scrollhint"><span>Baja</span><i></i></div>
+    </div>
+  </section>
+
+  <!-- ═══ 2. GOLPES ═══ -->
+  <section class="golpe">
+    <div class="golpe__bg" data-px="260" data-px-s=".1" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_0.jpg)"></div>
+    <div class="golpe__velo" data-px="-150" data-px-x="70"></div>
+    <div class="golpe__sombra" data-px="-72" data-px-x="-34"></div>
+    <div class="golpe__txt" data-px="-78">
+      <p class="golpe__n rv">01</p>
+      <h2 class="golpe__h rv d1">La partida se pierde en el draft.</h2>
+    </div>
+  </section>
+
+  <section class="golpe golpe--r">
+    <div class="golpe__bg" data-px="230" data-px-s=".12" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg)"></div>
+    <div class="golpe__velo" data-px="-170" data-px-x="-70"></div>
+    <div class="golpe__sombra" data-px="-76" data-px-x="34"></div>
+    <div class="golpe__txt" data-px="-84">
+      <p class="golpe__n rv">02</p>
+      <h2 class="golpe__h rv d1">Terminas, pierdes, y nadie te dice por qué.</h2>
+    </div>
+  </section>
+
+  <!-- ═══ 3. RECORRIDO ═══ -->
+  <section class="tour" id="tour">
+    <div class="tour__stick" id="tourStick">
+
+      <span class="tour__hilo"></span>
+
+      <div class="tour__word" data-w="0">META</div>
+      <div class="tour__word" data-w="1">DRAFT</div>
+      <div class="tour__word" data-w="2">VOZ</div>
+      <div class="tour__word" data-w="3">ANÁLISIS</div>
+      <div class="tour__word" data-w="4">LLAVE</div>
+
+      <div class="tour__mid">
+        <div class="win" id="win">
+          <!-- Capturas reales de la app, una por pantalla del recorrido.
+               La de arriba se ve y las demás esperan debajo con opacidad 0. -->
+          <img class="win__foto on" data-f="0" src="capturas/meta-juego.webp"   alt="Lolsito mostrando el meta del parche por rol" width="1410" height="1029" />
+          <img class="win__foto"    data-f="1" src="capturas/draft-de-ia.webp"  alt="Lolsito recomendando a quién escoger en la selección de campeón" width="1294" height="831" loading="lazy" />
+          <img class="win__foto"    data-f="2" src="capturas/coach-en-vivo.webp" alt="Lolsito narrando lo que pasa en la partida" width="1294" height="831" loading="lazy" />
+          <img class="win__foto"    data-f="3" src="capturas/analisis.webp"     alt="Lolsito analizando la partida terminada" width="1410" height="1029" loading="lazy" />
+          <img class="win__foto"    data-f="4" src="capturas/configuracion.webp" alt="La configuración de Lolsito con el campo de la llave de Gemini" width="1410" height="1029" loading="lazy" />
+        </div>
+
+        <div class="tour__copy" id="tourCopy">
+          <p data-c="0">Quién está <b>roto este parche</b>, rol por rol, antes de que entres a la fila.</p>
+          <p data-c="1">Ve a los cinco de enfrente y te dice <b>a quién escoger</b>, con el porqué de cada uno.</p>
+          <p data-c="2">Te habla <b>en español mientras juegas</b> y deja escrito todo lo que pasó, con su minuto.</p>
+          <p data-c="3">Al terminar te <b>califica y te dice en qué la regaste</b>, con tus números en la mano.</p>
+          <p data-c="4">Lo único que configuras: <b>pegas tu llave de Gemini</b> y ya. Nada más.</p>
+        </div>
+      </div>
+
+      <div class="chips">
+        <div class="chips__in" id="chips">
+          <button data-b="0">Meta</button>
+          <button data-b="1">Draft</button>
+          <button data-b="2">Voz</button>
+          <button data-b="3">Análisis</button>
+          <button data-b="4">Llave</button>
+        </div>
+        <button class="chips__skip" id="skip">Saltar</button>
+      </div>
+    </div>
+    <div class="tour__pages"></div>
+  </section>
+
+  <!-- ═══ 4. API KEY ═══ -->
+  <section class="key" id="key">
+    <div class="key__stick">
+      <div class="key__head" data-px="-90" data-px-ref="section">
+        <p class="key__k rv">Lo único que te pide</p>
+        <h2 class="key__h rv d1">Tu llave de Gemini. Gratis, en dos minutos.</h2>
+        <p class="key__sub rv d2">Lolsito no trae llave propia: usas la tuya y se queda guardada nada más en tu computadora.</p>
+      </div>
+      <div class="key__rail" id="rail">
+        <article class="paso">
+          <span class="paso__n">01</span>
+          <h3 class="paso__t">Entra a Google AI&nbsp;Studio</h3>
+          <p class="paso__d">Con tu cuenta de Google, la misma del correo. No piden tarjeta.</p>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Abrir ↗</a>
+        </article>
+        <article class="paso">
+          <span class="paso__n">02</span>
+          <h3 class="paso__t">Presiona "Create API key"</h3>
+          <p class="paso__d">Si es tu primera vez te pide aceptar los términos. Acepta y vuelve a presionarlo.</p>
+        </article>
+        <article class="paso">
+          <span class="paso__n">03</span>
+          <h3 class="paso__t">Elige un proyecto</h3>
+          <p class="paso__d">Si no tienes ninguno, deja que Google cree uno nuevo. El nombre da igual.</p>
+        </article>
+        <article class="paso">
+          <span class="paso__n">04</span>
+          <h3 class="paso__t">Copia la clave</h3>
+          <p class="paso__d">Es un texto largo que empieza con <code>AIza</code>. Cópialo completo: al cerrar la ventana ya no lo vuelves a ver.</p>
+        </article>
+        <article class="paso paso--fin">
+          <span class="paso__n">05</span>
+          <h3 class="paso__t">Pégala en Lolsito</h3>
+          <p class="paso__d">Configuración, campo "Google Gemini API key", Guardar. Ya está: la IA responde.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 5. DESCARGA ═══ -->
+  <section class="dl" id="descargar">
+    <div class="dl__mosaic" id="mosaic" data-px="150" data-px-s=".08"></div>
+    <div class="dl__in" data-px="-80">
+      <h2 class="dl__h rv">JUEGA<em>ACOMPAÑADO</em></h2>
+      <a class="dl__btn rv d2" href="#">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 12 5 5 5-5"/><path d="M4 20h16"/></svg>
+        Descargar para Windows
+      </a>
+      <p class="dl__fine rv d3">Gratis · Windows 10 y 11 · 64 bits · 77 MB</p>
+    </div>
+    <p class="dl__legal" data-px="-30">
+      Lolsito es un proyecto de fan y no está avalado por Riot Games. League of Legends
+      y todo su arte son marcas registradas de Riot Games, Inc.
+    </p>
+  </section>
+
+</main>
+
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.180.0/build/three.module.js';
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const lerp = (a,b,t)=>a+(b-a)*t;
+const clamp = (v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+
+const CHAMPS = ['Ahri','Yasuo','Jinx','LeeSin','Lux','Zed','Ashe','Darius','Katarina',
+  'Thresh','Ekko','Vi','Jhin','Kaisa','Sett','Yone','Viego','Akali','Irelia','Riven',
+  'MissFortune','Pyke','Senna','Samira'];
+const art = n => `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${n}_0.jpg`;
+
+/* ═══════════════════════════════════════════════════════════════
+   PORTADA: la Grieta, con la partida corriendo
+   El mapa del juego tumbado en perspectiva, los diez jugadores
+   caminando por sus calles y Lolsito cantando lo que ve. Cuando la
+   jungla enemiga se pierde de vista, su ficha se queda clavada en
+   gris y sale el ping donde se le vio por última vez.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* La versión del parche hace falta para el mapa y los iconos. Si el CDN no
+   contesta se usa una conocida y la portada sigue funcionando. */
+let VER = '15.24.1';
+try {
+  const r = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
+  const v = await r.json();
+  if (Array.isArray(v) && v[0]) VER = v[0];
+} catch { /* sin red: se queda la de respaldo */ }
+
+const icono = n => `https://ddragon.leagueoflegends.com/cdn/${VER}/img/champion/${n}.png`;
+const mapaGrieta = () => `https://ddragon.leagueoflegends.com/cdn/${VER}/img/map/map11.png`;
+
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(46, innerWidth/innerHeight, .1, 120);
+
+/* Carga texturas sin reventar: si una imagen falla, entra un pixel oscuro y
+   la escena sigue en pie. */
+const loader = new THREE.TextureLoader();
+loader.setCrossOrigin('anonymous');
+const texVacia = (() => {
+  const c = document.createElement('canvas');
+  c.width = c.height = 2;
+  const x = c.getContext('2d');
+  x.fillStyle = '#12121b'; x.fillRect(0, 0, 2, 2);
+  return new THREE.CanvasTexture(c);
+})();
+const carga = (url, onLoad) => loader.load(url, t => {
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 4;
+  onLoad(t);
+}, undefined, () => onLoad(texVacia));
+
+const grupo = new THREE.Group();
+scene.add(grupo);
+
+/* ── El mapa ─────────────────────────────────────────────────── */
+const LADO = 16;
+const mapa = new THREE.Mesh(
+  new THREE.PlaneGeometry(LADO, LADO, 1, 1),
+  new THREE.ShaderMaterial({
+    transparent: true,
+    uniforms: {uTex: {value: null}},
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main(){
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      uniform sampler2D uTex;
+      varying vec2 vUv;
+      void main(){
+        vec3 tex = texture2D(uTex, vUv).rgb;
+        float luma = dot(tex, vec3(0.299, 0.587, 0.114));
+        // Se conserva el dibujo del mapa y solo se tiñe de azul de noche: si
+        // se aplana a dos colores, las calles y la jungla dejan de verse.
+        vec3 tinte = tex * vec3(0.46, 0.56, 1.32) * 1.45;
+        vec3 col = mix(vec3(0.075, 0.08, 0.14), tinte, 0.9);
+        col += vec3(0.14, 0.15, 0.38) * smoothstep(0.35, 0.85, luma);
+
+        // Rejilla fina encima, como un tablero táctico.
+        vec2 g = abs(fract(vUv * 16.0) - 0.5);
+        float rej = 1.0 - smoothstep(0.0, 0.05, min(g.x, g.y));
+        col += vec3(0.30, 0.32, 0.62) * rej * 0.10;
+
+        // Los bordes se apagan: nada de cuadro recortado.
+        vec2 b = min(vUv, 1.0 - vUv);
+        gl_FragColor = vec4(col, smoothstep(0.0, 0.16, min(b.x, b.y)));
+      }
+    `,
+  })
+);
+carga(mapaGrieta(), t => mapa.material.uniforms.uTex.value = t);
+mapa.rotation.x = -Math.PI / 2;
+// El orden manda: lo que va encima del mapa se dibuja después, si no el mapa
+// (opaco por dentro) los borra al pintarse.
+mapa.renderOrder = 0;
+grupo.add(mapa);
+
+/* ── Rutas ───────────────────────────────────────────────────────
+   Coordenadas del minimapa: (0,0) abajo a la izquierda es la base azul,
+   (1,1) arriba a la derecha la roja. */
+const uvXY = (u, v) => new THREE.Vector3((u - .5) * LADO, 0, -(v - .5) * LADO);
+
+const RUTAS = {
+  top:    [[.06,.34],[.07,.62],[.13,.84],[.34,.93]],
+  mid:    [[.24,.24],[.38,.40],[.50,.50],[.62,.60],[.76,.76]],
+  bot:    [[.34,.06],[.62,.08],[.85,.15],[.93,.36]],
+  jgAzul: [[.20,.42],[.32,.30],[.44,.24],[.36,.14],[.20,.20]],
+  jgRojo: [[.78,.60],[.66,.70],[.56,.78],[.66,.86],[.80,.80]],
+};
+
+const JUGADORES = [
+  {champ:'Darius',   ruta:'top',    equipo:'rojo', v:.055, off:.15},
+  {champ:'LeeSin',   ruta:'jgRojo', equipo:'rojo', v:.075, off:0, esJungla:true},
+  {champ:'Katarina', ruta:'mid',    equipo:'rojo', v:.05,  off:.62},
+  {champ:'Jhin',     ruta:'bot',    equipo:'rojo', v:.045, off:.78},
+  {champ:'Thresh',   ruta:'bot',    equipo:'rojo', v:.045, off:.72},
+  {champ:'Riven',    ruta:'top',    equipo:'azul', v:.05,  off:.55},
+  {champ:'Vi',       ruta:'jgAzul', equipo:'azul', v:.07,  off:.30},
+  {champ:'Ahri',     ruta:'mid',    equipo:'azul', v:.05,  off:.30},
+  {champ:'Jinx',     ruta:'bot',    equipo:'azul', v:.045, off:.16},
+  {champ:'Lux',      ruta:'bot',    equipo:'azul', v:.045, off:.10},
+];
+
+const curvas = {};
+for (const [k, pts] of Object.entries(RUTAS)){
+  const curva = new THREE.CatmullRomCurve3(pts.map(([u,v]) => uvXY(u,v)));
+  curvas[k] = curva;
+  const linea = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(curva.getPoints(60)),
+    new THREE.LineBasicMaterial({color:0x5B5FD6, transparent:true, opacity:.2, depthWrite:false})
+  );
+  linea.position.y = .03;
+  linea.renderOrder = 1;
+  grupo.add(linea);
+}
+
+/* ── Los diez, como en el minimapa ───────────────────────────── */
+const fichaGeo = new THREE.PlaneGeometry(1.05, 1.05);
+const fichas = JUGADORES.map(j => {
+  const mat = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      uTex: {value: null},
+      uColor: {value: j.equipo === 'rojo'
+        ? new THREE.Color(.92, .36, .42)
+        : new THREE.Color(.44, .72, 1.0)},
+      uVivo: {value: 1},   // baja a 0 cuando se pierde de vista
+    },
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main(){
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      uniform sampler2D uTex;
+      uniform vec3 uColor;
+      uniform float uVivo;
+      varying vec2 vUv;
+      void main(){
+        float r = length(vUv - 0.5);
+        if (r > 0.5) discard;
+        vec3 tex = texture2D(uTex, vUv).rgb;
+        float luma = dot(tex, vec3(0.299, 0.587, 0.114));
+        vec3 col = mix(vec3(luma) * 0.5, tex, uVivo);
+        float aro = smoothstep(0.5, 0.44, r) - smoothstep(0.44, 0.37, r);
+        col = mix(col, uColor, aro * (0.55 + uVivo * 0.45));
+        gl_FragColor = vec4(col, smoothstep(0.5, 0.47, r) * (0.35 + uVivo * 0.65));
+      }
+    `,
+  });
+  carga(icono(j.champ), t => mat.uniforms.uTex.value = t);
+  const m = new THREE.Mesh(fichaGeo, mat);
+  m.position.y = .5;
+  m.renderOrder = 3;
+  grupo.add(m);
+  return {...j, mesh: m, mat};
+});
+
+/* ── Ping donde se le vio por última vez ─────────────────────── */
+const ping = new THREE.Mesh(
+  new THREE.PlaneGeometry(6.2, 6.2),
+  new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    uniforms: {uT: {value: 0}},
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main(){
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      uniform float uT;
+      varying vec2 vUv;
+      void main(){
+        float r = length(vUv - 0.5) * 2.0;
+        if (r > 1.0) discard;
+        // Aro fijo, dos ondas que salen y un punto al centro: el ping del juego.
+        float aro = 1.0 - smoothstep(0.0, 0.045, abs(r - 0.42));
+        float ondas = 0.0;
+        for (int i = 0; i < 2; i++){
+          float f = fract(uT * 0.55 - float(i) * 0.5);
+          ondas += (1.0 - smoothstep(0.0, 0.13, abs(r - f))) * (1.0 - f) * 0.9;
+        }
+        float punto = 1.0 - smoothstep(0.05, 0.09, r);
+        float a = (aro * 0.85 + ondas + punto) * step(0.001, uT);
+        gl_FragColor = vec4(vec3(1.0, 0.42, 0.5), clamp(a, 0.0, 1.0) * 0.95);
+      }
+    `,
+  })
+);
+ping.rotation.x = -Math.PI / 2;
+ping.position.y = .06;
+ping.visible = false;
+ping.renderOrder = 2;
+grupo.add(ping);
+
+/* ── Guion: ciclo de 15 s ────────────────────────────────────── */
+const CICLO = 15;
+const avisos   = [...document.querySelectorAll('.voz__i')];
+const relojEl  = document.getElementById('reloj');
+const relojN   = document.getElementById('relojN');
+
+const mouse = {tx:0, ty:0};
+addEventListener('pointermove', e => {
+  mouse.tx = (e.clientX / innerWidth - .5) * 2;
+  mouse.ty = (e.clientY / innerHeight - .5) * 2;
+}, {passive:true});
+
+const heroEl   = document.getElementById('hero');
+const heroWrap = document.getElementById('heroWrap');
+const heroBeat = document.getElementById('heroBeat');
+const hint     = document.querySelector('.scrollhint');
+
+let scrollP = 0, scrollPs = 0;
+let camBase = 30;   // distancia de la cámara al mapa
+let miraY = 0;      // sube el punto de mira y el mapa baja en pantalla
+
+function colocar(dive, mx = 0, my = 0){
+  camera.position.set(
+    mx,
+    grupo.position.y + camBase * (.78 - dive * .5) - my,
+    camBase * (.56 + dive * .16)
+  );
+  camera.lookAt(0, grupo.position.y + miraY, 0);
+}
+
+/* El mapa se encuadra solo: se prueba una distancia, se mide dónde caen sus
+   cuatro esquinas en pantalla y se corrige, hasta que cabe entero en la franja
+   de abajo. Así queda bien en cualquier monitor sin números a mano. */
+const ESQUINAS = [
+  new THREE.Vector3(-8, 0, -8), new THREE.Vector3(8, 0, -8),
+  new THREE.Vector3(8, 0, 8),   new THREE.Vector3(-8, 0, 8),
+];
+const vTmp = new THREE.Vector3();
+
+function medir(){
+  let x0 = 9, x1 = -9, y0 = 9, y1 = -9;
+  for (const e of ESQUINAS){
+    vTmp.copy(e).applyMatrix4(grupo.matrixWorld).project(camera);
+    x0 = Math.min(x0, vTmp.x); x1 = Math.max(x1, vTmp.x);
+    y0 = Math.min(y0, vTmp.y); y1 = Math.max(y1, vTmp.y);
+  }
+  return {w: x1 - x0, h: y1 - y0, cy: (y0 + y1) / 2};
+}
+
+function encuadrar(){
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+
+  const vertical = innerWidth / innerHeight < 1;
+  const ANCHO_MAX = vertical ? 1.9 : 1.68;   // en coordenadas de pantalla (-1 a 1)
+  const ALTO_MAX  = vertical ? 1.06 : 1.12;
+  const CENTRO    = vertical ? -.3 : -.34;   // el mapa vive por debajo del medio
+
+  grupo.updateMatrixWorld(true);
+  for (let k = 0; k < 8; k++){
+    colocar(0);
+    let m = medir();
+    camBase *= Math.max(m.w / ANCHO_MAX, m.h / ALTO_MAX);
+    colocar(0);
+    m = medir();
+    const altoVisible = 2 * Math.tan(camera.fov * Math.PI / 360) * camBase;
+    miraY += (m.cy - CENTRO) * altoVisible / 2;
+  }
+}
+encuadrar();
+
+const posTmp = new THREE.Vector3();
+
+function frame(ms){
+  const t = ms / 1000;
+  const hb = heroEl.getBoundingClientRect();
+  scrollP = clamp(-hb.top / (heroEl.offsetHeight - innerHeight));
+  scrollPs = lerp(scrollPs, scrollP, .075);
+  const p = scrollPs;
+
+  const ct = reduce ? 4 : t % CICLO;
+
+  fichas.forEach((f, i) => {
+    // La jungla enemiga se mete al arbusto en el segundo 4 y sale en el 11.
+    // Mientras no se le ve, su ficha se queda clavada y en gris justo donde
+    // estaba: eso es lo que la app te avisa, dónde se perdió de vista.
+    const oculto = f.esJungla && ct > 4 && ct < 11;
+
+    if (!oculto){
+      const u = (f.off + (reduce ? 0 : t * f.v)) % 2;
+      const d = u > 1 ? 2 - u : u;
+      curvas[f.ruta].getPointAt(clamp(d, .001, .999), posTmp);
+      const lado = (i % 2 ? 1 : -1) * .34;   // los de una misma calle no se encimen
+      f.mesh.position.set(posTmp.x + lado, .55, posTmp.z + lado * .5);
+    }
+    // Siempre de frente: si se acuestan con el mapa se ven como óvalos.
+    f.mesh.quaternion.copy(camera.quaternion);
+
+    if (f.esJungla){
+      f.mat.uniforms.uVivo.value = lerp(f.mat.uniforms.uVivo.value, oculto ? 0 : 1, .08);
+      if (!oculto) ping.position.set(f.mesh.position.x, .06, f.mesh.position.z);
+      ping.visible = oculto;
+    }
+  });
+
+  ping.material.uniforms.uT.value = (ct > 4 && ct < 11) ? (ct - 4) / 2.6 : 0;
+
+  const seg = Math.floor(760 + t);
+  relojN.textContent = `${String(Math.floor(seg / 60)).padStart(2,'0')}:${String(seg % 60).padStart(2,'0')}`;
+  relojEl.classList.toggle('on', p < .2);
+
+  const cual = ct < 4.6 ? -1 : ct < 8.5 ? 0 : ct < 11.5 ? 1 : 2;
+  avisos.forEach((a, i) => a.classList.toggle('on', i === cual && p < .22));
+
+  // Al bajar, la cámara se hunde en el mapa y el mapa se va con ella.
+  const dive = Math.pow(clamp((p - .15) / .6), 1.5);
+  grupo.rotation.y = -.18 + Math.sin(t * .06) * .03 + p * .2;
+  grupo.position.y = -1.2 - dive * 1.2;
+  colocar(dive, mouse.tx * 1.4, mouse.ty * .6);
+
+  canvas.style.opacity = String(1 - clamp((p - .7) / .2) * .96);
+
+  const ti = clamp((p - .1) / .3);
+  heroWrap.style.transform = `translateY(${-24 - ti * 7}vh) scale(${1 + ti * .55})`;
+  heroWrap.style.opacity   = String(1 - clamp(ti * 1.3));
+  heroWrap.style.filter    = `blur(${ti*ti*30}px)`;
+  hint.style.opacity       = String(1 - clamp(ti * 1.6));
+
+  const b = clamp((p - .62) / .18) * (1 - clamp((p - .94) / .06));
+  heroBeat.style.opacity   = String(b);
+  heroBeat.style.transform = `translateY(${(1-b)*38}px) scale(${.955 + b*.045})`;
+  heroBeat.style.filter    = `blur(${(1-b)*18}px)`;
+
+  if (hb.bottom > 0) renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+addEventListener('resize', () => {
+  renderer.setSize(innerWidth, innerHeight);
+  encuadrar();
+}, {passive:true});
+
+/* ═══════════════════════════════════════════════════════════════
+   RECORRIDO: seis pantallas de la app, una por cada 100vh
+   ═══════════════════════════════════════════════════════════════ */
+const BEATS = [
+  {tono:'neg', tilt:[ 1.4, -3.2], aspecto:1.370},  // Meta juego
+  {tono:'neg', tilt:[ 1.0,  3.0], aspecto:1.557},  // Draft de IA
+  {tono:'ind', tilt:[ 2.0, -1.4], aspecto:1.557},  // Coach en vivo
+  {tono:'neg', tilt:[-1.6, -2.6], aspecto:1.370},  // Análisis
+  {tono:'ind', tilt:[ 0.8,  2.2], aspecto:1.370},  // Configuración
+];
+
+const tour      = document.getElementById('tour');
+const tourStick = document.getElementById('tourStick');
+const win       = document.getElementById('win');
+const words     = [...document.querySelectorAll('.tour__word')];
+const hilo      = document.querySelector('.tour__hilo');
+const fotos     = [...document.querySelectorAll('.win__foto')];
+const copies    = [...document.querySelectorAll('.tour__copy p')];
+const chipBtns  = [...document.querySelectorAll('.chips__in button[data-b]')];
+
+/* Cada letra en su propio span para poder repartirlas a lo ancho */
+for (const w of words) w.innerHTML = [...w.textContent.trim()].map(c => `<span>${c}</span>`).join('');
+let beat = -1;
+
+let flote = 0;
+function pintarVentana(){
+  const B = BEATS[Math.max(beat, 0)];
+  win.style.transform =
+    `perspective(2200px) translate3d(0, ${flote.toFixed(1)}px, 0)` +
+    ` rotateX(${B.tilt[0]}deg) rotateY(${B.tilt[1]}deg)`;
+}
+
+function pintarBeat(i){
+  if (i === beat) return;
+  beat = i;
+  const B = BEATS[i];
+  tourStick.dataset.tono = B.tono;
+  win.style.setProperty('--aspecto', String(B.aspecto));
+  pintarVentana();
+  words.forEach((w,n)  => w.classList.toggle('on', n === i));
+  fotos.forEach((f,n)  => f.classList.toggle('on', n === i));
+  copies.forEach((c,n) => c.classList.toggle('on', n === i));
+  chipBtns.forEach((c,n)  => c.classList.toggle('on', n === i));
+  // El chip activo se centra moviendo SOLO su barra. scrollIntoView arrastraba
+  // el contenedor clavado completo y descuadraba la pantalla en celular.
+  const btn = chipBtns[i], cont = document.getElementById('chips');
+  if (btn && cont && cont.scrollWidth > cont.clientWidth){
+    cont.scrollTo({left: btn.offsetLeft - (cont.clientWidth - btn.offsetWidth) / 2, behavior:'smooth'});
+  }
+}
+
+/* Ir a un beat al presionar su chip */
+chipBtns.forEach((btn, i) => btn.addEventListener('click', () => {
+  const arr = tour.offsetTop;
+  const paso = (tour.offsetHeight - innerHeight) / BEATS.length;
+  scrollTo({top: arr + paso * (i + .5), behavior:'smooth'});
+}));
+document.getElementById('skip').addEventListener('click', () =>
+  document.getElementById('key').scrollIntoView({behavior:'smooth'}));
+
+/* ═══ Apariciones ═══ */
+const io = new IntersectionObserver((es, o) => {
+  for (const e of es) if (e.isIntersecting){ e.target.classList.add('on'); o.unobserve(e.target); }
+}, {rootMargin:'0px 0px -12% 0px'});
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+/* ═══ Scroll: parallax, progreso, recorrido y riel ═══ */
+const pxEls  = [...document.querySelectorAll('[data-px]')];
+const prog   = document.getElementById('prog');
+const barcta = document.getElementById('barcta');
+const key    = document.getElementById('key');
+const rail   = document.getElementById('rail');
+
+/* Un solo motor para todas las capas.
+   data-px    px que recorre la capa (negativo = va al revés que el scroll)
+   data-px-x  lo mismo en horizontal
+   data-px-s  zoom extra en los extremos del recorrido
+   data-px-y  desplazamiento fijo que hay que conservar (ej. centrados) */
+function parallax(){
+  for (const el of pxEls){
+    const ref = el.dataset.pxRef === 'section' ? el.closest('section') : el.parentElement;
+    const r = ref.getBoundingClientRect();
+    if (r.bottom < -300 || r.top > innerHeight + 300) continue;
+    // c va de +1 (la sección viene entrando) a -1 (ya se fue)
+    const c = clamp((r.top + r.height/2 - innerHeight/2) / innerHeight, -1.4, 1.4);
+    const dy = c * (+el.dataset.px || 0);
+    const dx = c * (+el.dataset.pxX || 0);
+    const sc = 1 + Math.abs(c) * (+el.dataset.pxS || 0);
+    const fijo = el.dataset.pxY || '0';
+    el.style.transform = `translate3d(${dx}px, calc(${fijo} + ${dy.toFixed(1)}px), 0) scale(${sc.toFixed(3)})`;
+  }
+}
+
+function onScroll(){
+  parallax();
+
+  prog.style.width = (scrollY / (document.body.scrollHeight - innerHeight) * 100) + '%';
+  barcta.classList.toggle('on', scrollY > innerHeight * .8);
+
+  // Recorrido
+  const tr = tour.getBoundingClientRect();
+  if (tr.top <= 0 && tr.bottom >= innerHeight){
+    const p = clamp(-tr.top / (tour.offsetHeight - innerHeight), 0, .9999);
+    const i = Math.floor(p * BEATS.length);
+    pintarBeat(i);
+    // La palabra del fondo se arrastra: el texto "se mueve" mientras lees
+    const local = p * BEATS.length - i;
+    const w = words[i];
+    if (w) w.style.transform = `translate3d(${(local - .5) * -84}px, ${(local - .5) * 26}px, 0)`;
+    const c = copies[i];
+    if (c) c.style.setProperty('--dx', `${(local - .5) * 46}px`);
+    // La ventana flota en sentido contrario a la palabra del fondo
+    flote = (local - .5) * -26;
+    pintarVentana();
+    hilo.style.transform = `scaleY(${1 + (local - .5) * .5})`;
+  } else if (beat === -1 && tr.top < innerHeight){
+    pintarBeat(0);
+  }
+
+  // Riel de la API key
+  const recorrido = key.offsetHeight - innerHeight;
+  const kr = key.getBoundingClientRect();
+  if (recorrido > 0 && kr.top <= 0 && kr.bottom >= innerHeight){
+    const p = clamp(-kr.top / recorrido);
+    rail.style.transform = `translate3d(${-p * railDist}px,0,0)`;
+  } else if (recorrido <= 0 && kr.bottom > 0 && kr.top < innerHeight){
+    // En rejilla fija no hay nada que correr: los pasos bajan despacio mientras
+    // el encabezado sube, para que la sección no se sienta plana.
+    const c = clamp((kr.top + key.offsetHeight/2 - innerHeight/2) / innerHeight, -1.2, 1.2);
+    rail.style.transform = `translate3d(0, ${(c * 52).toFixed(1)}px, 0)`;
+  }
+}
+
+/* Cuánto le falta al riel por correr y, con eso, cuánto scroll merece la
+   sección. Si los cinco pasos caben de una en pantallas anchas, el recorrido
+   es cero y la sección deja de retener el scroll a la fuerza. */
+let railDist = 0;
+function medirKey(){
+  rail.classList.remove('key__rail--fijo');
+  const cs    = getComputedStyle(rail);
+  const gap   = parseFloat(cs.columnGap) || 0;
+  const padX  = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+  const pasos = rail.children.length;
+  const MIN   = 250;   // ancho mínimo para que un paso siga siendo legible
+
+  if (pasos * MIN + (pasos - 1) * gap + padX <= rail.clientWidth){
+    // Caben todos: rejilla fija, cero scroll forzado
+    rail.classList.add('key__rail--fijo');
+    rail.style.transform = 'translate3d(0,0,0)';
+    railDist = 0;
+  } else {
+    railDist = Math.max(0, rail.scrollWidth - rail.clientWidth + (parseFloat(cs.paddingRight) || 0));
+  }
+  // 1.35 para que los pasos no pasen disparados
+  key.style.height = Math.round(innerHeight + railDist * 1.35) + 'px';
+}
+medirKey();
+addEventListener('resize', medirKey, {passive:true});
+// Las tarjetas se miden mal hasta que cargan las fuentes
+document.fonts?.ready.then(() => { medirKey(); onScroll(); });
+addEventListener('scroll', onScroll, {passive:true});
+addEventListener('resize', onScroll, {passive:true});
+onScroll();
+
+
+/* ═══ Mosaico del pie ═══ */
+const mosaic = document.getElementById('mosaic');
+const cols = innerWidth <= 900 ? 4 : 8;
+const filas = Math.ceil(innerHeight / (innerWidth/cols * (560/308))) + 1;
+for (let i = 0; i < cols * Math.max(filas, 3); i++){
+  const el = document.createElement('i');
+  el.style.backgroundImage = `url(${art(CHAMPS[(i*5) % CHAMPS.length])})`;
+  mosaic.appendChild(el);
+}
+</script>
+</body>
+</html>

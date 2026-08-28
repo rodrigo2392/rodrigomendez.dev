@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lolsito · tres portadas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<style>
+  .wrap { padding: clamp(70px, 12vh, 130px) clamp(20px, 7vw, 110px) 140px; max-width: 1500px; }
+  .k { font-size: 11px; font-weight: 800; letter-spacing: 0.4em; text-transform: uppercase; color: var(--ind-cl); }
+  .h { font-family: var(--display); font-size: clamp(38px, 7vw, 96px); line-height: 0.98; margin-top: 18px; letter-spacing: -0.015em; }
+  .d { margin-top: 20px; max-width: 62ch; color: rgba(255, 255, 255, 0.6); font-size: 15.5px; line-height: 1.75; }
+
+  .rej { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2vw, 26px); margin-top: clamp(40px, 6vh, 70px); }
+  .op {
+    display: flex; flex-direction: column; min-height: 340px;
+    border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.025);
+    padding: clamp(22px, 2.2vw, 32px);
+    transition: border-color 0.4s var(--ease), transform 0.4s var(--ease), background 0.4s var(--ease);
+  }
+  .op:hover { border-color: rgba(99, 102, 241, 0.55); transform: translateY(-4px); background: rgba(99, 102, 241, 0.07); }
+  .op__n { font-family: var(--display); font-size: clamp(40px, 4vw, 62px); line-height: 0.8; color: var(--ind); opacity: 0.85; }
+  .op__t { font-family: var(--display); font-size: clamp(20px, 1.7vw, 27px); margin-top: 22px; line-height: 1.1; }
+  .op__d { margin-top: 14px; font-size: 14px; color: rgba(255, 255, 255, 0.6); line-height: 1.68; }
+  .op__x { margin-top: 16px; font-size: 13px; color: rgba(255, 255, 255, 0.44); line-height: 1.6; }
+  .op__x b { color: rgba(255, 255, 255, 0.72); font-weight: 700; }
+  .op__go { margin-top: auto; padding-top: 22px; font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ind-cl); }
+
+  .pie { margin-top: clamp(40px, 6vh, 70px); padding-top: 26px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 13.5px; color: rgba(255, 255, 255, 0.45); line-height: 1.7; max-width: 70ch; }
+  .pie a { color: var(--ind-cl); }
+
+  /* La que se quedó: ya vive en la v2. */
+  .op--elegida { border-color: rgba(99, 102, 241, 0.55); background: rgba(99, 102, 241, 0.08); }
+  .op__t em { font-style: normal; display: inline-block; margin-left: 8px; padding: 4px 10px;
+    border-radius: 999px; background: var(--ind); color: #fff;
+    font-family: var(--body); font-size: 11px; font-weight: 800; letter-spacing: .1em;
+    text-transform: uppercase; vertical-align: middle; }
+
+  @media (max-width: 980px) { .rej { grid-template-columns: minmax(0, 1fr); } .op { min-height: 0; } }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<header class="bar">
+  <span class="bar__mark">LOLSITO</span>
+  <a class="bar__cta" href="../lolsito-v2/index.html">Ver la v2</a>
+</header>
+
+<main class="wrap">
+  <p class="k">pruebas de portada</p>
+  <h1 class="h">TRES FORMAS<br />DE ABRIR</h1>
+  <p class="d">
+    Las tres arrancan igual que la v2 (título, bajada, el mismo scroll pegado) y las tres
+    cuentan algo del juego, no un fondo bonito. Cambia qué se ve detrás del título y qué
+    entiende quien llega sin saber nada.
+  </p>
+
+  <div class="rej">
+    <a class="op" href="draft.html">
+      <span class="op__n">A</span>
+      <h2 class="op__t">El draft</h2>
+      <p class="op__d">
+        Las cinco cartas del equipo enemigo se voltean una por una y se quedan en gris.
+        Enfrente aparece a color la que te conviene, con hilos hacia cada rival.
+      </p>
+      <p class="op__x"><b>Cuenta:</b> a quién escoger. Lo más cercano a la pantalla de selección.</p>
+      <span class="op__go">Verla ↗</span>
+    </a>
+
+    <a class="op op--elegida" href="grieta.html">
+      <span class="op__n">B</span>
+      <h2 class="op__t">La Grieta <em>elegida</em></h2>
+      <p class="op__d">
+        El mapa del juego en perspectiva con los diez jugadores caminando. La jungla
+        enemiga desaparece, sale el ping y Lolsito lo canta.
+      </p>
+      <p class="op__x"><b>Cuenta:</b> el coach en vivo, que es lo más difícil de explicar con palabras.</p>
+      <span class="op__go">Verla ↗</span>
+    </a>
+
+    <a class="op" href="retrato.html">
+      <span class="op__n">C</span>
+      <h2 class="op__t">El retrato</h2>
+      <p class="op__d">
+        Un campeón a pantalla completa que se deshace en ceniza hacia el siguiente,
+        mientras la app descarta candidatos en voz alta hasta quedarse con uno.
+      </p>
+      <p class="op__x"><b>Cuenta:</b> que hay alguien pensando por ti. La más impactante y la más ligera.</p>
+      <span class="op__go">Verla ↗</span>
+    </a>
+  </div>
+
+  <p class="pie">
+    La portada B ya está puesta en <a href="../lolsito-v2/index.html">la v2</a>, en lugar del
+    muro de campeones en cilindro que estaba antes. Estas tres páginas se quedan solo como
+    prueba y comparación. Cada prueba trae abajo una nota con lo
+    que gana y lo que cuesta. El arte sale de Data Dragon, el CDN público de Riot: Lolsito
+    es un proyecto de fan y no está avalado por Riot Games.
+  </p>
+</main>
+
+</body>
+</html>

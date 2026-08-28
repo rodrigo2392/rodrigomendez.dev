@@ -1,0 +1,1690 @@
+---
+// Landing de Lolsito: descarga + instrucciones para la API key de Gemini.
+// La página usa la paleta "Indigo" de la app (src/index.css del repo lolsito-vite),
+// no la cian del sitio, para que se sienta continuación del producto. Todos los
+// tokens viven bajo .lol para no contaminar el resto del sitio.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { LOLSITO } from '../consts';
+import '@fontsource-variable/sora';
+import '@fontsource-variable/manrope';
+
+const FUNCIONES = [
+  {
+    titulo: 'Draft de IA',
+    texto:
+      'En la selección de campeón lee a los cinco enemigos y te dice qué escoger, filtrando solo los campeones que sí tienes comprados.',
+    icono: 'bot',
+  },
+  {
+    titulo: 'Runas y objetos solos',
+    texto:
+      'Al fijar tu campeón, Lolsito escribe la página de runas y el orden de compra directo en el cliente. Cero copiar y pegar.',
+    icono: 'zap',
+  },
+  {
+    titulo: 'Coach que te habla',
+    texto:
+      'Durante la partida te avisa por voz y por notificación de Windows lo que está pasando: quién murió, cuándo rotar, cuándo hacer objetivo.',
+    icono: 'voz',
+  },
+  {
+    titulo: 'Análisis al terminar',
+    texto:
+      'Cuando acaba el juego revisa tus números y te explica qué salió mal. Puedes pedirlo suave (contra tu partida) o duro (contra estándar de high elo).',
+    icono: 'chart',
+  },
+  {
+    titulo: 'Meta del parche',
+    texto:
+      'Tier list por rol con los campeones fuertes del parche y contra quién van bien, para no llegar en blanco a la fila.',
+    icono: 'trend',
+  },
+  {
+    titulo: 'Overlay del lobby',
+    texto:
+      'Con un atajo de teclado ves encima del juego quiénes son los diez jugadores y en qué liga están.',
+    icono: 'layers',
+  },
+];
+
+const PASOS_KEY = [
+  {
+    n: '01',
+    titulo: 'Abre Google AI Studio',
+    texto:
+      'Entra a aistudio.google.com/app/apikey e inicia sesión con tu cuenta de Google, la misma del correo. No necesitas tarjeta.',
+    liga: LOLSITO.geminiKeyUrl,
+    ligaTexto: 'Abrir Google AI Studio',
+  },
+  {
+    n: '02',
+    titulo: 'Presiona "Create API key"',
+    texto:
+      'Es el botón azul de esa pantalla. Si es tu primera vez te va a pedir aceptar los términos: acéptalos y vuelve a presionarlo.',
+  },
+  {
+    n: '03',
+    titulo: 'Elige un proyecto',
+    texto:
+      'Google te pide un proyecto de Google Cloud. Si no tienes ninguno, deja que él cree uno nuevo. El nombre da igual.',
+  },
+  {
+    n: '04',
+    titulo: 'Copia la clave',
+    texto:
+      // En letra normal "AIza" se confunde con "Alza": el token va en monoespaciada.
+      'Te aparece un texto largo que empieza con <code class="lol-tk">AIza</code>. Ese es. Cópialo completo con el botón de copiar; después de cerrar la ventana ya no lo vuelves a ver.',
+  },
+  {
+    n: '05',
+    titulo: 'Pégala en Lolsito',
+    texto:
+      'Abre Lolsito, ve a Configuración, pégala en el campo "Google Gemini API key" y presiona Guardar key. Listo: la IA ya responde.',
+  },
+];
+
+const FAQ = [
+  {
+    p: '¿Cuánto cuesta?',
+    r: 'Lolsito es gratis. Lo único que pones es tu propia clave de Gemini, que también tiene un nivel gratuito con límite diario más que suficiente para jugar. Si un día te pasas del límite, la IA deja de responder hasta el día siguiente; el resto de la app sigue funcionando.',
+  },
+  {
+    p: '¿Me pueden banear por usarlo?',
+    r: 'Lolsito no toca el juego: no inyecta código, no mueve tu mouse ni juega por ti. Lee la información que el propio cliente de League publica en tu computadora, las mismas fuentes que usan herramientas conocidas como Blitz o Porofessor. Dicho eso, ninguna app de terceros está "aprobada" oficialmente por Riot, así que la decisión de usarla es tuya.',
+  },
+  {
+    p: '¿Mis datos salen de mi computadora?',
+    r: 'No hay servidor mío en medio: no guardo tu cuenta, tus partidas ni tu clave. Lo único que sale de tu PC son las preguntas que Lolsito le hace a Gemini, y van de tu computadora directo a Google con tu propia clave. La clave se guarda solo en tu equipo.',
+  },
+  {
+    p: '¿Funciona en Mac o Linux?',
+    r: 'Por ahora solo Windows 10 y 11 de 64 bits. La app está hecha con Tauri, así que técnicamente puede compilarse para Mac, pero todavía no hay una versión probada.',
+  },
+  {
+    p: '¿Tengo que dejar el cliente de League abierto?',
+    r: 'Sí. Lolsito se conecta al cliente para saber en qué fase vas: lobby, selección de campeón, partida o pantalla de resultados. Si el cliente está cerrado, la app se queda esperando.',
+  },
+  {
+    p: 'No veo el overlay encima del juego, ¿qué hago?',
+    r: 'Casi siempre es porque League está en "Pantalla completa" exclusiva, y ahí Windows no deja que ninguna ventana se dibuje encima. Entra a las opciones de video del juego y cambia a "Sin bordes". El overlay tiene un botón que hace ese cambio por ti.',
+  },
+];
+---
+
+<BaseLayout
+  title="Lolsito — coach de League of Legends con IA"
+  description="App gratuita de escritorio que lee tu cliente de League of Legends: recomienda el pick del draft, importa runas y objetos solos, te habla durante la partida y analiza tu juego al terminar."
+  image="/img/lolsito/icon-310.png"
+>
+  <div class="lol">
+    <!-- ══════════════════ HERO ══════════════════ -->
+    <section class="lol-hero">
+      <!-- La Grieta en vivo detrás del título: el mapa del juego con los diez
+           jugadores caminando. Si no hay WebGL o el visitante pidió menos
+           movimiento, queda el resplandor de siempre y no se nota la falta. -->
+      <canvas class="lol-hero__mapa" data-grieta aria-hidden="true"></canvas>
+      <div class="lol-hero__glow" aria-hidden="true"></div>
+      <div class="lol-hero__velo" aria-hidden="true"></div>
+
+      <div class="lol-reloj" data-grieta-reloj aria-hidden="true">
+        <i></i> <span>Partida en curso</span> <b data-grieta-min>12:40</b>
+      </div>
+
+      <div class="container-site lol-hero__inner">
+        <div class="lol-hero__copy">
+          <div class="lol-brand">
+            <img src={LOLSITO.icono} alt="" width="52" height="52" class="lol-brand__icon" />
+            <div>
+              <p class="lol-brand__name">Lolsito</p>
+              <p class="lol-brand__sub">para League of Legends</p>
+            </div>
+          </div>
+
+          <h1 class="lol-h1">
+            Tu coach de League,<br />
+            <span class="lol-grad">sin salir del juego</span>
+          </h1>
+
+          <p class="lol-lead">
+            Lolsito se conecta a tu cliente de League y hace el trabajo aburrido: te dice
+            qué escoger en el draft, te pone las runas y los objetos solo, te avisa por voz
+            lo que está pasando en la partida y al terminar te explica dónde la regaste.
+          </p>
+
+          <div class="lol-cta">
+            {
+              LOLSITO.disponible ? (
+                <a class="lol-btn lol-btn--primary" href={LOLSITO.descarga} rel="noopener">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12" /><path d="m7 12 5 5 5-5" /><path d="M4 20h16" /></svg>
+                  Descargar para Windows
+                </a>
+              ) : (
+                <span class="lol-btn lol-btn--primary is-disabled" aria-disabled="true">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+                  Descarga en camino
+                </span>
+              )
+            }
+            <a class="lol-btn lol-btn--ghost" href="#api-key">Cómo sacar tu API key</a>
+          </div>
+
+          <p class="lol-fine">
+            Versión {LOLSITO.version} · {LOLSITO.plataforma} · {LOLSITO.peso} · Gratis
+          </p>
+
+          <!-- Lo que la app va diciendo mientras corre la partida del mapa.
+               Solo uno visible a la vez. -->
+          <div class="lol-voz" data-grieta-voz aria-hidden="true">
+            <div class="lol-voz__i">
+              <span class="lol-voz__ico">
+                <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /></svg>
+              </span>
+              <span class="lol-voz__t">
+                La jungla enemiga <b>lleva 12 segundos sin verse</b>. Juega pegado a tu torre.
+                <span class="lol-voz__min">Minuto 12:40 · aviso por voz</span>
+              </span>
+            </div>
+            <div class="lol-voz__i lol-voz__i--urgente">
+              <span class="lol-voz__ico">
+                <svg viewBox="0 0 24 24"><path d="M12 9v5" /><path d="M12 17h.01" /><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></svg>
+              </span>
+              <span class="lol-voz__t">
+                Vienen tres al medio. <b>Retírate ya.</b>
+                <span class="lol-voz__min">Minuto 13:02 · aviso por voz</span>
+              </span>
+            </div>
+            <div class="lol-voz__i">
+              <span class="lol-voz__ico">
+                <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>
+              </span>
+              <span class="lol-voz__t">
+                Dragón en 40 segundos y tu jungla ya va para allá. <b>Empuja tu línea.</b>
+                <span class="lol-voz__min">Minuto 13:20 · aviso por voz</span>
+              </span>
+            </div>
+          </div>
+
+          <ul class="lol-badges">
+            <li><span class="lol-dot lol-dot--pos"></span>Corre en tu computadora</li>
+            <li><span class="lol-dot lol-dot--accent"></span>Sin cuenta ni registro</li>
+            <li><span class="lol-dot lol-dot--gold"></span>Habla en español</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════ LA APP ══════════════════ -->
+    <!-- La ventana salía antes junto al título; ahora que el mapa ocupa el
+         fondo del hero, vive en su propia sección para que se vea completa. -->
+    <section class="lol-sec lol-vista" id="app">
+      <div class="container-site">
+        <p class="lol-kicker">así se ve</p>
+        <h2 class="lol-h2">Una ventana al lado del juego</h2>
+        <p class="lol-sub">
+          Lolsito abre en su propia ventana y va cambiando solo según la fase en la que
+          vayas: lobby, selección de campeón, partida o pantalla de resultados.
+        </p>
+
+        <!-- Recreación de la interfaz. No es una captura: es HTML, así que se ve
+             nítida en cualquier pantalla y no se despinta cuando la app cambie. -->
+        <div class="lol-mock reveal" aria-hidden="true">
+          <div class="lol-win">
+            <div class="lol-win__bar">
+              <span class="lol-win__dots"><i></i><i></i><i></i></span>
+              <span class="lol-win__title">Lolsito</span>
+            </div>
+            <div class="lol-win__body">
+              <aside class="lol-side">
+                <div class="lol-side__item">
+                  <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>
+                  Meta juego
+                </div>
+                <div class="lol-side__item is-on">
+                  <svg viewBox="0 0 24 24"><path d="M12 3v3" /><rect x="4" y="6" width="16" height="12" rx="3" /><circle cx="9" cy="12" r="1.2" /><circle cx="15" cy="12" r="1.2" /></svg>
+                  Draft de IA
+                </div>
+                <div class="lol-side__item">
+                  <svg viewBox="0 0 24 24"><path d="M4 20V10" /><path d="M10 20V4" /><path d="M16 20v-7" /><path d="M22 20H2" /></svg>
+                  Análisis
+                </div>
+                <div class="lol-side__item">
+                  <svg viewBox="0 0 24 24"><path d="M21 15a3 3 0 0 1-3 3H8l-5 3V6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3z" /></svg>
+                  Coach Q&amp;A
+                </div>
+                <div class="lol-side__item">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" /></svg>
+                  Configuración
+                </div>
+                <div class="lol-side__foot">
+                  <span class="lol-side__avatar"></span>
+                  <span class="lol-side__who">
+                    <b>Rodrigo</b>
+                    <em>Oro II</em>
+                  </span>
+                </div>
+              </aside>
+
+              <div class="lol-main">
+                <div class="lol-main__head">
+                  <span class="lol-main__title">Draft de IA</span>
+                  <span class="lol-pill"><span class="lol-pulse"></span>En selección</span>
+                </div>
+
+                <div class="lol-card">
+                  <span class="lol-label">Equipo enemigo</span>
+                  <div class="lol-champs">
+                    <span><i style="--h: 268"></i>Top</span>
+                    <span><i style="--h: 218"></i>Jung</span>
+                    <span><i style="--h: 340"></i>Mid</span>
+                    <span><i style="--h: 172"></i>ADC</span>
+                    <span><i style="--h: 42"></i>Sup</span>
+                  </div>
+                </div>
+
+                <div class="lol-card lol-card--rec">
+                  <span class="lol-label">Te conviene escoger</span>
+                  <div class="lol-rec">
+                    <span class="lol-rec__face"></span>
+                    <span class="lol-rec__body">
+                      <b>Vi<span class="lol-rec__wr">54% de victorias</span></b>
+                      <em>
+                        Limpia más rápido que su jungla y su ulti cae justo sobre
+                        el mid enemigo cuando salta.
+                      </em>
+                    </span>
+                  </div>
+                  <div class="lol-runes">
+                    <span class="r1"></span><span class="r2"></span><span class="r3"></span>
+                    <span class="lol-runes__btn">Importar runas</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lol-toast">
+            <span class="lol-toast__ico">
+              <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /></svg>
+            </span>
+            <span class="lol-toast__txt">"Cuidado, la jungla enemiga desapareció hace 12 segundos."</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════ FUNCIONES ══════════════════ -->
+    <section class="lol-sec" id="funciones">
+      <div class="container-site">
+        <p class="lol-kicker">lo que hace</p>
+        <h2 class="lol-h2">Seis cosas menos de las que preocuparte</h2>
+        <p class="lol-sub">
+          Nada de esto te pide salir del juego ni abrir el navegador a mitad del draft.
+        </p>
+
+        <div class="lol-grid">
+          {
+            FUNCIONES.map((f) => (
+              <article class="lol-feat reveal">
+                <span class="lol-feat__ico">
+                  {f.icono === 'bot' && <svg viewBox="0 0 24 24"><path d="M12 3v3" /><rect x="4" y="6" width="16" height="12" rx="3" /><circle cx="9" cy="12" r="1.3" /><circle cx="15" cy="12" r="1.3" /></svg>}
+                  {f.icono === 'zap' && <svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z" /></svg>}
+                  {f.icono === 'voz' && <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /><path d="M18.5 5.5a9 9 0 0 1 0 13" /></svg>}
+                  {f.icono === 'chart' && <svg viewBox="0 0 24 24"><path d="M4 20V10" /><path d="M10 20V4" /><path d="M16 20v-7" /><path d="M22 20H2" /></svg>}
+                  {f.icono === 'trend' && <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>}
+                  {f.icono === 'layers' && <svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z" /><path d="m3 13 9 5 9-5" /></svg>}
+                </span>
+                <h3 class="lol-feat__t">{f.titulo}</h3>
+                <p class="lol-feat__d">{f.texto}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════ INSTALAR ══════════════════ -->
+    <section class="lol-sec lol-sec--alt" id="instalar">
+      <div class="container-site">
+        <p class="lol-kicker">instalar</p>
+        <h2 class="lol-h2">Tres pasos y ya está corriendo</h2>
+
+        <ol class="lol-steps">
+          <li class="reveal">
+            <span class="lol-steps__n">1</span>
+            <div>
+              <h3>Descarga el instalador</h3>
+              <p>
+                Un solo archivo de {LOLSITO.peso}. Ábrelo y sigue el asistente de siempre.
+                Windows puede mostrarte un aviso de "editor desconocido" porque la app
+                todavía no está firmada: dale en <strong>Más información → Ejecutar de
+                todas formas</strong>.
+              </p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span class="lol-steps__n">2</span>
+            <div>
+              <h3>Abre League y luego Lolsito</h3>
+              <p>
+                Lolsito busca el cliente de League automáticamente. Cuando lo encuentra,
+                arriba te aparece tu nombre de invocador y en qué fase vas.
+              </p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span class="lol-steps__n">3</span>
+            <div>
+              <h3>Pega tu API key de Gemini</h3>
+              <p>
+                Es lo único que Lolsito te pide, y es gratis. Sin ella la app funciona,
+                pero las partes con inteligencia artificial se quedan calladas.
+                <a href="#api-key">Te explico cómo sacarla aquí abajo →</a>
+              </p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ══════════════════ API KEY ══════════════════ -->
+    <section class="lol-sec" id="api-key">
+      <div class="container-site">
+        <p class="lol-kicker">api key</p>
+        <h2 class="lol-h2">Cómo sacar tu clave de Gemini</h2>
+        <p class="lol-sub">
+          Gemini es la inteligencia artificial de Google. Lolsito no trae una clave propia:
+          usas la tuya, y así nadie más gasta tu cuota ni tú pagas la de nadie.
+          Toma unos dos minutos y no piden tarjeta.
+        </p>
+
+        <div class="lol-keygrid">
+          <ol class="lol-key">
+            {
+              PASOS_KEY.map((s) => (
+                <li class="reveal">
+                  <span class="lol-key__n">{s.n}</span>
+                  <div class="lol-key__c">
+                    <h3>{s.titulo}</h3>
+                    <p set:html={s.texto} />
+                    {s.liga && (
+                      <a class="lol-key__link" href={s.liga} target="_blank" rel="noopener">
+                        {s.ligaTexto} <span aria-hidden="true">↗</span>
+                      </a>
+                    )}
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+
+          <aside class="lol-aside">
+            <div class="lol-note">
+              <span class="lol-note__t">Cómo se ve la clave</span>
+              <code class="lol-code">AIzaSy<span class="lol-code__mask">••••••••••••••••••••••••</span>7fQ</code>
+              <p>
+                Siempre empieza con <code class="lol-tk">AIza</code> (A, i mayúscula, z, a)
+                y es una sola línea larga, sin espacios. Cópiala completa.
+              </p>
+            </div>
+
+            <div class="lol-note lol-note--safe">
+              <span class="lol-note__t">Dónde queda guardada</span>
+              <p>
+                Solo en tu computadora, dentro de Lolsito. No viaja a ningún servidor mío
+                porque no hay ninguno: las preguntas van directo de tu equipo a Google.
+              </p>
+            </div>
+
+            <div class="lol-note lol-note--warn">
+              <span class="lol-note__t">Si la IA no contesta</span>
+              <p>
+                Casi siempre es que la clave se pegó incompleta o que ese día ya te pasaste
+                del límite gratuito. En Configuración, Lolsito te muestra si la clave está
+                presente y los últimos cuatro caracteres para que compares.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════ FAQ ══════════════════ -->
+    <section class="lol-sec lol-sec--alt" id="preguntas">
+      <div class="container-site">
+        <p class="lol-kicker">dudas</p>
+        <h2 class="lol-h2">Lo que todo mundo pregunta</h2>
+
+        <div class="lol-faq">
+          {
+            FAQ.map((f) => (
+              <details class="lol-q reveal">
+                <summary>
+                  {f.p}
+                  <span class="lol-q__mark" aria-hidden="true"></span>
+                </summary>
+                <p>{f.r}</p>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════ CIERRE ══════════════════ -->
+    <section class="lol-end">
+      <div class="container-site lol-end__inner">
+        <img src={LOLSITO.icono} alt="" width="64" height="64" class="lol-end__icon" />
+        <h2 class="lol-h2">Pruébalo en tu próxima partida</h2>
+        <p class="lol-sub lol-sub--center">
+          Gratis, sin cuenta y sin anuncios. Si algo se rompe o se te ocurre una función,
+          escríbeme: lo estoy construyendo en público.
+        </p>
+        <div class="lol-cta lol-cta--center">
+          {
+            LOLSITO.disponible ? (
+              <a class="lol-btn lol-btn--primary" href={LOLSITO.descarga} rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12" /><path d="m7 12 5 5 5-5" /><path d="M4 20h16" /></svg>
+                Descargar Lolsito {LOLSITO.version}
+              </a>
+            ) : (
+              <span class="lol-btn lol-btn--primary is-disabled" aria-disabled="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+                Descarga en camino
+              </span>
+            )
+          }
+          <a class="lol-btn lol-btn--ghost" href="/#contacto">Escríbeme</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  /* ---------------------------------------------------------------- */
+  /* Tokens de la app (dirección "Indigo"), acotados a esta página.    */
+  /* Copiados de lolsito-vite/src/index.css para que la landing y el   */
+  /* producto se vean como la misma cosa.                             */
+  /* ---------------------------------------------------------------- */
+  .lol {
+    --app: #0e0e14;
+    --surface: #15151d;
+    --surface-2: #1c1c26;
+    --surface-3: #232330;
+    --line: #262633;
+    --line-soft: #1e1e29;
+
+    --accent: #4f46e5;
+    --accent-2: #6366f1;
+    --accent-3: #818cf8;
+    --accent-soft: rgba(99, 102, 241, 0.14);
+    --accent-ring: rgba(99, 102, 241, 0.45);
+
+    --text: #ededf4;
+    --muted: #9797ac;
+    --faint: #6a6a80;
+
+    --pos: #34d399;
+    --neg: #fb7185;
+    --warn: #fbbf24;
+    --gold: #e9b949;
+
+    --r-lg: 20px;
+    --r-md: 16px;
+    --r-sm: 12px;
+
+    --display: 'Sora Variable', 'Outfit Variable', system-ui, sans-serif;
+    --body: 'Manrope Variable', 'Outfit Variable', system-ui, sans-serif;
+
+    background: var(--app);
+    color: var(--text);
+    font-family: var(--body);
+  }
+
+  .lol :global(h1),
+  .lol :global(h2),
+  .lol :global(h3) {
+    font-family: var(--display);
+    letter-spacing: -0.03em;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Hero                                                             */
+  /* ---------------------------------------------------------------- */
+  .lol-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    display: grid;
+    align-items: start;
+    min-height: min(92vh, 58rem);
+    padding-block: 4.5rem 0;
+  }
+  .lol-hero__glow {
+    position: absolute;
+    top: -28rem;
+    left: 50%;
+    width: min(78rem, 150vw);
+    height: 52rem;
+    translate: -50% 0;
+    background: radial-gradient(
+      50% 50% at 50% 50%,
+      rgba(99, 102, 241, 0.22),
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: -2;
+  }
+  /* El mapa de la Grieta vive detrás de todo. En pantallas anchas se corre a
+     la derecha para no quedar debajo del texto; en angostas ocupa el fondo. */
+  .lol-hero__mapa {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: min(76%, 62rem);
+    height: 100%;
+    display: block;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 1.4s ease;
+  }
+  .lol-hero__mapa.is-on {
+    opacity: 1;
+  }
+  /* Oscurece la zona del texto para que el mapa nunca le quite contraste. */
+  .lol-hero__velo {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(46% 46% at 32% 34%, rgba(14, 14, 20, 0.92), rgba(14, 14, 20, 0.3) 62%, transparent 82%),
+      linear-gradient(to bottom, var(--app) 0%, rgba(14, 14, 20, 0.3) 22%, transparent 46%, rgba(14, 14, 20, 0.72) 92%, var(--app) 100%);
+  }
+  .lol-hero__inner {
+    position: relative;
+    width: 100%;
+  }
+  .lol-hero__copy {
+    max-width: 44rem;
+  }
+
+  /* Reloj de la partida que corre en el mapa */
+  .lol-reloj {
+    position: absolute;
+    top: 2.2rem;
+    right: clamp(1.5rem, 5vw, 4rem);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 12px;
+    background: rgba(28, 28, 38, 0.72);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--line);
+    font-size: 0.78rem;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .lol-reloj.is-on {
+    opacity: 1;
+    transform: none;
+  }
+  .lol-reloj b {
+    font-weight: 800;
+  }
+  .lol-reloj span {
+    color: var(--muted);
+  }
+  .lol-reloj i {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--pos);
+  }
+
+  /* Lo que la app va diciendo mientras corre la partida */
+  .lol-voz {
+    position: relative;
+    display: grid;
+    margin-top: 1.9rem;
+    min-height: 5.2rem;
+    max-width: 32rem;
+  }
+  .lol-voz__i {
+    grid-area: 1/1;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: rgba(28, 28, 38, 0.74);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--accent);
+    border-radius: 14px;
+    box-shadow: 0 24px 50px -30px rgba(0, 0, 0, 0.95);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
+    pointer-events: none;
+  }
+  .lol-voz__i.is-on {
+    opacity: 1;
+    transform: none;
+  }
+  .lol-voz__i--urgente {
+    border-left-color: var(--neg);
+  }
+  .lol-voz__ico {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex: none;
+    border-radius: 9px;
+    background: var(--accent-soft);
+    color: var(--accent-3);
+    margin-top: 1px;
+  }
+  .lol-voz__i--urgente .lol-voz__ico {
+    background: rgba(251, 113, 133, 0.16);
+    color: var(--neg);
+  }
+  .lol-voz__ico svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .lol-voz__t {
+    font-size: 0.86rem;
+    line-height: 1.45;
+    color: var(--text);
+  }
+  .lol-voz__t b {
+    font-weight: 800;
+  }
+  .lol-voz__min {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  /* La ventana de la app, ya en su propia sección */
+  .lol-vista .lol-mock {
+    margin-top: 2.6rem;
+    max-width: 62rem;
+    margin-inline: auto;
+  }
+  /* De frente: aquí la ventana es el tema, no un adorno del hero. */
+  .lol-vista .lol-win {
+    transform: none;
+  }
+
+  .lol-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 1.75rem;
+  }
+  .lol-brand__icon {
+    border-radius: 15px;
+    box-shadow: 0 12px 32px -14px var(--accent-ring);
+  }
+  .lol-brand__name {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .lol-brand__sub {
+    color: var(--faint);
+    font-size: 0.85rem;
+    line-height: 1.2;
+  }
+
+  /* El tope lo manda la primera línea: más grande y "Tu coach de League," parte
+     en dos y deja un hueco feo antes del degradado. */
+  .lol-h1 {
+    font-size: clamp(2.4rem, 4.6vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.03;
+    margin: 0 0 1.35rem;
+  }
+  .lol-grad {
+    background: linear-gradient(105deg, var(--accent-3), var(--accent-2) 55%, var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .lol-lead {
+    color: var(--muted);
+    font-size: 1.12rem;
+    line-height: 1.68;
+    max-width: 48ch;
+  }
+
+  .lol-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 2rem;
+  }
+  .lol-cta--center {
+    justify-content: center;
+  }
+  .lol-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.85rem 1.6rem;
+    border-radius: 14px;
+    font-family: var(--body);
+    font-weight: 700;
+    font-size: 0.98rem;
+    transition: filter 0.16s ease, transform 0.16s ease, border-color 0.16s ease;
+  }
+  .lol-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .lol-btn--primary {
+    background: linear-gradient(135deg, var(--accent-2), var(--accent));
+    color: #fff;
+    box-shadow: 0 14px 30px -16px var(--accent-ring);
+  }
+  .lol-btn--primary:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+  }
+  .lol-btn--primary.is-disabled {
+    background: var(--surface-2);
+    color: var(--muted);
+    border: 1px solid var(--line);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .lol-btn--primary.is-disabled:hover {
+    filter: none;
+    transform: none;
+  }
+  .lol-btn--ghost {
+    background: rgba(237, 237, 244, 0.05);
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+  .lol-btn--ghost:hover {
+    border-color: var(--accent-ring);
+  }
+
+  .lol-fine {
+    color: var(--faint);
+    font-size: 0.85rem;
+    margin-top: 0.95rem;
+  }
+
+  .lol-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.4rem;
+    list-style: none;
+    margin: 1.6rem 0 0;
+    padding: 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  .lol-badges li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .lol-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    flex: none;
+  }
+  .lol-dot--pos {
+    background: var(--pos);
+    box-shadow: 0 0 9px color-mix(in srgb, var(--pos) 65%, transparent);
+  }
+  .lol-dot--accent {
+    background: var(--accent-3);
+    box-shadow: 0 0 9px var(--accent-ring);
+  }
+  .lol-dot--gold {
+    background: var(--gold);
+    box-shadow: 0 0 9px color-mix(in srgb, var(--gold) 60%, transparent);
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Mockup de la app                                                 */
+  /* ---------------------------------------------------------------- */
+  .lol-mock {
+    position: relative;
+    perspective: 1400px;
+  }
+  .lol-win {
+    background: var(--app);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow:
+      0 40px 90px -40px rgba(0, 0, 0, 0.9),
+      0 0 0 1px rgba(99, 102, 241, 0.08),
+      0 0 70px -30px var(--accent-ring);
+    transform: rotateY(-6deg) rotateX(2deg);
+  }
+  .lol-win__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.65rem 0.9rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .lol-win__dots {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .lol-win__dots i {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: var(--surface-3);
+  }
+  .lol-win__title {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: var(--faint);
+  }
+  .lol-win__body {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    min-height: 22rem;
+  }
+
+  .lol-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.85rem 0.6rem;
+    background: var(--surface);
+    border-right: 1px solid var(--line-soft);
+  }
+  .lol-side__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    border-radius: 10px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--faint);
+    white-space: nowrap;
+  }
+  .lol-side__item svg {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .lol-side__item.is-on {
+    background: var(--accent-soft);
+    color: var(--accent-3);
+  }
+  .lol-side__foot {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--line-soft);
+  }
+  .lol-side__avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--accent-3), var(--accent));
+    flex: none;
+  }
+  .lol-side__who {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+    min-width: 0;
+  }
+  .lol-side__who b {
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+  .lol-side__who em {
+    font-style: normal;
+    font-size: 0.62rem;
+    color: var(--faint);
+  }
+
+  .lol-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 1rem 1.1rem;
+    min-width: 0;
+  }
+  .lol-main__head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .lol-main__title {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.02rem;
+  }
+  .lol-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: auto;
+    padding: 0.22rem 0.6rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-3);
+    font-size: 0.66rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .lol-pulse {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--accent-3);
+    animation: lol-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes lol-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 0 0 var(--accent-ring);
+    }
+    50% {
+      opacity: 0.55;
+      box-shadow: 0 0 0 5px transparent;
+    }
+  }
+
+  .lol-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 0.8rem 0.9rem;
+  }
+  .lol-card--rec {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), var(--surface) 60%);
+    border-color: rgba(99, 102, 241, 0.28);
+  }
+  .lol-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .lol-champs {
+    display: flex;
+    gap: 0.55rem;
+  }
+  .lol-champs span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--faint);
+  }
+  .lol-champs i {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: linear-gradient(
+      140deg,
+      hsl(var(--h) 48% 42%),
+      hsl(var(--h) 40% 22%)
+    );
+    border: 1px solid var(--line);
+  }
+  .lol-rec {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+  .lol-rec__face {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    flex: none;
+    background: linear-gradient(140deg, var(--accent-3), var(--accent));
+    box-shadow: 0 8px 18px -10px var(--accent-ring);
+  }
+  .lol-rec__body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+  }
+  .lol-rec__body b {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--display);
+    font-size: 0.88rem;
+    font-weight: 800;
+  }
+  .lol-rec__wr {
+    padding: 0.1rem 0.42rem;
+    border-radius: 999px;
+    background: rgba(52, 211, 153, 0.14);
+    color: var(--pos);
+    font-family: var(--body);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .lol-rec__body em {
+    font-style: normal;
+    font-size: 0.7rem;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+  .lol-runes {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .lol-runes span {
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+  }
+  /* Círculos de runas: insinúan los iconos sin dibujar arte de Riot. */
+  .lol-runes .r1 {
+    background: radial-gradient(circle at 35% 30%, #f3c969, #8a5a12 70%);
+    border-color: rgba(233, 185, 73, 0.45);
+  }
+  .lol-runes .r2 {
+    background: radial-gradient(circle at 35% 30%, var(--accent-3), #2b2569 70%);
+    border-color: rgba(129, 140, 248, 0.4);
+  }
+  .lol-runes .r3 {
+    background: radial-gradient(circle at 35% 30%, #6fd6c0, #14483f 70%);
+    border-color: rgba(52, 211, 153, 0.35);
+  }
+  .lol-runes__btn {
+    width: auto !important;
+    height: auto !important;
+    margin-left: auto;
+    padding: 0.3rem 0.7rem !important;
+    border-radius: 9px !important;
+    background: linear-gradient(135deg, var(--accent-2), var(--accent)) !important;
+    border: none !important;
+    color: #fff;
+    font-size: 0.64rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .lol-toast {
+    position: absolute;
+    right: -0.5rem;
+    bottom: -1.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    max-width: 22rem;
+    padding: 0.7rem 0.95rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 24px 50px -26px rgba(0, 0, 0, 0.95);
+  }
+  .lol-toast__ico {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    background: var(--accent-soft);
+    color: var(--accent-3);
+    flex: none;
+  }
+  .lol-toast__ico svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .lol-toast__txt {
+    font-size: 0.79rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Secciones                                                        */
+  /* ---------------------------------------------------------------- */
+  .lol-sec {
+    padding-block: 5rem;
+    border-top: 1px solid var(--line-soft);
+  }
+  .lol-sec--alt {
+    background: linear-gradient(180deg, var(--surface) 0%, var(--app) 100%);
+  }
+  .lol-kicker {
+    font-family: var(--body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-3);
+  }
+  .lol-h2 {
+    font-size: clamp(1.85rem, 3.5vw, 2.75rem);
+    font-weight: 800;
+    line-height: 1.12;
+    margin: 0.7rem 0 0;
+  }
+  .lol-sub {
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.65;
+    max-width: 56ch;
+    margin-top: 0.9rem;
+  }
+  .lol-sub--center {
+    margin-inline: auto;
+  }
+
+  .lol-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.1rem;
+    margin-top: 2.8rem;
+  }
+  .lol-feat {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 1.5rem 1.45rem;
+    transition: border-color 0.16s ease, transform 0.16s ease;
+  }
+  .lol-feat:hover {
+    border-color: rgba(99, 102, 241, 0.35);
+    transform: translateY(-2px);
+  }
+  .lol-feat__ico {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--accent-soft);
+    color: var(--accent-3);
+    margin-bottom: 1rem;
+  }
+  .lol-feat__ico svg {
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .lol-feat__t {
+    font-size: 1.08rem;
+    font-weight: 700;
+  }
+  .lol-feat__d {
+    color: var(--muted);
+    font-size: 0.93rem;
+    line-height: 1.62;
+    margin-top: 0.5rem;
+  }
+
+  /* Pasos de instalación */
+  .lol-steps {
+    list-style: none;
+    counter-reset: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.1rem;
+    margin: 2.8rem 0 0;
+    padding: 0;
+  }
+  .lol-steps li {
+    display: flex;
+    gap: 0.9rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 1.4rem;
+  }
+  .lol-steps__n {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    flex: none;
+    background: linear-gradient(135deg, var(--accent-2), var(--accent));
+    color: #fff;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 0.88rem;
+  }
+  .lol-steps h3 {
+    font-size: 1.02rem;
+    font-weight: 700;
+  }
+  .lol-steps p {
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.62;
+    margin-top: 0.45rem;
+  }
+  .lol-steps strong {
+    color: var(--text);
+  }
+  .lol-steps a {
+    color: var(--accent-3);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .lol-steps a:hover {
+    text-decoration: underline;
+  }
+
+  /* API key */
+  .lol-keygrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: 2.5rem;
+    margin-top: 2.8rem;
+    align-items: start;
+  }
+  .lol-key {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .lol-key li {
+    display: flex;
+    gap: 1.1rem;
+    padding-bottom: 1.6rem;
+  }
+  .lol-key li:last-child {
+    padding-bottom: 0;
+  }
+  /* La línea que une los pasos: se dibuja bajo el número, no en el último. */
+  .lol-key__n {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--accent-3);
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 0.82rem;
+  }
+  .lol-key li:not(:last-child) .lol-key__n::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 1px;
+    height: calc(1.6rem + 2px);
+    translate: -50% 0;
+    background: linear-gradient(180deg, var(--line), transparent);
+  }
+  .lol-key__c {
+    padding-top: 0.35rem;
+    min-width: 0;
+  }
+  .lol-key__c h3 {
+    font-size: 1.06rem;
+    font-weight: 700;
+  }
+  .lol-key__c p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin-top: 0.4rem;
+  }
+  .lol-key__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.8rem;
+    padding: 0.5rem 1rem;
+    border-radius: 11px;
+    background: var(--accent-soft);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: var(--accent-3);
+    font-size: 0.86rem;
+    font-weight: 700;
+    transition: background 0.16s ease;
+  }
+  .lol-key__link:hover {
+    background: rgba(99, 102, 241, 0.22);
+  }
+
+  .lol-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    position: sticky;
+    top: 6.5rem;
+  }
+  .lol-note {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--r-sm);
+    padding: 1.1rem 1.2rem;
+  }
+  .lol-note--safe {
+    border-left-color: var(--pos);
+  }
+  .lol-note--warn {
+    border-left-color: var(--warn);
+  }
+  .lol-note__t {
+    display: block;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+  .lol-note p {
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+  .lol-note strong {
+    color: var(--text);
+  }
+  .lol-code {
+    display: block;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.82rem;
+    color: var(--accent-3);
+    background: var(--app);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.7rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lol-code__mask {
+    color: var(--faint);
+  }
+  /* Token corto dentro de un párrafo (AIza). Va en mono para que la I mayúscula
+     no se lea como una ele. */
+  .lol-tk {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.9em;
+    padding: 0.1em 0.35em;
+    border-radius: 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--accent-3);
+  }
+
+  /* FAQ */
+  .lol-faq {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 2.5rem;
+    max-width: 62rem;
+  }
+  .lol-q {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    overflow: hidden;
+  }
+  .lol-q[open] {
+    border-color: rgba(99, 102, 241, 0.3);
+  }
+  .lol-q summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.05rem 1.25rem;
+    cursor: pointer;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1rem;
+    list-style: none;
+  }
+  .lol-q summary::-webkit-details-marker {
+    display: none;
+  }
+  .lol-q__mark {
+    position: relative;
+    width: 13px;
+    height: 13px;
+    margin-left: auto;
+    flex: none;
+  }
+  .lol-q__mark::before,
+  .lol-q__mark::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto 0;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--accent-3);
+    translate: 0 -50%;
+    transition: rotate 0.2s ease;
+  }
+  .lol-q__mark::after {
+    rotate: 90deg;
+  }
+  .lol-q[open] .lol-q__mark::after {
+    rotate: 0deg;
+  }
+  .lol-q p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.68;
+    padding: 0 1.25rem 1.25rem;
+    max-width: 72ch;
+  }
+
+  /* Cierre */
+  .lol-end {
+    padding-block: 5.5rem 6rem;
+    border-top: 1px solid var(--line-soft);
+    background:
+      radial-gradient(60% 100% at 50% 100%, rgba(99, 102, 241, 0.16), transparent 70%),
+      var(--app);
+  }
+  .lol-end__inner {
+    text-align: center;
+  }
+  .lol-end__icon {
+    border-radius: 18px;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 16px 40px -18px var(--accent-ring);
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Responsivo                                                       */
+  /* ---------------------------------------------------------------- */
+  @media (max-width: 68rem) {
+    .lol-hero {
+      min-height: min(88vh, 50rem);
+    }
+    .lol-win {
+      transform: none;
+    }
+    .lol-grid,
+    .lol-steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .lol-keygrid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2rem;
+    }
+    .lol-aside {
+      position: static;
+    }
+  }
+
+  @media (max-width: 46rem) {
+    .lol-hero {
+      min-height: 0;
+      padding-block: 2.5rem 0;
+    }
+    /* En celular el mapa se lleva una franja abajo y el texto la de arriba:
+       si se cruzan, ni se lee el copy ni se entiende el mapa. */
+    .lol-hero {
+      padding-bottom: 70vw;
+    }
+    .lol-hero__mapa {
+      inset: auto 0 0 0;
+      width: 100%;
+      height: 78vw;
+    }
+    .lol-reloj {
+      display: none;
+    }
+    .lol-hero__velo {
+      background: linear-gradient(
+        to bottom,
+        var(--app) 0%,
+        var(--app) 46%,
+        rgba(14, 14, 20, 0.55) 60%,
+        transparent 78%,
+        rgba(14, 14, 20, 0.6) 97%,
+        var(--app) 100%
+      );
+    }
+    .lol-voz {
+      min-height: 6.4rem;
+    }
+    .lol-reloj {
+      top: 1.2rem;
+      font-size: 0.72rem;
+    }
+    .lol-sec {
+      padding-block: 3.5rem;
+    }
+    .lol-grid,
+    .lol-steps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .lol-lead {
+      font-size: 1.02rem;
+    }
+    .lol-cta .lol-btn {
+      flex: 1 1 100%;
+      justify-content: center;
+    }
+    /* El overlay flotante no cabe junto a la ventana en móvil */
+    .lol-toast {
+      position: static;
+      max-width: none;
+      margin-top: 1rem;
+    }
+    .lol-win__body {
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+      min-height: 0;
+    }
+    .lol-side__item {
+      font-size: 0.66rem;
+      padding: 0.45rem 0.4rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lol-voz__i,
+    .lol-reloj,
+    .lol-hero__mapa {
+      transition: none;
+    }
+    .lol-pulse {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  // La Grieta del hero. Vive en su propio módulo porque arrastra three.js:
+  // así solo se descarga en esta página y no en el resto del sitio.
+  import { montarGrieta } from '../lib/lolsito-grieta';
+
+  let apagar: (() => void) | null = null;
+
+  async function init() {
+    apagar?.();
+    apagar = null;
+    const canvas = document.querySelector<HTMLCanvasElement>('canvas[data-grieta]');
+    if (!canvas) return;
+    apagar = await montarGrieta({
+      canvas,
+      voz: document.querySelector<HTMLElement>('[data-grieta-voz]'),
+      reloj: document.querySelector<HTMLElement>('[data-grieta-reloj]'),
+      minuto: document.querySelector<HTMLElement>('[data-grieta-min]'),
+    });
+  }
+
+  document.addEventListener('astro:page-load', init);
+  document.addEventListener('astro:before-swap', () => {
+    apagar?.();
+    apagar = null;
+  });
+</script>

@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lolsito</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   LOLSITO — mockup de landing
+   Tres colores: negro casi puro, blanco, e índigo. Todo el resto
+   del color lo pone el arte de los campeones.
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --neg:#07070B;
+  --neg-2:#0C0C13;
+  --bl:#FFFFFF;
+  --ind:#6366F1;
+  --ind-cl:#A5A9FF;
+  --display:'Anton', Impact, sans-serif;
+  --body:'Manrope', system-ui, sans-serif;
+  /* La curva de Apple: arranca rapido y se estaciona suave. */
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
+body{
+  background:var(--neg);color:var(--bl);font-family:var(--body);
+  line-height:1.5;overflow-x:clip;-webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--ind);color:#fff}
+
+/* ── Capas fijas ───────────────────────────────────────────── */
+#gl{position:fixed;inset:0;z-index:0;display:block}
+/* Grano de película: le quita el look de render limpio. */
+.grain{
+  position:fixed;inset:-50%;z-index:60;pointer-events:none;opacity:.16;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  animation:grain 700ms steps(4) infinite;
+}
+@keyframes grain{
+  0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}
+  50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-2%)}
+  100%{transform:translate(3%,1%)}
+}
+/* Viñeta que pega el 3D con el negro del resto de la página. */
+.vig{
+  position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(120% 85% at 50% 45%,transparent 35%,rgba(7,7,11,.72) 78%,var(--neg) 100%);
+}
+
+/* ── Barra superior ────────────────────────────────────────── */
+.bar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px clamp(20px,4vw,52px);
+  mix-blend-mode:difference;
+}
+.bar__mark{font-family:var(--display);font-size:20px;letter-spacing:.06em}
+.bar__cta{
+  font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  opacity:0;transform:translateY(-8px);transition:opacity .7s var(--ease),transform .7s var(--ease);
+}
+.bar__cta.on{opacity:1;transform:none}
+
+/* ── Progreso de scroll ────────────────────────────────────── */
+.prog{position:fixed;top:0;left:0;height:2px;width:0;background:var(--ind);z-index:70}
+
+/* ── Utilidades de aparición ───────────────────────────────── */
+/* La firma "Apple": entra desenfocado y se enfoca al aterrizar. */
+.rv{opacity:0;filter:blur(14px);transform:translateY(34px);
+  transition:opacity 1.05s var(--ease),filter 1.05s var(--ease),transform 1.05s var(--ease)}
+.rv.on{opacity:1;filter:blur(0);transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.18s}.d3{transition-delay:.3s}
+.d4{transition-delay:.42s}.d5{transition-delay:.54s}
+
+main{position:relative;z-index:10}
+
+/* ═══════════ 1. PORTADA ═══════════ */
+.hero{height:340vh;position:relative}
+.hero__stick{position:sticky;top:0;height:100vh;display:grid;place-items:center;overflow:hidden}
+/* Sombra suave al centro: sin esto el título blanco pelea con el arte. */
+.hero__stick::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(48% 46% at 50% 50%,rgba(7,7,11,.92) 0%,rgba(7,7,11,.68) 38%,rgba(7,7,11,.2) 68%,transparent 84%);
+}
+.hero__wrap{position:relative;z-index:2;text-align:center;padding-inline:20px;will-change:transform,opacity,filter}
+.hero__eyebrow{
+  font-size:clamp(10px,1.1vw,12px);font-weight:800;letter-spacing:.42em;
+  text-transform:uppercase;color:var(--ind-cl);margin-bottom:clamp(14px,2vw,22px);
+  text-shadow:0 2px 20px rgba(7,7,11,1);
+}
+.hero__title{
+  font-family:var(--display);line-height:.82;letter-spacing:-.015em;
+  font-size:clamp(74px,17.5vw,270px);
+  text-shadow:0 0 90px rgba(7,7,11,.9);
+}
+.hero__sub{
+  margin-top:clamp(18px,2.4vw,30px);font-size:clamp(15px,1.55vw,22px);
+  font-weight:500;color:rgba(255,255,255,.9);max-width:34ch;margin-inline:auto;
+  text-shadow:0 2px 24px rgba(7,7,11,.95);
+}
+/* Segundo mensaje: aparece cuando el carrusel se traga la portada. */
+.hero__beat{
+  position:absolute;inset:0;z-index:2;display:grid;place-items:center;padding-inline:24px;
+  opacity:0;pointer-events:none;
+}
+.hero__beat p{
+  font-family:var(--display);font-size:clamp(30px,5.6vw,84px);line-height:1.02;
+  text-align:center;max-width:16ch;
+}
+.hero__beat em{font-style:normal;color:var(--ind-cl)}
+.scrollhint{
+  position:absolute;bottom:30px;left:50%;translate:-50% 0;z-index:3;
+  font-size:10px;font-weight:800;letter-spacing:.34em;text-transform:uppercase;
+  color:rgba(255,255,255,.62);display:flex;flex-direction:column;align-items:center;gap:10px;
+  text-shadow:0 2px 18px rgba(7,7,11,1);
+}
+.scrollhint i{display:block;width:1px;height:40px;background:linear-gradient(var(--ind),transparent);animation:drop 2s var(--ease) infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}
+  55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ═══════════ 2. GOLPES ═══════════ */
+.golpe{height:100vh;position:relative;overflow:hidden;display:grid;place-items:center;isolation:isolate}
+.golpe__bg{
+  position:absolute;inset:-14% 0;background-size:cover;background-position:center;
+  will-change:transform;z-index:-2;
+}
+.golpe::after{
+  content:'';position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(90deg,rgba(7,7,11,.94) 0%,rgba(7,7,11,.62) 48%,rgba(7,7,11,.9) 100%);
+}
+.golpe__txt{padding-inline:clamp(20px,7vw,110px);width:100%;max-width:1500px}
+.golpe__n{
+  font-family:var(--display);font-size:clamp(12px,1.2vw,15px);letter-spacing:.3em;
+  color:var(--ind-cl);margin-bottom:18px;
+}
+.golpe__h{
+  font-family:var(--display);font-size:clamp(38px,7vw,104px);line-height:1;
+  max-width:15ch;letter-spacing:-.01em;
+}
+.golpe--r .golpe__txt{margin-left:auto;text-align:right}
+.golpe--r .golpe__h{margin-left:auto}
+
+/* ═══════════ 3. QUÉ ES ═══════════ */
+.qes{padding:clamp(110px,17vh,190px) clamp(20px,7vw,110px);position:relative;background:var(--neg)}
+.qes__k{font-size:11px;font-weight:800;letter-spacing:.4em;text-transform:uppercase;color:var(--ind-cl)}
+.qes__h{
+  font-family:var(--display);font-size:clamp(34px,5.2vw,78px);line-height:1.08;
+  margin-top:26px;max-width:19ch;letter-spacing:-.01em;
+}
+.qes__h b{color:var(--ind-cl);font-weight:inherit}
+.qes__p{
+  margin-top:34px;max-width:52ch;font-size:clamp(15px,1.35vw,19px);
+  color:rgba(255,255,255,.6);line-height:1.72;
+}
+
+/* ═══════════ 4. LO QUE HACE (pinneado) ═══════════ */
+.hace{position:relative}
+.hace__stick{position:sticky;top:0;height:100vh;overflow:hidden;display:grid;
+  grid-template-columns:1.15fr 1fr;align-items:center}
+.hace__art{position:absolute;inset:0;z-index:0}
+.hace__art figure{
+  position:absolute;inset:0;background-size:cover;background-position:center 22%;
+  opacity:0;transform:scale(1.1);
+  transition:opacity 1.1s var(--ease),transform 1.6s var(--ease);
+}
+.hace__art figure.on{opacity:1;transform:scale(1)}
+.hace__art::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,var(--neg) 4%,rgba(7,7,11,.5) 46%,rgba(7,7,11,.15) 100%);
+}
+.hace__list{position:relative;z-index:2;padding-inline:clamp(20px,7vw,110px);grid-column:1}
+.hace__item{
+  position:absolute;max-width:min(560px,90%);
+  opacity:0;filter:blur(12px);transform:translateY(30px);
+  transition:opacity .8s var(--ease),filter .8s var(--ease),transform .8s var(--ease);
+}
+.hace__item.on{opacity:1;filter:blur(0);transform:none;position:relative}
+.hace__num{
+  font-family:var(--display);font-size:13px;letter-spacing:.3em;color:var(--ind-cl);
+  display:block;margin-bottom:16px;
+}
+.hace__t{font-family:var(--display);font-size:clamp(30px,3.7vw,54px);line-height:1.04;letter-spacing:-.01em}
+.hace__d{margin-top:20px;font-size:clamp(14px,1.2vw,17px);color:rgba(255,255,255,.66);line-height:1.72;max-width:38ch}
+.hace__dots{position:absolute;left:clamp(20px,7vw,110px);bottom:9vh;display:flex;gap:8px;z-index:3}
+.hace__dots i{width:26px;height:2px;background:rgba(255,255,255,.2);transition:background .5s var(--ease)}
+.hace__dots i.on{background:var(--ind)}
+.hace__pages{height:600vh}
+
+/* ═══════════ 5. API KEY (scroll horizontal) ═══════════ */
+.key{height:480vh;position:relative;background:var(--neg-2)}
+.key__stick{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.key__head{padding:0 clamp(20px,7vw,110px);margin-bottom:clamp(28px,5vh,58px)}
+.key__k{font-size:11px;font-weight:800;letter-spacing:.4em;text-transform:uppercase;color:var(--ind-cl)}
+.key__h{font-family:var(--display);font-size:clamp(30px,4.8vw,72px);line-height:1;margin-top:16px;letter-spacing:-.01em}
+.key__sub{margin-top:16px;color:rgba(255,255,255,.55);max-width:46ch;font-size:15px}
+.key__rail{display:flex;gap:clamp(16px,2vw,30px);padding-inline:clamp(20px,7vw,110px);will-change:transform}
+.paso{
+  flex:0 0 clamp(255px,25vw,360px);min-height:clamp(230px,32vh,310px);
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.025);
+  padding:clamp(22px,2.2vw,32px);display:flex;flex-direction:column;
+}
+.paso__n{font-family:var(--display);font-size:clamp(46px,5vw,76px);line-height:.8;color:var(--ind);opacity:.85}
+.paso__t{font-family:var(--display);font-size:clamp(19px,1.6vw,25px);margin-top:22px;line-height:1.1}
+.paso__d{margin-top:14px;font-size:14px;color:rgba(255,255,255,.6);line-height:1.68}
+.paso__d code{
+  font-family:ui-monospace,'SF Mono',monospace;font-size:.9em;
+  background:rgba(99,102,241,.16);color:var(--ind-cl);padding:.12em .4em;
+}
+.paso a{
+  margin-top:auto;padding-top:20px;font-size:12px;font-weight:800;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ind-cl);
+  display:inline-flex;gap:8px;align-items:center;
+}
+.paso--fin{background:var(--ind);border-color:var(--ind)}
+.paso--fin .paso__n{color:rgba(255,255,255,.5)}
+.paso--fin .paso__d{color:rgba(255,255,255,.85)}
+
+/* ═══════════ 6. DESCARGA (pie a pantalla completa) ═══════════ */
+.dl{height:100vh;position:relative;display:grid;place-items:center;overflow:hidden;background:var(--neg)}
+.dl__mosaic{
+  position:absolute;inset:0;display:grid;grid-template-columns:repeat(8,1fr);
+  opacity:.62;filter:saturate(.75);
+}
+.dl__mosaic i{background-size:cover;background-position:center top;aspect-ratio:308/560}
+.dl::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(78% 68% at 50% 50%,rgba(7,7,11,.8) 14%,rgba(7,7,11,.93) 58%,var(--neg) 100%);
+}
+.dl__in{position:relative;z-index:3;text-align:center;padding-inline:20px}
+/* En Anton la tilde de la Ñ sube por encima de las mayúsculas: el interlineado
+   se deja apretado y el aire se agrega con el margen del segundo renglón. */
+.dl__h{font-family:var(--display);font-size:clamp(46px,9.4vw,152px);line-height:.94;letter-spacing:-.015em}
+.dl__h em{font-style:normal;display:block;margin-top:.22em;color:var(--ind-cl)}
+.dl__btn{
+  display:inline-flex;align-items:center;gap:16px;margin-top:clamp(30px,4.4vw,54px);
+  padding:clamp(20px,2.1vw,28px) clamp(34px,4.4vw,62px);
+  background:var(--bl);color:var(--neg);
+  font-family:var(--display);font-size:clamp(17px,1.85vw,27px);letter-spacing:.02em;
+  transition:transform .55s var(--ease),background .4s var(--ease),color .4s var(--ease),box-shadow .55s var(--ease);
+  box-shadow:0 0 0 rgba(99,102,241,0);
+}
+.dl__btn:hover{transform:translateY(-4px) scale(1.02);background:var(--ind);color:#fff;box-shadow:0 26px 70px -26px var(--ind)}
+.dl__btn svg{width:1em;height:1em;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.dl__fine{margin-top:24px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.42)}
+.dl__legal{
+  position:absolute;bottom:22px;left:0;right:0;z-index:3;text-align:center;
+  font-size:10.5px;color:rgba(255,255,255,.3);padding-inline:24px;line-height:1.6;
+}
+
+/* ═══════════ Responsivo ═══════════ */
+@media(max-width:860px){
+  /* En vertical el título necesita más sombra debajo: el arte llega hasta el borde. */
+  .hero__stick::before{
+    background:radial-gradient(76% 40% at 50% 47%,rgba(7,7,11,.95) 0%,rgba(7,7,11,.78) 45%,rgba(7,7,11,.25) 76%,transparent 92%);
+  }
+  .hace__stick{grid-template-columns:1fr;align-items:end;padding-bottom:16vh}
+  .hace__art::after{background:linear-gradient(180deg,rgba(7,7,11,.35) 0%,rgba(7,7,11,.72) 46%,var(--neg) 92%)}
+  .hace__art figure{background-position:center 14%}
+  .hace__item{max-width:none}
+  .hace__d{max-width:none}
+  .golpe--r .golpe__txt{text-align:left;margin-left:0}
+  .golpe--r .golpe__h{margin-left:0}
+  .golpe::after{background:linear-gradient(180deg,rgba(7,7,11,.6),rgba(7,7,11,.9))}
+  .dl__mosaic{grid-template-columns:repeat(4,1fr)}
+  .key{height:420vh}
+  /* En celular cada paso ocupa casi toda la pantalla: se lee uno a la vez. */
+  .key__rail{gap:14px}
+  .paso{flex:0 0 min(76vw,320px);min-height:auto}
+}
+@media(prefers-reduced-motion:reduce){
+  .rv{opacity:1;filter:none;transform:none}
+  .grain{animation:none}
+  .scrollhint i{animation:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="gl"></canvas>
+<div class="vig"></div>
+<div class="grain"></div>
+<div class="prog" id="prog"></div>
+
+<header class="bar">
+  <span class="bar__mark">LOLSITO</span>
+  <a class="bar__cta" id="barcta" href="#descargar">Descargar</a>
+</header>
+
+<main>
+
+  <!-- ═══ 1. PORTADA 3D ═══ -->
+  <section class="hero" id="hero">
+    <div class="hero__stick">
+      <div class="hero__wrap" id="heroWrap">
+        <p class="hero__eyebrow">Para League of Legends</p>
+        <h1 class="hero__title">LOLSITO</h1>
+        <p class="hero__sub">Alguien que sí sabe, viéndote jugar.</p>
+      </div>
+      <div class="hero__beat" id="heroBeat">
+        <p>No es una guía.<br />Es un <em>coach</em> dentro de tu computadora.</p>
+      </div>
+      <div class="scrollhint"><span>Baja</span><i></i></div>
+    </div>
+  </section>
+
+  <!-- ═══ 2. LOS GOLPES ═══ -->
+  <section class="golpe" data-golpe>
+    <div class="golpe__bg" data-px="0.22" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_0.jpg)"></div>
+    <div class="golpe__txt">
+      <p class="golpe__n rv">01</p>
+      <h2 class="golpe__h rv d1">La partida se pierde en el draft.</h2>
+    </div>
+  </section>
+
+  <section class="golpe golpe--r" data-golpe>
+    <div class="golpe__bg" data-px="0.26" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg)"></div>
+    <div class="golpe__txt">
+      <p class="golpe__n rv">02</p>
+      <h2 class="golpe__h rv d1">Copiando runas de una pestaña, con 20 segundos.</h2>
+    </div>
+  </section>
+
+  <section class="golpe" data-golpe>
+    <div class="golpe__bg" data-px="0.2" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg)"></div>
+    <div class="golpe__txt">
+      <p class="golpe__n rv">03</p>
+      <h2 class="golpe__h rv d1">Terminas, pierdes, y nadie te dice por qué.</h2>
+    </div>
+  </section>
+
+  <!-- ═══ 3. QUÉ ES ═══ -->
+  <section class="qes">
+    <p class="qes__k rv">Qué es esto</p>
+    <h2 class="qes__h rv d1">Lolsito es una app que abres junto a League y se queda <b>viendo tu partida</b>.</h2>
+    <p class="qes__p rv d2">
+      Se conecta sola a tu cliente. Sabe en qué fase vas, a quién tienes enfrente
+      y qué hiciste la partida pasada. Con eso te habla: antes de escoger, mientras
+      juegas y cuando termina. Gratis, en tu computadora, sin cuenta.
+    </p>
+  </section>
+
+  <!-- ═══ 4. LO QUE HACE ═══ -->
+  <section class="hace" id="hace">
+    <div class="hace__stick">
+      <div class="hace__art" id="haceArt">
+        <figure data-i="0" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/centered/Vi_0.jpg)"></figure>
+        <figure data-i="1" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/centered/Jhin_0.jpg)"></figure>
+        <figure data-i="2" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/centered/Sett_0.jpg)"></figure>
+        <figure data-i="3" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/centered/Ekko_0.jpg)"></figure>
+        <figure data-i="4" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/centered/Kaisa_0.jpg)"></figure>
+        <figure data-i="5" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/centered/Thresh_0.jpg)"></figure>
+      </div>
+
+      <div class="hace__list" id="haceList">
+        <article class="hace__item" data-i="0">
+          <span class="hace__num">01 / 06</span>
+          <h3 class="hace__t">Te dice a quién escoger</h3>
+          <p class="hace__d">Ve a los cinco del otro lado y te da el pick, filtrando nada más los campeones que sí tienes.</p>
+        </article>
+        <article class="hace__item" data-i="1">
+          <span class="hace__num">02 / 06</span>
+          <h3 class="hace__t">Te pone las runas solo</h3>
+          <p class="hace__d">Fijas tu campeón y la página de runas y el orden de compra ya están escritos dentro del cliente.</p>
+        </article>
+        <article class="hace__item" data-i="2">
+          <span class="hace__num">03 / 06</span>
+          <h3 class="hace__t">Te habla en la partida</h3>
+          <p class="hace__d">Voz en español cuando algo importa: la jungla desapareció, viene el objetivo, es momento de rotar.</p>
+        </article>
+        <article class="hace__item" data-i="3">
+          <span class="hace__num">04 / 06</span>
+          <h3 class="hace__t">Te dice en qué la regaste</h3>
+          <p class="hace__d">Al terminar revisa tus números y te lo explica. Suave contra tu partida, o duro contra estándar de high elo.</p>
+        </article>
+        <article class="hace__item" data-i="4">
+          <span class="hace__num">05 / 06</span>
+          <h3 class="hace__t">Te enseña el parche</h3>
+          <p class="hace__d">Quién está roto esta semana por cada rol, y contra quién funciona, antes de que entres a la fila.</p>
+        </article>
+        <article class="hace__item" data-i="5">
+          <span class="hace__num">06 / 06</span>
+          <h3 class="hace__t">Te muestra con quién juegas</h3>
+          <p class="hace__d">Un atajo de teclado y ves encima del juego quién es cada uno de los diez y en qué liga está.</p>
+        </article>
+      </div>
+
+      <div class="hace__dots" id="haceDots">
+        <i class="on"></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+    </div>
+    <div class="hace__pages"></div>
+  </section>
+
+  <!-- ═══ 5. API KEY ═══ -->
+  <section class="key" id="key">
+    <div class="key__stick">
+      <div class="key__head">
+        <p class="key__k rv">Lo único que te pide</p>
+        <h2 class="key__h rv d1">Tu llave de Gemini. Gratis, en dos minutos.</h2>
+        <p class="key__sub rv d2">Lolsito no trae llave propia: usas la tuya y se queda guardada nada más en tu computadora.</p>
+      </div>
+      <div class="key__rail" id="rail">
+        <article class="paso">
+          <span class="paso__n">01</span>
+          <h3 class="paso__t">Entra a Google AI&nbsp;Studio</h3>
+          <p class="paso__d">Con tu cuenta de Google, la misma del correo. No piden tarjeta.</p>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Abrir ↗</a>
+        </article>
+        <article class="paso">
+          <span class="paso__n">02</span>
+          <h3 class="paso__t">Presiona "Create API key"</h3>
+          <p class="paso__d">Si es tu primera vez te pide aceptar los términos. Acepta y vuelve a presionarlo.</p>
+        </article>
+        <article class="paso">
+          <span class="paso__n">03</span>
+          <h3 class="paso__t">Elige un proyecto</h3>
+          <p class="paso__d">Si no tienes ninguno, deja que Google cree uno nuevo. El nombre da igual.</p>
+        </article>
+        <article class="paso">
+          <span class="paso__n">04</span>
+          <h3 class="paso__t">Copia la clave</h3>
+          <p class="paso__d">Es un texto largo que empieza con <code>AIza</code>. Cópialo completo: al cerrar la ventana ya no lo vuelves a ver.</p>
+        </article>
+        <article class="paso paso--fin">
+          <span class="paso__n">05</span>
+          <h3 class="paso__t">Pégala en Lolsito</h3>
+          <p class="paso__d">Configuración, campo "Google Gemini API key", Guardar. Ya está: la IA responde.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 6. DESCARGA ═══ -->
+  <section class="dl" id="descargar">
+    <div class="dl__mosaic" id="mosaic"></div>
+    <div class="dl__in">
+      <h2 class="dl__h rv">JUEGA<em>ACOMPAÑADO</em></h2>
+      <a class="dl__btn rv d2" href="#">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 12 5 5 5-5"/><path d="M4 20h16"/></svg>
+        Descargar para Windows
+      </a>
+      <p class="dl__fine rv d3">Gratis · Windows 10 y 11 · 64 bits · 77 MB</p>
+    </div>
+    <p class="dl__legal">
+      Lolsito es un proyecto de fan y no está avalado por Riot Games. League of Legends
+      y todo su arte son marcas registradas de Riot Games, Inc.
+    </p>
+  </section>
+
+</main>
+
+<script type="module">
+/* ═══════════════════════════════════════════════════════════════
+   PORTADA 3D: un carrusel de campeones girando alrededor del eje.
+   Al hacer scroll el anillo acelera, se abre y se lo traga el negro.
+   ═══════════════════════════════════════════════════════════════ */
+import * as THREE from 'https://unpkg.com/three@0.180.0/build/three.module.js';
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const lerp = (a,b,t)=>a+(b-a)*t;
+const clamp = (v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+
+const CHAMPS = ['Ahri','Yasuo','Jinx','LeeSin','Lux','Zed','Ashe','Darius','Katarina',
+  'Thresh','Ekko','Vi','Jhin','Kaisa','Sett','Yone','Viego','Akali','Irelia','Riven',
+  'MissFortune','Pyke','Senna','Samira'];
+const art = n => `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${n}_0.jpg`;
+
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x07070b, 7.2, 25);
+
+const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, .1, 100);
+camera.position.set(0, 0, 12.4);
+
+const ring = new THREE.Group();
+scene.add(ring);
+
+const COLS = 16, ROWS = 4, R = 6.6, CW = 2.34, CH = 3.6, GAP = .16;
+const STEP = CH + GAP, SPAN = ROWS * STEP;
+const loader = new THREE.TextureLoader();
+loader.setCrossOrigin('anonymous');
+const cards = [];
+
+for (let r = 0; r < ROWS; r++){
+  for (let c = 0; c < COLS; c++){
+    const a = (c / COLS) * Math.PI * 2 + (r % 2 ? Math.PI / COLS : 0);
+    const tex = loader.load(art(CHAMPS[(r*COLS + c) % CHAMPS.length]));
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const m = new THREE.Mesh(
+      new THREE.PlaneGeometry(CW, CH),
+      new THREE.MeshBasicMaterial({map:tex, transparent:true, fog:true})
+    );
+    const base = (r - (ROWS-1)/2) * STEP;
+    const nx = Math.sin(a), nz = Math.cos(a);
+    m.position.set(nx*R, base, nz*R);
+    m.rotation.y = a;                      // tangente al cilindro
+    m.userData = {
+      base, nx, nz, a,
+      dir: c % 2 ? 1 : -1,                 // columnas alternas suben y bajan
+      vel: .00022 + (c % 3) * .00009,
+      k: .55 + ((r*7 + c*13) % 11) / 11 * 1.15,   // cada carta se dispersa a su ritmo
+      tilt: (((r*5 + c*3) % 7) - 3) * .05,
+    };
+    ring.add(m); cards.push(m);
+  }
+}
+
+/* Mouse: solo inclina la cámara un poquito. Nada de girar la escena. */
+const mouse = {x:0, y:0, tx:0, ty:0};
+addEventListener('pointermove', e => {
+  mouse.tx = (e.clientX / innerWidth - .5) * 2;
+  mouse.ty = (e.clientY / innerHeight - .5) * 2;
+}, {passive:true});
+
+const heroEl   = document.getElementById('hero');
+const heroWrap = document.getElementById('heroWrap');
+const heroBeat = document.getElementById('heroBeat');
+const hint     = document.querySelector('.scrollhint');
+
+let spin = 0, scrollP = 0, scrollPs = 0;
+let camBase = 12.4, fogBase = 25;
+
+/* El muro se encuadra según la forma de la pantalla: en vertical la cámara se
+   aleja, si no solo caben dos cartas y el título queda encima del arte. */
+function encuadrar(){
+  const aspect = innerWidth / innerHeight;
+  const anchoObjetivo = aspect < 1 ? 7.4 : 9.6;   // cuántas cartas se ven al frente
+  const d = anchoObjetivo / (2 * Math.tan(camera.fov * Math.PI / 360) * aspect);
+  camBase = R + Math.max(d, 4.6);
+  fogBase = camBase * 2.05;
+  scene.fog.near = camBase * .56;
+}
+encuadrar();
+
+function frame(t){
+  // Progreso 0→1 dentro de la portada
+  const hb = heroEl.getBoundingClientRect();
+  const total = heroEl.offsetHeight - innerHeight;
+  scrollP = clamp(-hb.top / total);
+  scrollPs = lerp(scrollPs, scrollP, .075);   // suavizado: el "peso" de Apple
+  const p = scrollPs;
+
+  // El muro gira solo; al bajar acelera
+  spin += reduce ? 0 : (0.0014 + p * 0.014);
+  ring.rotation.y = spin;
+
+  // Dispersión: a partir de la mitad las cartas salen despedidas hacia afuera
+  // y pasan de largo junto a la cámara. Ese es el golpe.
+  const disp = Math.pow(clamp((p - .2) / .55), 1.7) * 17;
+  const fade = clamp((p - .42) / .28);
+
+  for (const m of cards){
+    const u = m.userData;
+    let y = u.base;
+    if (!reduce){
+      y = (u.base + u.dir * t * u.vel) % SPAN;
+      if (y >  SPAN/2) y -= SPAN;
+      if (y < -SPAN/2) y += SPAN;
+    }
+    const d = disp * u.k;
+    m.position.set(u.nx * (R + d), y + d * u.tilt, u.nz * (R + d));
+    m.rotation.z = u.tilt * disp * .05;
+    m.material.opacity = 1 - fade * (0.75 + u.k * .18);
+  }
+
+  // Cámara: se recarga hacia atrás mientras el muro se abre
+  camera.position.z = camBase + p * 2.6;
+  camera.position.x = lerp(camera.position.x, mouse.tx * .8, .06);
+  camera.position.y = lerp(camera.position.y, -mouse.ty * .5, .06);
+  camera.lookAt(0, 0, 0);
+
+  // La niebla se cierra: lo que queda se lo traga el negro
+  scene.fog.far = fogBase - clamp((p - .3) / .5) * fogBase * .62;
+  canvas.style.opacity = String(1 - clamp((p - .7) / .2) * .96);
+
+  // Título: crece, se desenfoca y se va
+  const ti = clamp((p - .1) / .3);
+  heroWrap.style.transform = `translateY(${-ti*70}px) scale(${1 + ti*.55})`;
+  heroWrap.style.opacity   = String(1 - clamp(ti * 1.3));
+  heroWrap.style.filter    = `blur(${ti*ti*30}px)`;
+  hint.style.opacity       = String(1 - clamp(ti * 1.6));
+
+  // Segundo mensaje: entra ya que el muro se abrió
+  const b = clamp((p - .62) / .18) * (1 - clamp((p - .94) / .06));
+  heroBeat.style.opacity   = String(b);
+  heroBeat.style.transform = `translateY(${(1-b)*38}px) scale(${.955 + b*.045})`;
+  heroBeat.style.filter    = `blur(${(1-b)*18}px)`;
+
+  // Sin pintar cuando la portada ya no se ve
+  if (hb.bottom > 0) renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  encuadrar();
+}, {passive:true});
+
+/* ═══ Apariciones ═══ */
+const io = new IntersectionObserver((es, o) => {
+  for (const e of es) if (e.isIntersecting){ e.target.classList.add('on'); o.unobserve(e.target); }
+}, {rootMargin:'0px 0px -12% 0px'});
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+/* ═══ Parallax de los golpes + progreso + barra ═══ */
+const pxEls = [...document.querySelectorAll('[data-px]')];
+const prog  = document.getElementById('prog');
+const barcta= document.getElementById('barcta');
+
+/* ═══ Sección pinneada: 6 momentos ═══ */
+const hace  = document.getElementById('hace');
+const items = [...document.querySelectorAll('.hace__item')];
+const figs  = [...document.querySelectorAll('.hace__art figure')];
+const dots  = [...document.querySelectorAll('.hace__dots i')];
+let haceIdx = -1;
+
+/* ═══ Riel horizontal de la API key ═══ */
+const key  = document.getElementById('key');
+const rail = document.getElementById('rail');
+
+function onScroll(){
+  // Parallax
+  for (const el of pxEls){
+    const r = el.parentElement.getBoundingClientRect();
+    if (r.bottom < -200 || r.top > innerHeight + 200) continue;
+    const c = (r.top + r.height/2 - innerHeight/2) / innerHeight;
+    el.style.transform = `translate3d(0,${c * (+el.dataset.px) * 100}%,0) scale(1.04)`;
+  }
+
+  // Progreso
+  const max = document.body.scrollHeight - innerHeight;
+  prog.style.width = (scrollY / max * 100) + '%';
+  barcta.classList.toggle('on', scrollY > innerHeight * .8);
+
+  // Pinneado
+  const hr = hace.getBoundingClientRect();
+  const hTotal = hace.offsetHeight - innerHeight;
+  if (hr.top <= 0 && hr.bottom >= innerHeight){
+    const p = clamp(-hr.top / hTotal, 0, .9999);
+    const i = Math.floor(p * items.length);
+    if (i !== haceIdx){
+      haceIdx = i;
+      items.forEach((el,n) => el.classList.toggle('on', n === i));
+      figs.forEach((el,n)  => el.classList.toggle('on', n === i));
+      dots.forEach((el,n)  => el.classList.toggle('on', n === i));
+    }
+  } else if (haceIdx === -1 && hr.top < innerHeight){
+    haceIdx = 0;
+    items[0].classList.add('on'); figs[0].classList.add('on');
+  }
+
+  // Riel horizontal
+  const kr = key.getBoundingClientRect();
+  if (kr.top <= 0 && kr.bottom >= innerHeight){
+    const p = clamp(-kr.top / (key.offsetHeight - innerHeight));
+    const dist = rail.scrollWidth - innerWidth + 40;
+    rail.style.transform = `translate3d(${-p * Math.max(dist,0)}px,0,0)`;
+  }
+}
+addEventListener('scroll', onScroll, {passive:true});
+addEventListener('resize', onScroll, {passive:true});
+onScroll();
+
+/* ═══ Mosaico del pie ═══ */
+const mosaic = document.getElementById('mosaic');
+const filas = Math.ceil(innerHeight / (innerWidth/8 * (560/308))) + 1;
+const total = 8 * Math.max(filas, 3);
+for (let i = 0; i < total; i++){
+  const el = document.createElement('i');
+  el.style.backgroundImage = `url(${art(CHAMPS[(i*5) % CHAMPS.length])})`;
+  mosaic.appendChild(el);
+}
+</script>
+</body>
+</html>

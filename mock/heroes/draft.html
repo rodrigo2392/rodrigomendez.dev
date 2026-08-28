@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lolsito · portada A · El draft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="base.css" />
+<style>
+  /* Portada A: la selección de campeón. Las cinco cartas del equipo enemigo se
+     voltean una por una, Lolsito las lee y pone enfrente la tuya. */
+  .hero { height: 280vh; }
+
+  .tag--pick {
+    left: 50%;
+    bottom: clamp(88px, 13vh, 130px);
+    translate: -50% 0;
+  }
+  .tag--lee {
+    top: 44vh;
+    left: 50%;
+    translate: -50% 0;
+    background: rgba(99, 102, 241, 0.16);
+    border-color: rgba(99, 102, 241, 0.45);
+    color: var(--ind-cl);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .tag--lee i {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--ind-cl);
+    animation: lat 1.6s ease-in-out infinite;
+  }
+  @keyframes lat {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tag--lee i { animation: none; }
+  }
+
+  /* El título vive arriba y las cartas abajo: no se pisan nunca. */
+  .hero__wrap { transform: translateY(-24vh); }
+  .hero__title { font-size: clamp(66px, 15vw, 226px); }
+  .hero__stick::before {
+    background: radial-gradient(58% 40% at 50% 26%, rgba(7, 7, 11, 0.92) 0%, rgba(7, 7, 11, 0.6) 44%, transparent 78%);
+  }
+  @media (max-width: 900px) {
+    .hero__wrap { transform: translateY(-26vh); }
+    .tag--lee { top: 40vh; font-size: 11.5px; }
+    .tag--pick { bottom: clamp(70px, 11vh, 100px); font-size: 11.5px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="gl"></canvas>
+<div class="vig"></div>
+<div class="grain"></div>
+
+<header class="bar">
+  <span class="bar__mark">LOLSITO</span>
+  <a class="bar__cta" href="#">Descargar</a>
+</header>
+
+<main>
+  <section class="hero" id="hero">
+    <div class="hero__stick" id="stick">
+      <div class="hero__wrap" id="heroWrap">
+        <p class="hero__eyebrow">Para League of Legends</p>
+        <h1 class="hero__title">LOLSITO</h1>
+        <p class="hero__sub">Alguien que sí sabe, viéndote jugar.</p>
+      </div>
+
+      <div class="tag tag--lee" id="tagLee"><i></i> Leyendo al equipo enemigo</div>
+      <div class="tag tag--pick" id="tagPick">
+        <b id="pickNombre">Vi</b>
+        <span>te conviene contra ellos</span>
+        <em id="pickWr">54% de victorias</em>
+      </div>
+
+      <div class="hero__beat" id="heroBeat">
+        <p>No es una guía.<br />Es un <em>coach</em> dentro de tu computadora.</p>
+      </div>
+      <div class="scrollhint"><span>Baja</span><i></i></div>
+    </div>
+  </section>
+
+  <section class="nota">
+    <p class="nota__k">portada A · el draft</p>
+    <h2 class="nota__h">Las cartas del enemigo</h2>
+    <p class="nota__d">
+      La portada es el momento en el que Lolsito sirve: la selección de campeón. Las cinco
+      cartas del equipo de enfrente se voltean una por una, se quedan en gris porque son
+      del rival, y enfrente aparece a color la que te conviene, con hilos que salen hacia
+      cada enemigo. Al bajar, las cartas se abren y dejan pasar el resto de la página.
+      <b>Se entiende en dos segundos qué hace la app</b> sin leer una sola línea.
+    </p>
+    <p class="nota__legal">
+      Lolsito es un proyecto de fan y no está avalado por Riot Games. League of Legends y
+      todo su arte son marcas registradas de Riot Games, Inc.
+    </p>
+  </section>
+</main>
+
+<nav class="switch">
+  <span class="switch__tag">portada</span>
+  <a href="../lolsito-v2/index.html">Actual</a>
+  <a class="on" href="draft.html">A · Draft</a>
+  <a href="grieta.html">B · Grieta</a>
+  <a href="retrato.html">C · Retrato</a>
+</nav>
+
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.180.0/build/three.module.js';
+import { reduce, lerp, clamp, version, artCarga, bonito, cargador, bucle } from './lol.js';
+
+await version();
+
+/* Equipo de enfrente y la respuesta de Lolsito. Los porcentajes son de mentira,
+   como en todo el mock. */
+const ENEMIGOS = [
+  { champ: 'Darius', rol: 'Top' },
+  { champ: 'LeeSin', rol: 'Jungla' },
+  { champ: 'Katarina', rol: 'Mid' },
+  { champ: 'Jhin', rol: 'ADC' },
+  { champ: 'Thresh', rol: 'Support' },
+];
+const PICK = { champ: 'Vi', wr: '54% de victorias' };
+
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x07070b, 9, 26);
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(0, 1.3, 11);
+
+const carga = cargador(THREE);
+
+/* ── La carta ────────────────────────────────────────────────────
+   Un solo plano con las dos caras resueltas en el shader: por delante
+   el arte, por detrás el dorso. Así el volteo es una rotación y ya. */
+const CW = 1.62, CH = 2.95;
+const cartaGeo = new THREE.PlaneGeometry(CW, CH, 1, 1);
+
+function materialCarta(tex, { equipo }) {
+  return new THREE.ShaderMaterial({
+    side: THREE.DoubleSide,
+    transparent: true,
+    uniforms: {
+      uTex: { value: tex },
+      uSat: { value: equipo === 'rojo' ? 0.22 : 1 },   // el rival va casi en gris
+      uBrillo: { value: equipo === 'rojo' ? 0.92 : 1.12 },
+      uScan: { value: 0 },                              // barrido de lectura
+      uBorde: { value: equipo === 'rojo'
+        ? new THREE.Color(0.85, 0.31, 0.36)
+        : new THREE.Color(0.42, 0.44, 0.98) },
+      uAlfa: { value: 1 },
+      uGlow: { value: equipo === 'rojo' ? 0 : 1 },
+    },
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main(){
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      uniform sampler2D uTex;
+      uniform float uSat, uBrillo, uScan, uAlfa, uGlow;
+      uniform vec3 uBorde;
+      varying vec2 vUv;
+
+      void main(){
+        vec2 uv = vUv;
+        vec3 col;
+        float alfa = 1.0;
+
+        if (gl_FrontFacing) {
+          // El arte de carga trae mucho aire arriba: se encuadra al pecho.
+          vec2 uv2 = vec2(uv.x, uv.y * 0.86 + 0.13);
+          vec3 tex = texture2D(uTex, uv2).rgb;
+          float luma = dot(tex, vec3(0.299, 0.587, 0.114));
+          col = mix(vec3(luma), tex, uSat) * uBrillo;
+          // Los rivales llevan un tinte frío para que no compitan con tu pick.
+          col = mix(col, col * vec3(0.82, 0.86, 1.05), 1.0 - uSat);
+        } else {
+          // Dorso: fondo oscuro con un rombo apenas insinuado.
+          vec2 c = (uv - 0.5) * vec2(1.9, 1.0);
+          float rombo = 1.0 - smoothstep(0.16, 0.19, abs(c.x) + abs(c.y));
+          col = mix(vec3(0.055, 0.055, 0.082), uBorde * 0.55, rombo * 0.5);
+        }
+
+        // Marco
+        vec2 b = min(uv, 1.0 - uv);
+        float borde = 1.0 - smoothstep(0.006, 0.014, min(b.x * 1.8, b.y));
+        col = mix(col, uBorde, borde * 0.9);
+
+        // Sombra inferior para asentar el arte
+        col *= mix(0.45, 1.0, smoothstep(0.0, 0.42, uv.y));
+
+        // Barrido de lectura: una franja que sube mientras Lolsito la analiza
+        float f = 1.0 - smoothstep(0.0, 0.14, abs(uv.y - uScan));
+        col += uBorde * f * 0.85 * step(0.001, uScan) * step(uScan, 0.999);
+
+        col += uBorde * uGlow * borde * 0.5;
+        gl_FragColor = vec4(col, alfa * uAlfa);
+      }
+    `,
+  });
+}
+
+const grupo = new THREE.Group();
+scene.add(grupo);
+
+/* ── Cinco enemigos en arco ─────────────────────────────────── */
+const ARCO = 7.8;
+const Y_FILA = -1.35;   // las cartas viven en la mitad de abajo
+const cartas = [];
+ENEMIGOS.forEach((e, i) => {
+  const a = (i - (ENEMIGOS.length - 1) / 2) * 0.265;
+  const mesh = new THREE.Mesh(cartaGeo, materialCarta(null, { equipo: 'rojo' }));
+  carga(artCarga(e.champ), (t) => (mesh.material.uniforms.uTex.value = t));
+  mesh.position.set(Math.sin(a) * ARCO, Y_FILA, -ARCO + Math.cos(a) * ARCO);
+  mesh.rotation.y = -a;
+  mesh.userData = { a, i, base: mesh.position.clone() };
+  grupo.add(mesh);
+  cartas.push(mesh);
+});
+
+/* ── Tu pick, al frente ─────────────────────────────────────── */
+const pick = new THREE.Mesh(cartaGeo, materialCarta(null, { equipo: 'azul' }));
+carga(artCarga(PICK.champ), (t) => (pick.material.uniforms.uTex.value = t));
+pick.position.set(0, Y_FILA + 0.05, 2.2);
+pick.scale.setScalar(0.98);
+pick.material.uniforms.uAlfa.value = 0;
+grupo.add(pick);
+
+/* Halo detrás del pick */
+const halo = new THREE.Sprite(
+  new THREE.SpriteMaterial({
+    map: (() => {
+      const c = document.createElement('canvas');
+      c.width = c.height = 256;
+      const x = c.getContext('2d');
+      const g = x.createRadialGradient(128, 128, 0, 128, 128, 128);
+      g.addColorStop(0, 'rgba(120,126,255,.62)');
+      g.addColorStop(0.4, 'rgba(80,80,220,.20)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      x.fillStyle = g;
+      x.fillRect(0, 0, 256, 256);
+      return new THREE.CanvasTexture(c);
+    })(),
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    opacity: 0,
+  })
+);
+halo.scale.setScalar(7);
+halo.position.copy(pick.position).setZ(pick.position.z - 0.2);
+grupo.add(halo);
+
+/* ── Hilos del pick a cada enemigo ──────────────────────────── */
+const hilos = cartas.map((c) => {
+  const desde = new THREE.Vector3(0, Y_FILA + 0.05, 2.2);
+  const hasta = c.position.clone();
+  const medio = desde
+    .clone()
+    .add(hasta)
+    .multiplyScalar(0.5)
+    .add(new THREE.Vector3(0, 1.5, 0.6));
+  const curva = new THREE.QuadraticBezierCurve3(desde, medio, hasta);
+  const pts = curva.getPoints(48);
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const ts = new Float32Array(pts.length);
+  pts.forEach((_, i) => (ts[i] = i / (pts.length - 1)));
+  geo.setAttribute('aT', new THREE.BufferAttribute(ts, 1));
+  const mat = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    uniforms: { uProg: { value: 0 }, uAlfa: { value: 1 } },
+    vertexShader: /* glsl */ `
+      attribute float aT;
+      varying float vT;
+      void main(){
+        vT = aT;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      uniform float uProg, uAlfa;
+      varying float vT;
+      void main(){
+        // El hilo se dibuja solo hasta donde llegó el análisis, y la punta brilla.
+        float dentro = step(vT, uProg);
+        float punta = 1.0 - smoothstep(0.0, 0.09, uProg - vT);
+        vec3 col = mix(vec3(0.36, 0.38, 0.86), vec3(0.85, 0.88, 1.0), punta);
+        gl_FragColor = vec4(col, dentro * (0.5 + punta * 0.8) * uAlfa);
+      }
+    `,
+  });
+  return new THREE.Line(geo, mat);
+});
+hilos.forEach((h) => grupo.add(h));
+
+/* ── Guion de entrada ───────────────────────────────────────── */
+// t en segundos: cada enemigo se voltea 0.42 s después del anterior.
+const T_INICIO = 0.5, T_PASO = 0.42, T_FLIP = 0.85;
+const T_PICK = T_INICIO + T_PASO * ENEMIGOS.length + 0.25;
+
+const tagLee = document.getElementById('tagLee');
+const tagPick = document.getElementById('tagPick');
+document.getElementById('pickNombre').textContent = bonito(PICK.champ);
+document.getElementById('pickWr').textContent = PICK.wr;
+
+const heroEl = document.getElementById('hero');
+const heroWrap = document.getElementById('heroWrap');
+const heroBeat = document.getElementById('heroBeat');
+const hint = document.querySelector('.scrollhint');
+
+const mouse = { tx: 0, ty: 0 };
+addEventListener(
+  'pointermove',
+  (e) => {
+    mouse.tx = (e.clientX / innerWidth - 0.5) * 2;
+    mouse.ty = (e.clientY / innerHeight - 0.5) * 2;
+  },
+  { passive: true }
+);
+
+let scrollPs = 0;
+let camBase = 11;
+
+function encuadrar() {
+  const aspect = innerWidth / innerHeight;
+  // Que quepan las cinco cartas: el arco mide ~9 de ancho.
+  const ancho = aspect < 1 ? 10.4 : 13.4;
+  const d = ancho / (2 * Math.tan((camera.fov * Math.PI) / 360) * aspect);
+  camBase = Math.max(d, 8.6);
+}
+encuadrar();
+
+bucle(heroEl, (t) => {
+  const hb = heroEl.getBoundingClientRect();
+  const p = clamp(-hb.top / (heroEl.offsetHeight - innerHeight));
+  scrollPs = lerp(scrollPs, p, 0.075);
+  const s = scrollPs;
+
+  // Apertura al bajar: las cartas se abren y el pick se viene encima.
+  const abre = Math.pow(clamp((s - 0.18) / 0.55), 1.6);
+  const fade = clamp((s - 0.45) / 0.3);
+
+  cartas.forEach((c, i) => {
+    const u = c.userData;
+    const flipT = clamp((t - (T_INICIO + i * T_PASO)) / T_FLIP);
+    const suave = flipT * flipT * (3 - 2 * flipT);
+    c.rotation.y = -u.a + (1 - suave) * Math.PI;
+    // El barrido de lectura corre justo después del volteo.
+    const scanT = clamp((t - (T_INICIO + i * T_PASO + T_FLIP * 0.75)) / 0.7);
+    c.material.uniforms.uScan.value = scanT > 0 && scanT < 1 ? scanT : 0;
+    c.material.uniforms.uAlfa.value = (1 - fade) * (reduce ? 1 : Math.min(1, flipT * 2));
+
+    const fuera = abre * (1.1 + i * 0.16);
+    c.position.set(
+      u.base.x + Math.sign(u.a || (i - 2)) * fuera * 3.2,
+      u.base.y + Math.sin(t * 0.5 + i) * 0.05 + fuera * 0.5,
+      u.base.z + fuera * 3.4
+    );
+    c.rotation.z = Math.sin(t * 0.4 + i * 1.7) * 0.012 + fuera * 0.1 * Math.sign(u.a || 1);
+  });
+
+  const pickT = clamp((t - T_PICK) / 1.1);
+  const pickS = pickT * pickT * (3 - 2 * pickT);
+  pick.material.uniforms.uAlfa.value = pickS * (1 - clamp((s - 0.5) / 0.28));
+  pick.position.y = Y_FILA + 0.05 + (1 - pickS) * -2.6 + Math.sin(t * 0.6) * 0.045;
+  pick.position.z = 2.2 + abre * 3.2;
+  pick.scale.setScalar(0.98 * (0.92 + pickS * 0.08) * (1 + abre * 0.22));
+  halo.material.opacity = pickS * 0.85 * (1 - fade);
+  halo.position.set(pick.position.x, pick.position.y, pick.position.z - 0.25);
+  halo.scale.setScalar(7 * (1 + abre * 0.3));
+
+  hilos.forEach((h, i) => {
+    const hp = clamp((t - (T_PICK + 0.45 + i * 0.12)) / 0.75);
+    h.material.uniforms.uProg.value = hp;
+    h.material.uniforms.uAlfa.value = (1 - clamp(abre * 1.6)) * pickS;
+  });
+
+  // Etiquetas de HTML: se prenden con el mismo guion.
+  tagLee.classList.toggle('on', t > 0.35 && t < T_PICK + 0.4 && s < 0.2);
+  tagPick.classList.toggle('on', t > T_PICK + 0.85 && s < 0.22);
+
+  camera.position.z = camBase + s * 3.4;
+  camera.position.x = lerp(camera.position.x, mouse.tx * 0.85, 0.06);
+  camera.position.y = lerp(camera.position.y, 1.3 - mouse.ty * 0.55, 0.06);
+  // En vertical las cartas se bajan un poco: el título come más pantalla.
+  camera.lookAt(0, innerWidth / innerHeight < 1 ? -0.3 : -1.2, 0);
+  scene.fog.far = 26 - clamp((s - 0.3) / 0.5) * 12;
+
+  canvas.style.opacity = String(1 - clamp((s - 0.72) / 0.2) * 0.96);
+
+  const ti = clamp((s - 0.1) / 0.3);
+  heroWrap.style.transform = `translateY(${-24 - ti * 7}vh) scale(${1 + ti * 0.55})`;
+  heroWrap.style.opacity = String(1 - clamp(ti * 1.3));
+  heroWrap.style.filter = `blur(${ti * ti * 30}px)`;
+  hint.style.opacity = String(1 - clamp(ti * 1.6));
+
+  const b = clamp((s - 0.62) / 0.18) * (1 - clamp((s - 0.94) / 0.06));
+  heroBeat.style.opacity = String(b);
+  heroBeat.style.transform = `translateY(${(1 - b) * 38}px) scale(${0.955 + b * 0.045})`;
+  heroBeat.style.filter = `blur(${(1 - b) * 18}px)`;
+
+  if (hb.bottom > 0) renderer.render(scene, camera);
+});
+
+addEventListener(
+  'resize',
+  () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    encuadrar();
+  },
+  { passive: true }
+);
+</script>
+</body>
+</html>

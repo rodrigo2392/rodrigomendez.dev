@@ -4,7 +4,7 @@ import { PROJECTS } from '../consts';
 ---
 <BaseLayout
   title="Proyectos"
-  description="Los productos que construyo en público: Piclink, Cronowork y Cross The Chicken."
+  description="Los productos que construyo en público: Lolsito, Piclink, Cronowork y Cross The Chicken."
 >
   <section class="container-site proyectos">
     <header class="proyectos__head">
@@ -35,9 +35,16 @@ import { PROJECTS } from '../consts';
               ))}
             </ul>
             <div class="pcard__links">
-              <a class="btn-accent" href={p.url} target="_blank" rel="noopener">
-                Visitar <span aria-hidden="true">↗</span>
-              </a>
+              {/* Los proyectos con página propia dentro del sitio no abren pestaña nueva. */}
+              {p.url.startsWith('/') ? (
+                <a class="btn-accent" href={p.url}>
+                  Ver más <span aria-hidden="true">→</span>
+                </a>
+              ) : (
+                <a class="btn-accent" href={p.url} target="_blank" rel="noopener">
+                  Visitar <span aria-hidden="true">↗</span>
+                </a>
+              )}
               {p.repo && (
                 <a class="btn-outline" href={p.repo} target="_blank" rel="noopener">
                   Código

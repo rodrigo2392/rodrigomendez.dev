@@ -45,6 +45,17 @@ export const NAV = [
 // Proyectos mostrados en /proyectos.
 export const PROJECTS = [
   {
+    name: 'Lolsito',
+    tagline: 'Coach de League of Legends con IA',
+    description:
+      'App de escritorio que lee tu cliente de LoL: recomienda pick en el draft, importa runas y objetos solos, te habla en partida y analiza tu juego al terminar.',
+    url: '/lolsito',
+    repo: null,
+    stack: ['Tauri', 'Rust', 'React', 'Gemini'],
+    status: 'Beta · Windows',
+    accent: 'lab',
+  },
+  {
     name: 'Piclink',
     tagline: 'SaaS para fotógrafos',
     description:
@@ -224,3 +235,24 @@ export const SERVICIOS = [
     destacado: false,
   },
 ] as const;
+
+/* ------------------------------------------------------------------ */
+/* Lolsito — app de escritorio para League of Legends (/lolsito)       */
+/* ------------------------------------------------------------------ */
+
+// El instalador pesa ~77 MB (lleva la voz local de Piper adentro), muy por
+// encima del límite de 25 MB por archivo de Cloudflare, así que NO puede vivir
+// en public/. Se sube como release de GitHub y aquí solo va la liga.
+export const LOLSITO = {
+  nombre: 'Lolsito',
+  version: '0.1.0',
+  plataforma: 'Windows 10 / 11 · 64 bits',
+  peso: '77 MB',
+  icono: '/img/lolsito/icon.png',
+  // Poner en true SOLO cuando la release de GitHub ya esté publicada: mientras
+  // sea false el botón se muestra en estado "en camino" en lugar de mandar a un 404.
+  disponible: false,
+  descarga: 'https://github.com/rodrigo2392/lolsito/releases/latest',
+  repo: null as string | null,
+  geminiKeyUrl: 'https://aistudio.google.com/app/apikey',
+} as const;
