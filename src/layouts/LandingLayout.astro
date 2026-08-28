@@ -1,0 +1,77 @@
+---
+/**
+ * Layout para landings que van solas: sin nav, sin pie y sin los estilos del
+ * sitio. La página trae su propio diseño de arriba a abajo y aquí solo se
+ * resuelve el head (SEO, favicon, redes).
+ *
+ * A propósito no hay ClientRouter: estas páginas montan escenas de three.js y
+ * observadores propios, y una navegación con transiciones los dejaría a medias.
+ */
+import { SITE } from '../consts';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  /** Color de fondo mientras carga y en la barra del navegador móvil. */
+  fondo?: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const {
+  title,
+  description,
+  image = '/og-default.png',
+  fondo = '#07070B',
+  jsonLd,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const ogImage = new URL(image, SITE.url).href;
+---
+
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content={fondo} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="canonical" href={canonical} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="es_MX" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    {
+      jsonLd && (
+        <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+      )
+    }
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global define:vars={{ fondo }}>
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    margin: 0;
+    background: var(--fondo);
+  }
+</style>

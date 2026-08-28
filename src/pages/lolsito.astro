@@ -1,1690 +1,567 @@
 ---
-// Landing de Lolsito: descarga + instrucciones para la API key de Gemini.
-// La página usa la paleta "Indigo" de la app (src/index.css del repo lolsito-vite),
-// no la cian del sitio, para que se sienta continuación del producto. Todos los
-// tokens viven bajo .lol para no contaminar el resto del sitio.
-import BaseLayout from '../layouts/BaseLayout.astro';
+// Landing de Lolsito: una sola pagina, con su propio diseno de arriba a abajo.
+// No usa el layout del sitio (ni nav ni pie) porque es una pieza aparte: el
+// visitante llega aqui a ver la app, no a navegar el portafolio.
+//
+// El diseno se trabajo en mock/lolsito-v2/index.html; este archivo es esa
+// misma pieza ya conectada a las constantes del proyecto, con three.js y las
+// fuentes servidos desde aqui en lugar de un CDN.
+import LandingLayout from '../layouts/LandingLayout.astro';
 import { LOLSITO } from '../consts';
-import '@fontsource-variable/sora';
+import '@fontsource/anton';
 import '@fontsource-variable/manrope';
-
-const FUNCIONES = [
-  {
-    titulo: 'Draft de IA',
-    texto:
-      'En la selección de campeón lee a los cinco enemigos y te dice qué escoger, filtrando solo los campeones que sí tienes comprados.',
-    icono: 'bot',
-  },
-  {
-    titulo: 'Runas y objetos solos',
-    texto:
-      'Al fijar tu campeón, Lolsito escribe la página de runas y el orden de compra directo en el cliente. Cero copiar y pegar.',
-    icono: 'zap',
-  },
-  {
-    titulo: 'Coach que te habla',
-    texto:
-      'Durante la partida te avisa por voz y por notificación de Windows lo que está pasando: quién murió, cuándo rotar, cuándo hacer objetivo.',
-    icono: 'voz',
-  },
-  {
-    titulo: 'Análisis al terminar',
-    texto:
-      'Cuando acaba el juego revisa tus números y te explica qué salió mal. Puedes pedirlo suave (contra tu partida) o duro (contra estándar de high elo).',
-    icono: 'chart',
-  },
-  {
-    titulo: 'Meta del parche',
-    texto:
-      'Tier list por rol con los campeones fuertes del parche y contra quién van bien, para no llegar en blanco a la fila.',
-    icono: 'trend',
-  },
-  {
-    titulo: 'Overlay del lobby',
-    texto:
-      'Con un atajo de teclado ves encima del juego quiénes son los diez jugadores y en qué liga están.',
-    icono: 'layers',
-  },
-];
-
-const PASOS_KEY = [
-  {
-    n: '01',
-    titulo: 'Abre Google AI Studio',
-    texto:
-      'Entra a aistudio.google.com/app/apikey e inicia sesión con tu cuenta de Google, la misma del correo. No necesitas tarjeta.',
-    liga: LOLSITO.geminiKeyUrl,
-    ligaTexto: 'Abrir Google AI Studio',
-  },
-  {
-    n: '02',
-    titulo: 'Presiona "Create API key"',
-    texto:
-      'Es el botón azul de esa pantalla. Si es tu primera vez te va a pedir aceptar los términos: acéptalos y vuelve a presionarlo.',
-  },
-  {
-    n: '03',
-    titulo: 'Elige un proyecto',
-    texto:
-      'Google te pide un proyecto de Google Cloud. Si no tienes ninguno, deja que él cree uno nuevo. El nombre da igual.',
-  },
-  {
-    n: '04',
-    titulo: 'Copia la clave',
-    texto:
-      // En letra normal "AIza" se confunde con "Alza": el token va en monoespaciada.
-      'Te aparece un texto largo que empieza con <code class="lol-tk">AIza</code>. Ese es. Cópialo completo con el botón de copiar; después de cerrar la ventana ya no lo vuelves a ver.',
-  },
-  {
-    n: '05',
-    titulo: 'Pégala en Lolsito',
-    texto:
-      'Abre Lolsito, ve a Configuración, pégala en el campo "Google Gemini API key" y presiona Guardar key. Listo: la IA ya responde.',
-  },
-];
-
-const FAQ = [
-  {
-    p: '¿Cuánto cuesta?',
-    r: 'Lolsito es gratis. Lo único que pones es tu propia clave de Gemini, que también tiene un nivel gratuito con límite diario más que suficiente para jugar. Si un día te pasas del límite, la IA deja de responder hasta el día siguiente; el resto de la app sigue funcionando.',
-  },
-  {
-    p: '¿Me pueden banear por usarlo?',
-    r: 'Lolsito no toca el juego: no inyecta código, no mueve tu mouse ni juega por ti. Lee la información que el propio cliente de League publica en tu computadora, las mismas fuentes que usan herramientas conocidas como Blitz o Porofessor. Dicho eso, ninguna app de terceros está "aprobada" oficialmente por Riot, así que la decisión de usarla es tuya.',
-  },
-  {
-    p: '¿Mis datos salen de mi computadora?',
-    r: 'No hay servidor mío en medio: no guardo tu cuenta, tus partidas ni tu clave. Lo único que sale de tu PC son las preguntas que Lolsito le hace a Gemini, y van de tu computadora directo a Google con tu propia clave. La clave se guarda solo en tu equipo.',
-  },
-  {
-    p: '¿Funciona en Mac o Linux?',
-    r: 'Por ahora solo Windows 10 y 11 de 64 bits. La app está hecha con Tauri, así que técnicamente puede compilarse para Mac, pero todavía no hay una versión probada.',
-  },
-  {
-    p: '¿Tengo que dejar el cliente de League abierto?',
-    r: 'Sí. Lolsito se conecta al cliente para saber en qué fase vas: lobby, selección de campeón, partida o pantalla de resultados. Si el cliente está cerrado, la app se queda esperando.',
-  },
-  {
-    p: 'No veo el overlay encima del juego, ¿qué hago?',
-    r: 'Casi siempre es porque League está en "Pantalla completa" exclusiva, y ahí Windows no deja que ninguna ventana se dibuje encima. Entra a las opciones de video del juego y cambia a "Sin bordes". El overlay tiene un botón que hace ese cambio por ti.',
-  },
-];
 ---
 
-<BaseLayout
-  title="Lolsito — coach de League of Legends con IA"
+<LandingLayout
+  title="Lolsito - coach de League of Legends con IA"
   description="App gratuita de escritorio que lee tu cliente de League of Legends: recomienda el pick del draft, importa runas y objetos solos, te habla durante la partida y analiza tu juego al terminar."
   image="/img/lolsito/icon-310.png"
 >
-  <div class="lol">
-    <!-- ══════════════════ HERO ══════════════════ -->
-    <section class="lol-hero">
-      <!-- La Grieta en vivo detrás del título: el mapa del juego con los diez
-           jugadores caminando. Si no hay WebGL o el visitante pidió menos
-           movimiento, queda el resplandor de siempre y no se nota la falta. -->
-      <canvas class="lol-hero__mapa" data-grieta aria-hidden="true"></canvas>
-      <div class="lol-hero__glow" aria-hidden="true"></div>
-      <div class="lol-hero__velo" aria-hidden="true"></div>
+<canvas id="gl"></canvas>
+<div class="vig"></div>
+<div class="grain"></div>
+<div class="prog" id="prog"></div>
 
-      <div class="lol-reloj" data-grieta-reloj aria-hidden="true">
-        <i></i> <span>Partida en curso</span> <b data-grieta-min>12:40</b>
+<header class="bar">
+  <span class="bar__mark">LOLSITO</span>
+  <a class="bar__cta" id="barcta" href="#descargar">Descargar</a>
+</header>
+
+<main>
+
+  <!-- ═══ 1. PORTADA ═══ -->
+  <section class="hero" id="hero">
+    <div class="hero__stick">
+      <div class="hero__wrap" id="heroWrap">
+        <p class="hero__eyebrow">Para League of Legends</p>
+        <h1 class="hero__title">LOLSITO</h1>
+        <p class="hero__sub">Alguien que sí sabe, viéndote jugar.</p>
       </div>
 
-      <div class="container-site lol-hero__inner">
-        <div class="lol-hero__copy">
-          <div class="lol-brand">
-            <img src={LOLSITO.icono} alt="" width="52" height="52" class="lol-brand__icon" />
-            <div>
-              <p class="lol-brand__name">Lolsito</p>
-              <p class="lol-brand__sub">para League of Legends</p>
-            </div>
-          </div>
+      <div class="reloj" id="reloj"><i></i> <span>Partida en curso</span> <b id="relojN">12:40</b></div>
 
-          <h1 class="lol-h1">
-            Tu coach de League,<br />
-            <span class="lol-grad">sin salir del juego</span>
-          </h1>
-
-          <p class="lol-lead">
-            Lolsito se conecta a tu cliente de League y hace el trabajo aburrido: te dice
-            qué escoger en el draft, te pone las runas y los objetos solo, te avisa por voz
-            lo que está pasando en la partida y al terminar te explica dónde la regaste.
-          </p>
-
-          <div class="lol-cta">
-            {
-              LOLSITO.disponible ? (
-                <a class="lol-btn lol-btn--primary" href={LOLSITO.descarga} rel="noopener">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12" /><path d="m7 12 5 5 5-5" /><path d="M4 20h16" /></svg>
-                  Descargar para Windows
-                </a>
-              ) : (
-                <span class="lol-btn lol-btn--primary is-disabled" aria-disabled="true">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
-                  Descarga en camino
-                </span>
-              )
-            }
-            <a class="lol-btn lol-btn--ghost" href="#api-key">Cómo sacar tu API key</a>
-          </div>
-
-          <p class="lol-fine">
-            Versión {LOLSITO.version} · {LOLSITO.plataforma} · {LOLSITO.peso} · Gratis
-          </p>
-
-          <!-- Lo que la app va diciendo mientras corre la partida del mapa.
-               Solo uno visible a la vez. -->
-          <div class="lol-voz" data-grieta-voz aria-hidden="true">
-            <div class="lol-voz__i">
-              <span class="lol-voz__ico">
-                <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /></svg>
-              </span>
-              <span class="lol-voz__t">
-                La jungla enemiga <b>lleva 12 segundos sin verse</b>. Juega pegado a tu torre.
-                <span class="lol-voz__min">Minuto 12:40 · aviso por voz</span>
-              </span>
-            </div>
-            <div class="lol-voz__i lol-voz__i--urgente">
-              <span class="lol-voz__ico">
-                <svg viewBox="0 0 24 24"><path d="M12 9v5" /><path d="M12 17h.01" /><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></svg>
-              </span>
-              <span class="lol-voz__t">
-                Vienen tres al medio. <b>Retírate ya.</b>
-                <span class="lol-voz__min">Minuto 13:02 · aviso por voz</span>
-              </span>
-            </div>
-            <div class="lol-voz__i">
-              <span class="lol-voz__ico">
-                <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>
-              </span>
-              <span class="lol-voz__t">
-                Dragón en 40 segundos y tu jungla ya va para allá. <b>Empuja tu línea.</b>
-                <span class="lol-voz__min">Minuto 13:20 · aviso por voz</span>
-              </span>
-            </div>
-          </div>
-
-          <ul class="lol-badges">
-            <li><span class="lol-dot lol-dot--pos"></span>Corre en tu computadora</li>
-            <li><span class="lol-dot lol-dot--accent"></span>Sin cuenta ni registro</li>
-            <li><span class="lol-dot lol-dot--gold"></span>Habla en español</li>
-          </ul>
+      <!-- Lo que Lolsito va diciendo mientras corre la partida del mapa.
+           Solo uno visible a la vez; el guion los prende desde el JS. -->
+      <div class="voz" id="voz" aria-hidden="true">
+        <div class="voz__i">
+          <span class="voz__ico"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg></span>
+          <span class="voz__t">
+            La jungla enemiga <b>lleva 12 segundos sin verse</b>. Juega pegado a tu torre.
+            <span class="voz__min">Minuto 12:40 · aviso por voz</span>
+          </span>
+        </div>
+        <div class="voz__i urgente">
+          <span class="voz__ico"><svg viewBox="0 0 24 24"><path d="M12 9v5"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>
+          <span class="voz__t">
+            Vienen tres al medio. <b>Retírate ya.</b>
+            <span class="voz__min">Minuto 13:02 · aviso por voz</span>
+          </span>
+        </div>
+        <div class="voz__i">
+          <span class="voz__ico"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg></span>
+          <span class="voz__t">
+            Dragón en 40 segundos y tu jungla ya va para allá. <b>Empuja tu línea.</b>
+            <span class="voz__min">Minuto 13:20 · aviso por voz</span>
+          </span>
         </div>
       </div>
-    </section>
 
-    <!-- ══════════════════ LA APP ══════════════════ -->
-    <!-- La ventana salía antes junto al título; ahora que el mapa ocupa el
-         fondo del hero, vive en su propia sección para que se vea completa. -->
-    <section class="lol-sec lol-vista" id="app">
-      <div class="container-site">
-        <p class="lol-kicker">así se ve</p>
-        <h2 class="lol-h2">Una ventana al lado del juego</h2>
-        <p class="lol-sub">
-          Lolsito abre en su propia ventana y va cambiando solo según la fase en la que
-          vayas: lobby, selección de campeón, partida o pantalla de resultados.
-        </p>
+      <div class="hero__beat" id="heroBeat">
+        <p>No es una guía.<br />Es un <em>coach</em> dentro de tu computadora.</p>
+      </div>
+      <div class="scrollhint"><span>Baja</span><i></i></div>
+    </div>
+  </section>
 
-        <!-- Recreación de la interfaz. No es una captura: es HTML, así que se ve
-             nítida en cualquier pantalla y no se despinta cuando la app cambie. -->
-        <div class="lol-mock reveal" aria-hidden="true">
-          <div class="lol-win">
-            <div class="lol-win__bar">
-              <span class="lol-win__dots"><i></i><i></i><i></i></span>
-              <span class="lol-win__title">Lolsito</span>
-            </div>
-            <div class="lol-win__body">
-              <aside class="lol-side">
-                <div class="lol-side__item">
-                  <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>
-                  Meta juego
-                </div>
-                <div class="lol-side__item is-on">
-                  <svg viewBox="0 0 24 24"><path d="M12 3v3" /><rect x="4" y="6" width="16" height="12" rx="3" /><circle cx="9" cy="12" r="1.2" /><circle cx="15" cy="12" r="1.2" /></svg>
-                  Draft de IA
-                </div>
-                <div class="lol-side__item">
-                  <svg viewBox="0 0 24 24"><path d="M4 20V10" /><path d="M10 20V4" /><path d="M16 20v-7" /><path d="M22 20H2" /></svg>
-                  Análisis
-                </div>
-                <div class="lol-side__item">
-                  <svg viewBox="0 0 24 24"><path d="M21 15a3 3 0 0 1-3 3H8l-5 3V6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3z" /></svg>
-                  Coach Q&amp;A
-                </div>
-                <div class="lol-side__item">
-                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" /></svg>
-                  Configuración
-                </div>
-                <div class="lol-side__foot">
-                  <span class="lol-side__avatar"></span>
-                  <span class="lol-side__who">
-                    <b>Rodrigo</b>
-                    <em>Oro II</em>
-                  </span>
-                </div>
-              </aside>
+  <!-- ═══ 2. GOLPES ═══ -->
+  <section class="golpe">
+    <div class="golpe__bg" data-px="260" data-px-s=".1" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_0.jpg)"></div>
+    <div class="golpe__velo" data-px="-150" data-px-x="70"></div>
+    <div class="golpe__sombra" data-px="-72" data-px-x="-34"></div>
+    <div class="golpe__txt" data-px="-78">
+      <p class="golpe__n rv">01</p>
+      <h2 class="golpe__h rv d1">La partida se pierde en el draft.</h2>
+    </div>
+  </section>
 
-              <div class="lol-main">
-                <div class="lol-main__head">
-                  <span class="lol-main__title">Draft de IA</span>
-                  <span class="lol-pill"><span class="lol-pulse"></span>En selección</span>
-                </div>
+  <section class="golpe golpe--r">
+    <div class="golpe__bg" data-px="230" data-px-s=".12" style="background-image:url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg)"></div>
+    <div class="golpe__velo" data-px="-170" data-px-x="-70"></div>
+    <div class="golpe__sombra" data-px="-76" data-px-x="34"></div>
+    <div class="golpe__txt" data-px="-84">
+      <p class="golpe__n rv">02</p>
+      <h2 class="golpe__h rv d1">Terminas, pierdes, y nadie te dice por qué.</h2>
+    </div>
+  </section>
 
-                <div class="lol-card">
-                  <span class="lol-label">Equipo enemigo</span>
-                  <div class="lol-champs">
-                    <span><i style="--h: 268"></i>Top</span>
-                    <span><i style="--h: 218"></i>Jung</span>
-                    <span><i style="--h: 340"></i>Mid</span>
-                    <span><i style="--h: 172"></i>ADC</span>
-                    <span><i style="--h: 42"></i>Sup</span>
-                  </div>
-                </div>
+  <!-- ═══ 3. RECORRIDO ═══ -->
+  <section class="tour" id="tour">
+    <div class="tour__stick" id="tourStick">
 
-                <div class="lol-card lol-card--rec">
-                  <span class="lol-label">Te conviene escoger</span>
-                  <div class="lol-rec">
-                    <span class="lol-rec__face"></span>
-                    <span class="lol-rec__body">
-                      <b>Vi<span class="lol-rec__wr">54% de victorias</span></b>
-                      <em>
-                        Limpia más rápido que su jungla y su ulti cae justo sobre
-                        el mid enemigo cuando salta.
-                      </em>
-                    </span>
-                  </div>
-                  <div class="lol-runes">
-                    <span class="r1"></span><span class="r2"></span><span class="r3"></span>
-                    <span class="lol-runes__btn">Importar runas</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      <span class="tour__hilo"></span>
 
-          <div class="lol-toast">
-            <span class="lol-toast__ico">
-              <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /></svg>
-            </span>
-            <span class="lol-toast__txt">"Cuidado, la jungla enemiga desapareció hace 12 segundos."</span>
-          </div>
+      <div class="tour__word" data-w="0">META</div>
+      <div class="tour__word" data-w="1">DRAFT</div>
+      <div class="tour__word" data-w="2">VOZ</div>
+      <div class="tour__word" data-w="3">ANÁLISIS</div>
+      <div class="tour__word" data-w="4">LLAVE</div>
+
+      <div class="tour__mid">
+        <div class="win" id="win">
+          <!-- Capturas reales de la app, una por pantalla del recorrido.
+               La de arriba se ve y las demás esperan debajo con opacidad 0. -->
+          <img class="win__foto on" data-f="0" src="/img/lolsito/capturas/meta-juego.webp"   alt="Lolsito mostrando el meta del parche por rol" width="1410" height="1029" />
+          <img class="win__foto"    data-f="1" src="/img/lolsito/capturas/draft-de-ia.webp"  alt="Lolsito recomendando a quién escoger en la selección de campeón" width="1294" height="831" loading="lazy" />
+          <img class="win__foto"    data-f="2" src="/img/lolsito/capturas/coach-en-vivo.webp" alt="Lolsito narrando lo que pasa en la partida" width="1294" height="831" loading="lazy" />
+          <img class="win__foto"    data-f="3" src="/img/lolsito/capturas/analisis.webp"     alt="Lolsito analizando la partida terminada" width="1410" height="1029" loading="lazy" />
+          <img class="win__foto"    data-f="4" src="/img/lolsito/capturas/configuracion.webp" alt="La configuración de Lolsito con el campo de la llave de Gemini" width="1410" height="1029" loading="lazy" />
+        </div>
+
+        <div class="tour__copy" id="tourCopy">
+          <p data-c="0">Quién está <b>roto este parche</b>, rol por rol, antes de que entres a la fila.</p>
+          <p data-c="1">Ve a los cinco de enfrente y te dice <b>a quién escoger</b>, con el porqué de cada uno.</p>
+          <p data-c="2">Te habla <b>en español mientras juegas</b> y deja escrito todo lo que pasó, con su minuto.</p>
+          <p data-c="3">Al terminar te <b>califica y te dice en qué la regaste</b>, con tus números en la mano.</p>
+          <p data-c="4">Lo único que configuras: <b>pegas tu llave de Gemini</b> y ya. Nada más.</p>
         </div>
       </div>
-    </section>
 
-    <!-- ══════════════════ FUNCIONES ══════════════════ -->
-    <section class="lol-sec" id="funciones">
-      <div class="container-site">
-        <p class="lol-kicker">lo que hace</p>
-        <h2 class="lol-h2">Seis cosas menos de las que preocuparte</h2>
-        <p class="lol-sub">
-          Nada de esto te pide salir del juego ni abrir el navegador a mitad del draft.
-        </p>
-
-        <div class="lol-grid">
-          {
-            FUNCIONES.map((f) => (
-              <article class="lol-feat reveal">
-                <span class="lol-feat__ico">
-                  {f.icono === 'bot' && <svg viewBox="0 0 24 24"><path d="M12 3v3" /><rect x="4" y="6" width="16" height="12" rx="3" /><circle cx="9" cy="12" r="1.3" /><circle cx="15" cy="12" r="1.3" /></svg>}
-                  {f.icono === 'zap' && <svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z" /></svg>}
-                  {f.icono === 'voz' && <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /><path d="M18.5 5.5a9 9 0 0 1 0 13" /></svg>}
-                  {f.icono === 'chart' && <svg viewBox="0 0 24 24"><path d="M4 20V10" /><path d="M10 20V4" /><path d="M16 20v-7" /><path d="M22 20H2" /></svg>}
-                  {f.icono === 'trend' && <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>}
-                  {f.icono === 'layers' && <svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z" /><path d="m3 13 9 5 9-5" /></svg>}
-                </span>
-                <h3 class="lol-feat__t">{f.titulo}</h3>
-                <p class="lol-feat__d">{f.texto}</p>
-              </article>
-            ))
-          }
+      <div class="chips">
+        <div class="chips__in" id="chips">
+          <button data-b="0">Meta</button>
+          <button data-b="1">Draft</button>
+          <button data-b="2">Voz</button>
+          <button data-b="3">Análisis</button>
+          <button data-b="4">Llave</button>
         </div>
+        <button class="chips__skip" id="skip">Saltar</button>
       </div>
-    </section>
+    </div>
+    <div class="tour__pages"></div>
+  </section>
 
-    <!-- ══════════════════ INSTALAR ══════════════════ -->
-    <section class="lol-sec lol-sec--alt" id="instalar">
-      <div class="container-site">
-        <p class="lol-kicker">instalar</p>
-        <h2 class="lol-h2">Tres pasos y ya está corriendo</h2>
-
-        <ol class="lol-steps">
-          <li class="reveal">
-            <span class="lol-steps__n">1</span>
-            <div>
-              <h3>Descarga el instalador</h3>
-              <p>
-                Un solo archivo de {LOLSITO.peso}. Ábrelo y sigue el asistente de siempre.
-                Windows puede mostrarte un aviso de "editor desconocido" porque la app
-                todavía no está firmada: dale en <strong>Más información → Ejecutar de
-                todas formas</strong>.
-              </p>
-            </div>
-          </li>
-          <li class="reveal">
-            <span class="lol-steps__n">2</span>
-            <div>
-              <h3>Abre League y luego Lolsito</h3>
-              <p>
-                Lolsito busca el cliente de League automáticamente. Cuando lo encuentra,
-                arriba te aparece tu nombre de invocador y en qué fase vas.
-              </p>
-            </div>
-          </li>
-          <li class="reveal">
-            <span class="lol-steps__n">3</span>
-            <div>
-              <h3>Pega tu API key de Gemini</h3>
-              <p>
-                Es lo único que Lolsito te pide, y es gratis. Sin ella la app funciona,
-                pero las partes con inteligencia artificial se quedan calladas.
-                <a href="#api-key">Te explico cómo sacarla aquí abajo →</a>
-              </p>
-            </div>
-          </li>
-        </ol>
+  <!-- ═══ 4. API KEY ═══ -->
+  <section class="key" id="key">
+    <div class="key__stick">
+      <div class="key__head" data-px="-90" data-px-ref="section">
+        <p class="key__k rv">Lo único que te pide</p>
+        <h2 class="key__h rv d1">Tu llave de Gemini. Gratis, en dos minutos.</h2>
+        <p class="key__sub rv d2">Lolsito no trae llave propia: usas la tuya y se queda guardada nada más en tu computadora.</p>
       </div>
-    </section>
-
-    <!-- ══════════════════ API KEY ══════════════════ -->
-    <section class="lol-sec" id="api-key">
-      <div class="container-site">
-        <p class="lol-kicker">api key</p>
-        <h2 class="lol-h2">Cómo sacar tu clave de Gemini</h2>
-        <p class="lol-sub">
-          Gemini es la inteligencia artificial de Google. Lolsito no trae una clave propia:
-          usas la tuya, y así nadie más gasta tu cuota ni tú pagas la de nadie.
-          Toma unos dos minutos y no piden tarjeta.
-        </p>
-
-        <div class="lol-keygrid">
-          <ol class="lol-key">
-            {
-              PASOS_KEY.map((s) => (
-                <li class="reveal">
-                  <span class="lol-key__n">{s.n}</span>
-                  <div class="lol-key__c">
-                    <h3>{s.titulo}</h3>
-                    <p set:html={s.texto} />
-                    {s.liga && (
-                      <a class="lol-key__link" href={s.liga} target="_blank" rel="noopener">
-                        {s.ligaTexto} <span aria-hidden="true">↗</span>
-                      </a>
-                    )}
-                  </div>
-                </li>
-              ))
-            }
-          </ol>
-
-          <aside class="lol-aside">
-            <div class="lol-note">
-              <span class="lol-note__t">Cómo se ve la clave</span>
-              <code class="lol-code">AIzaSy<span class="lol-code__mask">••••••••••••••••••••••••</span>7fQ</code>
-              <p>
-                Siempre empieza con <code class="lol-tk">AIza</code> (A, i mayúscula, z, a)
-                y es una sola línea larga, sin espacios. Cópiala completa.
-              </p>
-            </div>
-
-            <div class="lol-note lol-note--safe">
-              <span class="lol-note__t">Dónde queda guardada</span>
-              <p>
-                Solo en tu computadora, dentro de Lolsito. No viaja a ningún servidor mío
-                porque no hay ninguno: las preguntas van directo de tu equipo a Google.
-              </p>
-            </div>
-
-            <div class="lol-note lol-note--warn">
-              <span class="lol-note__t">Si la IA no contesta</span>
-              <p>
-                Casi siempre es que la clave se pegó incompleta o que ese día ya te pasaste
-                del límite gratuito. En Configuración, Lolsito te muestra si la clave está
-                presente y los últimos cuatro caracteres para que compares.
-              </p>
-            </div>
-          </aside>
-        </div>
+      <div class="key__rail" id="rail">
+        <article class="paso">
+          <span class="paso__n">01</span>
+          <h3 class="paso__t">Entra a Google AI&nbsp;Studio</h3>
+          <p class="paso__d">Con tu cuenta de Google, la misma del correo. No piden tarjeta.</p>
+          <a href={LOLSITO.geminiKeyUrl} target="_blank" rel="noopener">Abrir ↗</a>
+        </article>
+        <article class="paso">
+          <span class="paso__n">02</span>
+          <h3 class="paso__t">Presiona "Create API key"</h3>
+          <p class="paso__d">Si es tu primera vez te pide aceptar los términos. Acepta y vuelve a presionarlo.</p>
+        </article>
+        <article class="paso">
+          <span class="paso__n">03</span>
+          <h3 class="paso__t">Elige un proyecto</h3>
+          <p class="paso__d">Si no tienes ninguno, deja que Google cree uno nuevo. El nombre da igual.</p>
+        </article>
+        <article class="paso">
+          <span class="paso__n">04</span>
+          <h3 class="paso__t">Copia la clave</h3>
+          <p class="paso__d">Es un texto largo que empieza con <code>AIza</code>. Cópialo completo: al cerrar la ventana ya no lo vuelves a ver.</p>
+        </article>
+        <article class="paso paso--fin">
+          <span class="paso__n">05</span>
+          <h3 class="paso__t">Pégala en Lolsito</h3>
+          <p class="paso__d">Configuración, campo "Google Gemini API key", Guardar. Ya está: la IA responde.</p>
+        </article>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ══════════════════ FAQ ══════════════════ -->
-    <section class="lol-sec lol-sec--alt" id="preguntas">
-      <div class="container-site">
-        <p class="lol-kicker">dudas</p>
-        <h2 class="lol-h2">Lo que todo mundo pregunta</h2>
+  <!-- ═══ 5. DESCARGA ═══ -->
+  <section class="dl" id="descargar">
+    <div class="dl__mosaic" id="mosaic" data-px="150" data-px-s=".08"></div>
+    <div class="dl__in" data-px="-80">
+      <h2 class="dl__h rv">JUEGA<em>ACOMPAÑADO</em></h2>
+      {
+        LOLSITO.disponible ? (
+          <a class="dl__btn rv d2" href={LOLSITO.descarga} rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 12 5 5 5-5"/><path d="M4 20h16"/></svg>
+            Descargar para Windows
+          </a>
+        ) : (
+          <span class="dl__btn dl__btn--espera rv d2" aria-disabled="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            Descarga en camino
+          </span>
+        )
+      }
+      <p class="dl__fine rv d3">Gratis · {LOLSITO.plataforma} · {LOLSITO.peso}</p>
+    </div>
+    <p class="dl__legal" data-px="-30">
+      Lolsito es un proyecto de fan y no está avalado por Riot Games. League of Legends
+      y todo su arte son marcas registradas de Riot Games, Inc.
+    </p>
+  </section>
 
-        <div class="lol-faq">
-          {
-            FAQ.map((f) => (
-              <details class="lol-q reveal">
-                <summary>
-                  {f.p}
-                  <span class="lol-q__mark" aria-hidden="true"></span>
-                </summary>
-                <p>{f.r}</p>
-              </details>
-            ))
-          }
-        </div>
-      </div>
-    </section>
+</main>
+</LandingLayout>
 
-    <!-- ══════════════════ CIERRE ══════════════════ -->
-    <section class="lol-end">
-      <div class="container-site lol-end__inner">
-        <img src={LOLSITO.icono} alt="" width="64" height="64" class="lol-end__icon" />
-        <h2 class="lol-h2">Pruébalo en tu próxima partida</h2>
-        <p class="lol-sub lol-sub--center">
-          Gratis, sin cuenta y sin anuncios. Si algo se rompe o se te ocurre una función,
-          escríbeme: lo estoy construyendo en público.
-        </p>
-        <div class="lol-cta lol-cta--center">
-          {
-            LOLSITO.disponible ? (
-              <a class="lol-btn lol-btn--primary" href={LOLSITO.descarga} rel="noopener">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12" /><path d="m7 12 5 5 5-5" /><path d="M4 20h16" /></svg>
-                Descargar Lolsito {LOLSITO.version}
-              </a>
-            ) : (
-              <span class="lol-btn lol-btn--primary is-disabled" aria-disabled="true">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
-                Descarga en camino
-              </span>
-            )
-          }
-          <a class="lol-btn lol-btn--ghost" href="/#contacto">Escríbeme</a>
-        </div>
-      </div>
-    </section>
-  </div>
-</BaseLayout>
+<style is:global>
 
-<style>
-  /* ---------------------------------------------------------------- */
-  /* Tokens de la app (dirección "Indigo"), acotados a esta página.    */
-  /* Copiados de lolsito-vite/src/index.css para que la landing y el   */
-  /* producto se vean como la misma cosa.                             */
-  /* ---------------------------------------------------------------- */
-  .lol {
-    --app: #0e0e14;
-    --surface: #15151d;
-    --surface-2: #1c1c26;
-    --surface-3: #232330;
-    --line: #262633;
-    --line-soft: #1e1e29;
+/* ═══════════════════════════════════════════════════════════════
+   LOLSITO v2
+   La pieza central es el RECORRIDO: la ventana de la app se queda
+   clavada al centro y su contenido cambia pantalla por pantalla,
+   con una palabra gigante detrás que la ventana parte a la mitad.
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --neg:#07070B;
+  --neg-2:#0C0C13;
+  --bl:#FFFFFF;
+  --ind:#6366F1;        /* acento: botones, pills, líneas finas */
+  --ind-fondo:#221E52;  /* mismo índigo pero para llenar pantallas enteras:
+                           el acento a pantalla completa deslumbra */
+  --ind-cl:#9599F0;  /* lila de acento, un punto más apagado que el original */
+  /* tokens de la app, para que las pantallas se vean como el producto */
+  --app:#0E0E14; --sf:#15151D; --sf2:#1C1C26; --sf3:#232330;
+  --ln:#262633; --lns:#1E1E29;
+  --tx:#EDEDF4; --mu:#9797AC; --fa:#6A6A80;
+  --pos:#34D399; --neg-c:#FB7185; --warn:#FBBF24;
+  --display:'Anton', Impact, sans-serif;
+  --body:'Manrope Variable', 'Manrope', system-ui, sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--neg);color:var(--bl);font-family:var(--body);line-height:1.5;
+  overflow-x:clip;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+::selection{background:var(--ind);color:#fff}
 
-    --accent: #4f46e5;
-    --accent-2: #6366f1;
-    --accent-3: #818cf8;
-    --accent-soft: rgba(99, 102, 241, 0.14);
-    --accent-ring: rgba(99, 102, 241, 0.45);
+#gl{position:fixed;inset:0;z-index:0;display:block}
+.grain{
+  position:fixed;inset:-50%;z-index:60;pointer-events:none;opacity:.15;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  animation:grain 700ms steps(4) infinite;
+}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}
+  50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-2%)}100%{transform:translate(3%,1%)}}
+.vig{position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(120% 85% at 50% 45%,transparent 35%,rgba(7,7,11,.72) 78%,var(--neg) 100%)}
 
-    --text: #ededf4;
-    --muted: #9797ac;
-    --faint: #6a6a80;
+.bar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;
+  justify-content:space-between;padding:22px clamp(20px,4vw,52px);
+  color:#fff;text-shadow:0 1px 14px rgba(0,0,0,.6)}
+.bar__mark{font-family:var(--display);font-size:20px;letter-spacing:.06em}
+.bar__cta{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  opacity:0;transform:translateY(-8px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.bar__cta.on{opacity:1;transform:none}
+.prog{position:fixed;top:0;left:0;height:2px;width:0;background:var(--ind);z-index:70}
 
-    --pos: #34d399;
-    --neg: #fb7185;
-    --warn: #fbbf24;
-    --gold: #e9b949;
+.rv{opacity:0;filter:blur(14px);transform:translateY(34px);
+  transition:opacity 1.05s var(--ease),filter 1.05s var(--ease),transform 1.05s var(--ease)}
+.rv.on{opacity:1;filter:blur(0);transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.18s}.d3{transition-delay:.3s}
+main{position:relative;z-index:10}
 
-    --r-lg: 20px;
-    --r-md: 16px;
-    --r-sm: 12px;
+/* ═══════════ 1. PORTADA 3D ═══════════ */
+.hero{height:280vh;position:relative}
+.hero__stick{position:sticky;top:0;height:100vh;display:grid;place-items:center;overflow:hidden}
+/* El velo cubre la mitad de arriba, que es donde vive el título: el mapa
+   queda abajo y nunca compite con las letras. */
+.hero__stick::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(56% 38% at 50% 24%,rgba(7,7,11,.92) 0%,rgba(7,7,11,.55) 46%,transparent 78%)}
+.hero__wrap{position:relative;z-index:2;text-align:center;padding-inline:20px;
+  transform:translateY(-24vh);will-change:transform,opacity,filter}
+.hero__eyebrow{font-size:clamp(10px,1.1vw,12px);font-weight:800;letter-spacing:.42em;
+  text-transform:uppercase;color:var(--ind-cl);margin-bottom:clamp(14px,2vw,22px);
+  text-shadow:0 2px 20px rgba(7,7,11,1)}
+.hero__title{font-family:var(--display);line-height:.82;letter-spacing:-.015em;
+  font-size:clamp(74px,17.5vw,270px);text-shadow:0 0 90px rgba(7,7,11,.9)}
+.hero__sub{margin-top:clamp(18px,2.4vw,30px);font-size:clamp(15px,1.55vw,22px);font-weight:500;
+  color:rgba(255,255,255,.9);max-width:34ch;margin-inline:auto;text-shadow:0 2px 24px rgba(7,7,11,.95)}
+.hero__beat{position:absolute;inset:0;z-index:2;display:grid;place-items:center;padding-inline:24px;
+  opacity:0;pointer-events:none}
+.hero__beat p{font-family:var(--display);font-size:clamp(30px,5.6vw,84px);line-height:1.02;
+  text-align:center;max-width:16ch}
+.hero__beat em{font-style:normal;color:var(--ind-cl)}
+.scrollhint{position:absolute;bottom:30px;left:50%;translate:-50% 0;z-index:3;font-size:10px;
+  font-weight:800;letter-spacing:.34em;text-transform:uppercase;color:rgba(255,255,255,.62);
+  display:flex;flex-direction:column;align-items:center;gap:10px;text-shadow:0 2px 18px rgba(7,7,11,1)}
+.scrollhint i{display:block;width:1px;height:40px;background:linear-gradient(var(--ind),transparent);
+  animation:drop 2s var(--ease) infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}
+  55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 
-    --display: 'Sora Variable', 'Outfit Variable', system-ui, sans-serif;
-    --body: 'Manrope Variable', 'Outfit Variable', system-ui, sans-serif;
 
-    background: var(--app);
-    color: var(--text);
-    font-family: var(--body);
-  }
+/* ── Portada: lo que dice el coach ─────────────────────────── */
+.voz{position:absolute;left:clamp(20px,5vw,62px);bottom:clamp(84px,13vh,132px);z-index:3;
+  width:min(30rem,74vw);display:grid}
+.voz__i{grid-area:1/1;display:flex;align-items:flex-start;gap:12px;padding:13px 16px;
+  background:rgba(12,12,19,.78);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.1);border-left:2px solid var(--ind);border-radius:12px;
+  box-shadow:0 24px 50px -30px rgba(0,0,0,.95);
+  opacity:0;transform:translateY(14px);
+  transition:opacity .55s var(--ease),transform .55s var(--ease);pointer-events:none}
+.voz__i.on{opacity:1;transform:none}
+.voz__i.urgente{border-left-color:#FB7185}
+.voz__ico{display:grid;place-items:center;width:28px;height:28px;flex:none;border-radius:8px;
+  background:rgba(99,102,241,.18);color:var(--ind-cl);margin-top:1px}
+.voz__i.urgente .voz__ico{background:rgba(251,113,133,.16);color:#FB7185}
+.voz__ico svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.voz__t{font-size:13.5px;line-height:1.45;color:rgba(255,255,255,.86)}
+.voz__t b{font-weight:800}
+.voz__min{display:block;margin-top:3px;font-size:10.5px;font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(255,255,255,.34)}
 
-  .lol :global(h1),
-  .lol :global(h2),
-  .lol :global(h3) {
-    font-family: var(--display);
-    letter-spacing: -0.03em;
-  }
+/* Reloj de la partida */
+.reloj{position:absolute;top:clamp(78px,11vh,110px);right:clamp(20px,5vw,62px);z-index:3;
+  display:flex;align-items:center;gap:10px;padding:9px 14px;
+  background:rgba(12,12,19,.72);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.1);border-radius:12px;
+  font-size:12.5px;white-space:nowrap;font-variant-numeric:tabular-nums;
+  opacity:0;transform:translateY(8px);
+  transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.reloj.on{opacity:1;transform:none}
+.reloj b{font-weight:800}
+.reloj span{color:rgba(255,255,255,.55)}
+.reloj i{width:6px;height:6px;border-radius:999px;background:var(--pos)}
 
-  /* ---------------------------------------------------------------- */
-  /* Hero                                                             */
-  /* ---------------------------------------------------------------- */
-  .lol-hero {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-    display: grid;
-    align-items: start;
-    min-height: min(92vh, 58rem);
-    padding-block: 4.5rem 0;
-  }
-  .lol-hero__glow {
-    position: absolute;
-    top: -28rem;
-    left: 50%;
-    width: min(78rem, 150vw);
-    height: 52rem;
-    translate: -50% 0;
-    background: radial-gradient(
-      50% 50% at 50% 50%,
-      rgba(99, 102, 241, 0.22),
-      transparent 70%
-    );
-    pointer-events: none;
-    z-index: -2;
-  }
-  /* El mapa de la Grieta vive detrás de todo. En pantallas anchas se corre a
-     la derecha para no quedar debajo del texto; en angostas ocupa el fondo. */
-  .lol-hero__mapa {
-    position: absolute;
-    inset: 0 0 0 auto;
-    width: min(76%, 62rem);
-    height: 100%;
-    display: block;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 1.4s ease;
-  }
-  .lol-hero__mapa.is-on {
-    opacity: 1;
-  }
-  /* Oscurece la zona del texto para que el mapa nunca le quite contraste. */
-  .lol-hero__velo {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(46% 46% at 32% 34%, rgba(14, 14, 20, 0.92), rgba(14, 14, 20, 0.3) 62%, transparent 82%),
-      linear-gradient(to bottom, var(--app) 0%, rgba(14, 14, 20, 0.3) 22%, transparent 46%, rgba(14, 14, 20, 0.72) 92%, var(--app) 100%);
-  }
-  .lol-hero__inner {
-    position: relative;
-    width: 100%;
-  }
-  .lol-hero__copy {
-    max-width: 44rem;
-  }
+/* ═══════════ 2. GOLPES ═══════════ */
+/* Tres planos que corren a velocidades distintas: el arte del campeón atrás,
+   el número fantasma en medio y el texto al frente en sentido contrario. Eso
+   es lo que da la sensación de profundidad, no un solo fondo moviéndose. */
+.golpe{height:100vh;position:relative;overflow:hidden;display:grid;place-items:center;isolation:isolate}
+.golpe__bg{position:absolute;inset:-34% 0;background-size:cover;background-position:center;
+  will-change:transform;z-index:-3}
+/* Velo de color: viaja más rápido que el arte y le da atmósfera al plano medio */
+.golpe__velo{position:absolute;inset:-30% -14%;z-index:-2;pointer-events:none;
+  will-change:transform;
+  background:radial-gradient(46% 52% at 62% 44%,rgba(79,70,229,.22),transparent 68%)}
+.golpe::after{content:'';position:absolute;inset:0;z-index:-1;
+  background:
+    linear-gradient(180deg,rgba(7,7,11,.62) 0%,transparent 26%,transparent 70%,rgba(7,7,11,.88) 100%),
+    linear-gradient(90deg,rgba(7,7,11,.96) 0%,rgba(7,7,11,.9) 32%,rgba(7,7,11,.58) 72%,rgba(7,7,11,.88) 100%),
+    rgba(7,7,11,.3)}
+.golpe--r::after{
+  background:
+    linear-gradient(180deg,rgba(7,7,11,.62) 0%,transparent 26%,transparent 70%,rgba(7,7,11,.88) 100%),
+    linear-gradient(270deg,rgba(7,7,11,.96) 0%,rgba(7,7,11,.9) 32%,rgba(7,7,11,.58) 72%,rgba(7,7,11,.88) 100%),
+    rgba(7,7,11,.3)}
+/* Mancha oscura que acompaña al texto: es el plano más cercano */
+.golpe__sombra{position:absolute;inset:-16% -20%;z-index:-1;pointer-events:none;
+  will-change:transform;
+  background:radial-gradient(44% 48% at 26% 52%,rgba(7,7,11,.82),transparent 74%)}
+.golpe--r .golpe__sombra{background:radial-gradient(44% 48% at 74% 52%,rgba(7,7,11,.82),transparent 74%)}
+.golpe__txt{position:relative;padding-inline:clamp(20px,7vw,110px);width:100%;max-width:1500px;
+  will-change:transform}
+.golpe__n{font-family:var(--display);font-size:clamp(12px,1.2vw,15px);letter-spacing:.3em;
+  color:var(--ind-cl);margin-bottom:18px}
+.golpe__h{font-family:var(--display);font-size:clamp(38px,7vw,104px);line-height:1;
+  max-width:15ch;letter-spacing:-.01em}
+.golpe--r .golpe__txt{margin-left:auto;text-align:right}
+.golpe--r .golpe__h{margin-left:auto}
 
-  /* Reloj de la partida que corre en el mapa */
-  .lol-reloj {
-    position: absolute;
-    top: 2.2rem;
-    right: clamp(1.5rem, 5vw, 4rem);
-    z-index: 2;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.5rem 0.85rem;
-    border-radius: 12px;
-    background: rgba(28, 28, 38, 0.72);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--line);
-    font-size: 0.78rem;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .lol-reloj.is-on {
-    opacity: 1;
-    transform: none;
-  }
-  .lol-reloj b {
-    font-weight: 800;
-  }
-  .lol-reloj span {
-    color: var(--muted);
-  }
-  .lol-reloj i {
-    width: 6px;
-    height: 6px;
-    border-radius: 999px;
-    background: var(--pos);
-  }
+/* ═══════════════════════════════════════════════════════════════
+   3. RECORRIDO — la ventana clavada
+   ═══════════════════════════════════════════════════════════════ */
+.tour{position:relative}
+.tour__pages{height:660vh}
+.tour__stick{
+  position:sticky;top:0;height:100vh;overflow:clip;
+  display:grid;grid-template-columns:minmax(0,100%);grid-template-rows:1fr auto;
+  place-items:center;
+  background:var(--neg);
+  transition:background 1.4s var(--ease);
+}
+/* Dos beats van sobre índigo pleno: son el golpe de color de la página. */
+.tour__stick[data-tono="ind"]{background:var(--ind-fondo)}
 
-  /* Lo que la app va diciendo mientras corre la partida */
-  .lol-voz {
-    position: relative;
-    display: grid;
-    margin-top: 1.9rem;
-    min-height: 5.2rem;
-    max-width: 32rem;
-  }
-  .lol-voz__i {
-    grid-area: 1/1;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    padding: 0.85rem 1rem;
-    background: rgba(28, 28, 38, 0.74);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--line);
-    border-left: 2px solid var(--accent);
-    border-radius: 14px;
-    box-shadow: 0 24px 50px -30px rgba(0, 0, 0, 0.95);
-    opacity: 0;
-    transform: translateY(12px);
-    transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
-    pointer-events: none;
-  }
-  .lol-voz__i.is-on {
-    opacity: 1;
-    transform: none;
-  }
-  .lol-voz__i--urgente {
-    border-left-color: var(--neg);
-  }
-  .lol-voz__ico {
-    display: grid;
-    place-items: center;
-    width: 28px;
-    height: 28px;
-    flex: none;
-    border-radius: 9px;
-    background: var(--accent-soft);
-    color: var(--accent-3);
-    margin-top: 1px;
-  }
-  .lol-voz__i--urgente .lol-voz__ico {
-    background: rgba(251, 113, 133, 0.16);
-    color: var(--neg);
-  }
-  .lol-voz__ico svg {
-    width: 15px;
-    height: 15px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .lol-voz__t {
-    font-size: 0.86rem;
-    line-height: 1.45;
-    color: var(--text);
-  }
-  .lol-voz__t b {
-    font-weight: 800;
-  }
-  .lol-voz__min {
-    display: block;
-    margin-top: 0.2rem;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--faint);
-  }
+/* Palabra gigante: vive detrás de la ventana, que la parte a la mitad.
+   Las letras se reparten a lo ancho de la pantalla (justificadas), así una
+   palabra de tres letras asoma igual que una de ocho. */
+.tour__word{
+  position:absolute;top:50%;left:50%;z-index:1;
+  width:104vw;translate:-50% -50%;
+  display:flex;justify-content:space-between;
+  font-family:var(--display);font-size:clamp(88px,15.5vw,215px);line-height:.78;
+  color:rgba(255,255,255,.13);
+  opacity:0;pointer-events:none;will-change:transform,opacity;
+  transition:opacity .8s var(--ease);
+}
+.tour__word.on{opacity:1}
+.tour__word span{display:block}
+.tour__stick[data-tono="ind"] .tour__word{color:rgba(7,7,11,.34)}
 
-  /* La ventana de la app, ya en su propia sección */
-  .lol-vista .lol-mock {
-    margin-top: 2.6rem;
-    max-width: 62rem;
-    margin-inline: auto;
-  }
-  /* De frente: aquí la ventana es el tema, no un adorno del hero. */
-  .lol-vista .lol-win {
-    transform: none;
-  }
+/* Hilo fino que baja hasta la ventana, como el del sitio de referencia */
+.tour__hilo{
+  position:absolute;top:0;left:50%;width:1px;height:14vh;z-index:1;
+  transform-origin:top center;will-change:transform;
+  background:linear-gradient(rgba(255,255,255,.28),transparent);
+}
+.tour__stick[data-tono="ind"] .tour__hilo{background:linear-gradient(rgba(255,255,255,.34),transparent)}
 
-  .lol-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    margin-bottom: 1.75rem;
-  }
-  .lol-brand__icon {
-    border-radius: 15px;
-    box-shadow: 0 12px 32px -14px var(--accent-ring);
-  }
-  .lol-brand__name {
-    font-family: var(--display);
-    font-weight: 800;
-    font-size: 1.35rem;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
-  }
-  .lol-brand__sub {
-    color: var(--faint);
-    font-size: 0.85rem;
-    line-height: 1.2;
-  }
+.tour__mid{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;
+  gap:clamp(16px,2.4vh,30px);width:100%;min-width:0}
 
-  /* El tope lo manda la primera línea: más grande y "Tu coach de League," parte
-     en dos y deja un hueco feo antes del degradado. */
-  .lol-h1 {
-    font-size: clamp(2.4rem, 4.6vw, 3.6rem);
-    font-weight: 800;
-    line-height: 1.03;
-    margin: 0 0 1.35rem;
-  }
-  .lol-grad {
-    background: linear-gradient(105deg, var(--accent-3), var(--accent-2) 55%, var(--accent));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .lol-lead {
-    color: var(--muted);
-    font-size: 1.12rem;
-    line-height: 1.68;
-    max-width: 48ch;
-  }
+/* ── La ventana de la app ─────────────────────────────────── */
+.win{
+  position:relative;width:min(1010px,74vw);
+  /* El alto lo pone la captura que se esté viendo: las de la app cambiaron de
+     tamaño entre sesiones y forzar un aspecto único recortaría contenido. */
+  aspect-ratio:var(--aspecto,1.37);
+  transition:aspect-ratio .9s var(--ease),height .9s var(--ease),
+             transform 1.2s var(--ease),box-shadow 1s var(--ease);
+  background:var(--app);border:1px solid var(--ln);border-radius:16px;overflow:hidden;
+  box-shadow:0 60px 120px -50px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.04),
+             0 0 90px -40px rgba(99,102,241,.55);
+  transform-style:preserve-3d;
+  will-change:transform;
+}
+/* En pantalla apaisada manda el ALTO, no el ancho: si no, la captura más alta
+   (aspecto 1.37) se sale de la pantalla y se le corta la barra de título. */
+@media (orientation:landscape) and (min-width:901px){
+  .win{height:clamp(360px,67vh,760px);width:auto;max-width:90vw}
+}
 
-  .lol-cta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-    margin-top: 2rem;
-  }
-  .lol-cta--center {
-    justify-content: center;
-  }
-  .lol-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.85rem 1.6rem;
-    border-radius: 14px;
-    font-family: var(--body);
-    font-weight: 700;
-    font-size: 0.98rem;
-    transition: filter 0.16s ease, transform 0.16s ease, border-color 0.16s ease;
-  }
-  .lol-btn svg {
-    width: 18px;
-    height: 18px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .lol-btn--primary {
-    background: linear-gradient(135deg, var(--accent-2), var(--accent));
-    color: #fff;
-    box-shadow: 0 14px 30px -16px var(--accent-ring);
-  }
-  .lol-btn--primary:hover {
-    filter: brightness(1.12);
-    transform: translateY(-1px);
-  }
-  .lol-btn--primary.is-disabled {
-    background: var(--surface-2);
-    color: var(--muted);
-    border: 1px solid var(--line);
-    box-shadow: none;
+/* Las capturas se apilan y solo una está encendida. */
+.win__foto{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;
+  opacity:0;transform:scale(1.02);
+  transition:opacity .8s var(--ease),transform 1.1s var(--ease);
+}
+.win__foto.on{opacity:1;transform:none}
+.tour__stick[data-tono="ind"] .win{box-shadow:0 60px 120px -48px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.07)}
+/* ── Texto que se mueve bajo la ventana ───────────────────── */
+.tour__copy{position:relative;height:clamp(70px,9.5vh,96px);width:min(1000px,86vw);
+  display:grid;place-items:center}
+.tour__copy p{
+  grid-area:1/1;text-align:center;max-width:46ch;font-size:clamp(14px,1.5vw,20px);
+  line-height:1.5;color:rgba(255,255,255,.72);
+  opacity:0;filter:blur(10px);transform:translateY(24px);
+  transition:opacity .7s var(--ease),filter .7s var(--ease),transform .7s var(--ease);
+}
+.tour__copy p.on{opacity:1;filter:blur(0);transform:translateX(var(--dx,0))}
+.tour__copy p b{color:#fff;font-weight:800}
+
+/* ── Barra de pasos ───────────────────────────────────────── */
+.chips{position:relative;z-index:5;display:flex;align-items:center;gap:8px;
+  margin-bottom:clamp(14px,2.6vh,26px);padding-inline:16px;max-width:100%;min-width:0}
+.chips__in{display:flex;align-items:center;gap:2px;padding:6px;border-radius:999px;
+  background:rgba(255,255,255,.07);backdrop-filter:blur(14px);overflow-x:auto;
+  scrollbar-width:none;min-width:0}
+.chips__in::-webkit-scrollbar{display:none}
+.chips__in button{padding:8px 15px;border-radius:999px;font-size:12.5px;font-weight:700;
+  color:rgba(255,255,255,.45);white-space:nowrap;
+  transition:color .45s var(--ease),background .45s var(--ease)}
+.chips__in button.on{color:#07070B;background:#fff}
+.chips__skip{flex:none;padding:10px 18px;border-radius:999px;background:#fff;color:#07070B;
+  font-size:12.5px;font-weight:800;transition:transform .4s var(--ease)}
+.chips__skip:hover{transform:translateY(-2px)}
+
+/* ═══════════ 4. API KEY ═══════════ */
+/* El alto lo fija el JS según cuánto tenga que correr el riel. Este valor es
+   solo el respaldo por si el JS no llega a correr. */
+.key{height:100vh;position:relative;background:var(--neg-2)}
+.key__stick{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;
+  flex-direction:column;justify-content:center}
+.key__head{padding:0 clamp(20px,7vw,110px);margin-bottom:clamp(28px,5vh,58px)}
+.key__k{font-size:11px;font-weight:800;letter-spacing:.4em;text-transform:uppercase;color:var(--ind-cl)}
+.key__h{font-family:var(--display);font-size:clamp(30px,4.8vw,72px);line-height:1;margin-top:16px;
+  letter-spacing:-.01em}
+.key__sub{margin-top:16px;color:rgba(255,255,255,.55);max-width:46ch;font-size:15px}
+.key__rail{display:flex;gap:clamp(16px,2vw,30px);padding-inline:clamp(20px,7vw,110px);
+  will-change:transform}
+/* Cuando los cinco pasos caben de una (pantallas anchas) se reparten el ancho
+   y la sección deja de retener el scroll: no hay nada que correr. */
+.key__rail--fijo{justify-content:center}
+.key__rail--fijo .paso{flex:1 1 0;min-width:0;max-width:380px}
+.paso{flex:0 0 clamp(255px,25vw,360px);min-height:clamp(230px,32vh,310px);
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.025);
+  padding:clamp(22px,2.2vw,32px);display:flex;flex-direction:column}
+.paso__n{font-family:var(--display);font-size:clamp(46px,5vw,76px);line-height:.8;color:var(--ind);opacity:.85}
+.paso__t{font-family:var(--display);font-size:clamp(19px,1.6vw,25px);margin-top:22px;line-height:1.1}
+.paso__d{margin-top:14px;font-size:14px;color:rgba(255,255,255,.6);line-height:1.68}
+.paso__d code{font-family:ui-monospace,'SF Mono',monospace;font-size:.9em;
+  background:rgba(99,102,241,.16);color:var(--ind-cl);padding:.12em .4em}
+.paso a{margin-top:auto;padding-top:20px;font-size:12px;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ind-cl);display:inline-flex;gap:8px;align-items:center}
+.paso--fin{background:var(--ind-fondo);border-color:rgba(99,102,241,.5)}
+.paso--fin .paso__n{color:rgba(255,255,255,.42)}
+.paso--fin .paso__d{color:rgba(255,255,255,.8)}
+
+/* ═══════════ 5. DESCARGA ═══════════ */
+.dl{height:100vh;position:relative;display:grid;place-items:center;overflow:hidden;background:var(--neg)}
+.dl__mosaic{position:absolute;inset:-18% 0;display:grid;grid-template-columns:repeat(8,1fr);
+  opacity:.62;filter:saturate(.75);will-change:transform}
+.dl__mosaic i{background-size:cover;background-position:center top;aspect-ratio:308/560}
+.dl::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(78% 68% at 50% 50%,rgba(7,7,11,.8) 14%,rgba(7,7,11,.93) 58%,var(--neg) 100%)}
+.dl__in{position:relative;z-index:3;text-align:center;padding-inline:20px}
+.dl__h{font-family:var(--display);font-size:clamp(46px,9.4vw,152px);line-height:.94;letter-spacing:-.015em}
+.dl__h em{font-style:normal;display:block;margin-top:.22em;color:var(--ind-cl)}
+.dl__btn{display:inline-flex;align-items:center;gap:16px;margin-top:clamp(30px,4.4vw,54px);
+  padding:clamp(20px,2.1vw,28px) clamp(34px,4.4vw,62px);background:var(--bl);color:var(--neg);
+  font-family:var(--display);font-size:clamp(17px,1.85vw,27px);letter-spacing:.02em;
+  transition:transform .55s var(--ease),background .4s var(--ease),color .4s var(--ease),box-shadow .55s var(--ease)}
+.dl__btn:hover{transform:translateY(-4px) scale(1.02);background:var(--ind);color:#fff;
+  box-shadow:0 26px 70px -26px var(--ind)}
+.dl__btn svg{width:1em;height:1em;stroke:currentColor;stroke-width:2.4;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.dl__fine{margin-top:24px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.42)}
+.dl__legal{position:absolute;bottom:22px;left:0;right:0;z-index:3;text-align:center;
+  font-size:10.5px;color:rgba(255,255,255,.3);padding-inline:24px;line-height:1.6}
+
+/* ═══════════ Responsivo ═══════════ */
+@media(max-width:900px){
+  .hero__stick::before{background:radial-gradient(76% 34% at 50% 22%,rgba(7,7,11,.95) 0%,rgba(7,7,11,.7) 48%,transparent 82%)}
+  .hero__wrap{transform:translateY(-28vh)}
+  .voz{left:50%;translate:-50% 0;width:min(30rem,88vw);bottom:clamp(74px,11vh,110px)}
+  .golpe--r .golpe__txt{text-align:left;margin-left:0}
+  .golpe--r .golpe__h{margin-left:0}
+  .golpe::after{background:linear-gradient(180deg,rgba(7,7,11,.6),rgba(7,7,11,.9))}
+  .dl__mosaic{grid-template-columns:repeat(4,1fr)}
+  .key__rail{gap:14px}
+  .paso{flex:0 0 min(76vw,320px);min-height:auto}
+
+  /* El recorrido en vertical: la ventana se angosta y el menú lateral se va. */
+  .tour__mid{padding-top:2vh;gap:14px}
+  /* En vertical la ventana se hace alta: si no, el contenido no cabe y
+     la palabra del fondo no alcanza a asomar por los lados. */
+  .win{width:94vw;aspect-ratio:var(--aspecto,1.37);height:auto}
+  .tour__word{width:112vw;font-size:clamp(56px,19vw,128px)}
+  .tour__copy{height:auto;min-height:96px;padding-block:8px}
+  .chips{margin-bottom:14px;width:100%}
+  .chips__in{flex:1;min-width:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .rv{opacity:1;filter:none;transform:none}
+  .grain,.scrollhint i{animation:none}
+  .win{transition:none}
+}
+
+  /* El boton cuando la release todavia no esta publicada. */
+  .dl__btn--espera {
+    background: rgba(255, 255, 255, .08);
+    color: rgba(255, 255, 255, .62);
     cursor: not-allowed;
   }
-  .lol-btn--primary.is-disabled:hover {
-    filter: none;
+  .dl__btn--espera:hover {
     transform: none;
-  }
-  .lol-btn--ghost {
-    background: rgba(237, 237, 244, 0.05);
-    border: 1px solid var(--line);
-    color: var(--text);
-  }
-  .lol-btn--ghost:hover {
-    border-color: var(--accent-ring);
-  }
-
-  .lol-fine {
-    color: var(--faint);
-    font-size: 0.85rem;
-    margin-top: 0.95rem;
-  }
-
-  .lol-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.4rem;
-    list-style: none;
-    margin: 1.6rem 0 0;
-    padding: 0;
-    color: var(--muted);
-    font-size: 0.88rem;
-  }
-  .lol-badges li {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .lol-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 999px;
-    flex: none;
-  }
-  .lol-dot--pos {
-    background: var(--pos);
-    box-shadow: 0 0 9px color-mix(in srgb, var(--pos) 65%, transparent);
-  }
-  .lol-dot--accent {
-    background: var(--accent-3);
-    box-shadow: 0 0 9px var(--accent-ring);
-  }
-  .lol-dot--gold {
-    background: var(--gold);
-    box-shadow: 0 0 9px color-mix(in srgb, var(--gold) 60%, transparent);
-  }
-
-  /* ---------------------------------------------------------------- */
-  /* Mockup de la app                                                 */
-  /* ---------------------------------------------------------------- */
-  .lol-mock {
-    position: relative;
-    perspective: 1400px;
-  }
-  .lol-win {
-    background: var(--app);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    overflow: hidden;
-    box-shadow:
-      0 40px 90px -40px rgba(0, 0, 0, 0.9),
-      0 0 0 1px rgba(99, 102, 241, 0.08),
-      0 0 70px -30px var(--accent-ring);
-    transform: rotateY(-6deg) rotateX(2deg);
-  }
-  .lol-win__bar {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    padding: 0.65rem 0.9rem;
-    background: var(--surface);
-    border-bottom: 1px solid var(--line-soft);
-  }
-  .lol-win__dots {
-    display: inline-flex;
-    gap: 6px;
-  }
-  .lol-win__dots i {
-    width: 9px;
-    height: 9px;
-    border-radius: 999px;
-    background: var(--surface-3);
-  }
-  .lol-win__title {
-    font-family: var(--display);
-    font-weight: 800;
-    font-size: 0.8rem;
-    color: var(--faint);
-  }
-  .lol-win__body {
-    display: grid;
-    grid-template-columns: 8.5rem minmax(0, 1fr);
-    min-height: 22rem;
-  }
-
-  .lol-side {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: 0.85rem 0.6rem;
-    background: var(--surface);
-    border-right: 1px solid var(--line-soft);
-  }
-  .lol-side__item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.6rem;
-    border-radius: 10px;
-    font-size: 0.74rem;
-    font-weight: 600;
-    color: var(--faint);
-    white-space: nowrap;
-  }
-  .lol-side__item svg {
-    width: 14px;
-    height: 14px;
-    flex: none;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .lol-side__item.is-on {
-    background: var(--accent-soft);
-    color: var(--accent-3);
-  }
-  .lol-side__foot {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: auto;
-    padding-top: 0.8rem;
-    border-top: 1px solid var(--line-soft);
-  }
-  .lol-side__avatar {
-    width: 22px;
-    height: 22px;
-    border-radius: 999px;
-    background: linear-gradient(135deg, var(--accent-3), var(--accent));
-    flex: none;
-  }
-  .lol-side__who {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.25;
-    min-width: 0;
-  }
-  .lol-side__who b {
-    font-size: 0.72rem;
-    font-weight: 700;
-  }
-  .lol-side__who em {
-    font-style: normal;
-    font-size: 0.62rem;
-    color: var(--faint);
-  }
-
-  .lol-main {
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-    padding: 1rem 1.1rem;
-    min-width: 0;
-  }
-  .lol-main__head {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-  }
-  .lol-main__title {
-    font-family: var(--display);
-    font-weight: 800;
-    font-size: 1.02rem;
-  }
-  .lol-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-left: auto;
-    padding: 0.22rem 0.6rem;
-    border-radius: 999px;
-    background: var(--accent-soft);
-    color: var(--accent-3);
-    font-size: 0.66rem;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  .lol-pulse {
-    width: 6px;
-    height: 6px;
-    border-radius: 999px;
-    background: var(--accent-3);
-    animation: lol-pulse 1.8s ease-in-out infinite;
-  }
-  @keyframes lol-pulse {
-    0%,
-    100% {
-      opacity: 1;
-      box-shadow: 0 0 0 0 var(--accent-ring);
-    }
-    50% {
-      opacity: 0.55;
-      box-shadow: 0 0 0 5px transparent;
-    }
-  }
-
-  .lol-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--r-md);
-    padding: 0.8rem 0.9rem;
-  }
-  .lol-card--rec {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), var(--surface) 60%);
-    border-color: rgba(99, 102, 241, 0.28);
-  }
-  .lol-label {
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--faint);
-  }
-  .lol-champs {
-    display: flex;
-    gap: 0.55rem;
-  }
-  .lol-champs span {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.55rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--faint);
-  }
-  .lol-champs i {
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
-    background: linear-gradient(
-      140deg,
-      hsl(var(--h) 48% 42%),
-      hsl(var(--h) 40% 22%)
-    );
-    border: 1px solid var(--line);
-  }
-  .lol-rec {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.7rem;
-  }
-  .lol-rec__face {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    flex: none;
-    background: linear-gradient(140deg, var(--accent-3), var(--accent));
-    box-shadow: 0 8px 18px -10px var(--accent-ring);
-  }
-  .lol-rec__body {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    flex: 1;
-    min-width: 0;
-  }
-  .lol-rec__body b {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--display);
-    font-size: 0.88rem;
-    font-weight: 800;
-  }
-  .lol-rec__wr {
-    padding: 0.1rem 0.42rem;
-    border-radius: 999px;
-    background: rgba(52, 211, 153, 0.14);
-    color: var(--pos);
-    font-family: var(--body);
-    font-size: 0.55rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-  }
-  .lol-rec__body em {
-    font-style: normal;
-    font-size: 0.7rem;
-    line-height: 1.45;
-    color: var(--muted);
-  }
-  .lol-runes {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .lol-runes span {
-    width: 22px;
-    height: 22px;
-    border-radius: 999px;
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-  }
-  /* Círculos de runas: insinúan los iconos sin dibujar arte de Riot. */
-  .lol-runes .r1 {
-    background: radial-gradient(circle at 35% 30%, #f3c969, #8a5a12 70%);
-    border-color: rgba(233, 185, 73, 0.45);
-  }
-  .lol-runes .r2 {
-    background: radial-gradient(circle at 35% 30%, var(--accent-3), #2b2569 70%);
-    border-color: rgba(129, 140, 248, 0.4);
-  }
-  .lol-runes .r3 {
-    background: radial-gradient(circle at 35% 30%, #6fd6c0, #14483f 70%);
-    border-color: rgba(52, 211, 153, 0.35);
-  }
-  .lol-runes__btn {
-    width: auto !important;
-    height: auto !important;
-    margin-left: auto;
-    padding: 0.3rem 0.7rem !important;
-    border-radius: 9px !important;
-    background: linear-gradient(135deg, var(--accent-2), var(--accent)) !important;
-    border: none !important;
-    color: #fff;
-    font-size: 0.64rem;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .lol-toast {
-    position: absolute;
-    right: -0.5rem;
-    bottom: -1.6rem;
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    max-width: 22rem;
-    padding: 0.7rem 0.95rem;
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    box-shadow: 0 24px 50px -26px rgba(0, 0, 0, 0.95);
-  }
-  .lol-toast__ico {
-    display: grid;
-    place-items: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 9px;
-    background: var(--accent-soft);
-    color: var(--accent-3);
-    flex: none;
-  }
-  .lol-toast__ico svg {
-    width: 15px;
-    height: 15px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .lol-toast__txt {
-    font-size: 0.79rem;
-    color: var(--muted);
-    line-height: 1.4;
-  }
-
-  /* ---------------------------------------------------------------- */
-  /* Secciones                                                        */
-  /* ---------------------------------------------------------------- */
-  .lol-sec {
-    padding-block: 5rem;
-    border-top: 1px solid var(--line-soft);
-  }
-  .lol-sec--alt {
-    background: linear-gradient(180deg, var(--surface) 0%, var(--app) 100%);
-  }
-  .lol-kicker {
-    font-family: var(--body);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--accent-3);
-  }
-  .lol-h2 {
-    font-size: clamp(1.85rem, 3.5vw, 2.75rem);
-    font-weight: 800;
-    line-height: 1.12;
-    margin: 0.7rem 0 0;
-  }
-  .lol-sub {
-    color: var(--muted);
-    font-size: 1.05rem;
-    line-height: 1.65;
-    max-width: 56ch;
-    margin-top: 0.9rem;
-  }
-  .lol-sub--center {
-    margin-inline: auto;
-  }
-
-  .lol-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.1rem;
-    margin-top: 2.8rem;
-  }
-  .lol-feat {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--r-md);
-    padding: 1.5rem 1.45rem;
-    transition: border-color 0.16s ease, transform 0.16s ease;
-  }
-  .lol-feat:hover {
-    border-color: rgba(99, 102, 241, 0.35);
-    transform: translateY(-2px);
-  }
-  .lol-feat__ico {
-    display: grid;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 11px;
-    background: var(--accent-soft);
-    color: var(--accent-3);
-    margin-bottom: 1rem;
-  }
-  .lol-feat__ico svg {
-    width: 19px;
-    height: 19px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .lol-feat__t {
-    font-size: 1.08rem;
-    font-weight: 700;
-  }
-  .lol-feat__d {
-    color: var(--muted);
-    font-size: 0.93rem;
-    line-height: 1.62;
-    margin-top: 0.5rem;
-  }
-
-  /* Pasos de instalación */
-  .lol-steps {
-    list-style: none;
-    counter-reset: none;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.1rem;
-    margin: 2.8rem 0 0;
-    padding: 0;
-  }
-  .lol-steps li {
-    display: flex;
-    gap: 0.9rem;
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-    border-radius: var(--r-md);
-    padding: 1.4rem;
-  }
-  .lol-steps__n {
-    display: grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 999px;
-    flex: none;
-    background: linear-gradient(135deg, var(--accent-2), var(--accent));
-    color: #fff;
-    font-family: var(--display);
-    font-weight: 800;
-    font-size: 0.88rem;
-  }
-  .lol-steps h3 {
-    font-size: 1.02rem;
-    font-weight: 700;
-  }
-  .lol-steps p {
-    color: var(--muted);
-    font-size: 0.92rem;
-    line-height: 1.62;
-    margin-top: 0.45rem;
-  }
-  .lol-steps strong {
-    color: var(--text);
-  }
-  .lol-steps a {
-    color: var(--accent-3);
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  .lol-steps a:hover {
-    text-decoration: underline;
-  }
-
-  /* API key */
-  .lol-keygrid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-    gap: 2.5rem;
-    margin-top: 2.8rem;
-    align-items: start;
-  }
-  .lol-key {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-  }
-  .lol-key li {
-    display: flex;
-    gap: 1.1rem;
-    padding-bottom: 1.6rem;
-  }
-  .lol-key li:last-child {
-    padding-bottom: 0;
-  }
-  /* La línea que une los pasos: se dibuja bajo el número, no en el último. */
-  .lol-key__n {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    flex: none;
-    border-radius: 12px;
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-    color: var(--accent-3);
-    font-family: var(--display);
-    font-weight: 800;
-    font-size: 0.82rem;
-  }
-  .lol-key li:not(:last-child) .lol-key__n::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    width: 1px;
-    height: calc(1.6rem + 2px);
-    translate: -50% 0;
-    background: linear-gradient(180deg, var(--line), transparent);
-  }
-  .lol-key__c {
-    padding-top: 0.35rem;
-    min-width: 0;
-  }
-  .lol-key__c h3 {
-    font-size: 1.06rem;
-    font-weight: 700;
-  }
-  .lol-key__c p {
-    color: var(--muted);
-    font-size: 0.95rem;
-    line-height: 1.65;
-    margin-top: 0.4rem;
-  }
-  .lol-key__link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 0.8rem;
-    padding: 0.5rem 1rem;
-    border-radius: 11px;
-    background: var(--accent-soft);
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    color: var(--accent-3);
-    font-size: 0.86rem;
-    font-weight: 700;
-    transition: background 0.16s ease;
-  }
-  .lol-key__link:hover {
-    background: rgba(99, 102, 241, 0.22);
-  }
-
-  .lol-aside {
-    display: flex;
-    flex-direction: column;
-    gap: 0.9rem;
-    position: sticky;
-    top: 6.5rem;
-  }
-  .lol-note {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--accent);
-    border-radius: var(--r-sm);
-    padding: 1.1rem 1.2rem;
-  }
-  .lol-note--safe {
-    border-left-color: var(--pos);
-  }
-  .lol-note--warn {
-    border-left-color: var(--warn);
-  }
-  .lol-note__t {
-    display: block;
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-  }
-  .lol-note p {
-    color: var(--muted);
-    font-size: 0.88rem;
-    line-height: 1.6;
-  }
-  .lol-note strong {
-    color: var(--text);
-  }
-  .lol-code {
-    display: block;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 0.82rem;
-    color: var(--accent-3);
-    background: var(--app);
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    padding: 0.6rem 0.75rem;
-    margin-bottom: 0.7rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .lol-code__mask {
-    color: var(--faint);
-  }
-  /* Token corto dentro de un párrafo (AIza). Va en mono para que la I mayúscula
-     no se lea como una ele. */
-  .lol-tk {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 0.9em;
-    padding: 0.1em 0.35em;
-    border-radius: 6px;
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-    color: var(--accent-3);
-  }
-
-  /* FAQ */
-  .lol-faq {
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-    margin-top: 2.5rem;
-    max-width: 62rem;
-  }
-  .lol-q {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--r-sm);
-    overflow: hidden;
-  }
-  .lol-q[open] {
-    border-color: rgba(99, 102, 241, 0.3);
-  }
-  .lol-q summary {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.05rem 1.25rem;
-    cursor: pointer;
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 1rem;
-    list-style: none;
-  }
-  .lol-q summary::-webkit-details-marker {
-    display: none;
-  }
-  .lol-q__mark {
-    position: relative;
-    width: 13px;
-    height: 13px;
-    margin-left: auto;
-    flex: none;
-  }
-  .lol-q__mark::before,
-  .lol-q__mark::after {
-    content: '';
-    position: absolute;
-    inset: 50% 0 auto 0;
-    height: 2px;
-    border-radius: 2px;
-    background: var(--accent-3);
-    translate: 0 -50%;
-    transition: rotate 0.2s ease;
-  }
-  .lol-q__mark::after {
-    rotate: 90deg;
-  }
-  .lol-q[open] .lol-q__mark::after {
-    rotate: 0deg;
-  }
-  .lol-q p {
-    color: var(--muted);
-    font-size: 0.95rem;
-    line-height: 1.68;
-    padding: 0 1.25rem 1.25rem;
-    max-width: 72ch;
-  }
-
-  /* Cierre */
-  .lol-end {
-    padding-block: 5.5rem 6rem;
-    border-top: 1px solid var(--line-soft);
-    background:
-      radial-gradient(60% 100% at 50% 100%, rgba(99, 102, 241, 0.16), transparent 70%),
-      var(--app);
-  }
-  .lol-end__inner {
-    text-align: center;
-  }
-  .lol-end__icon {
-    border-radius: 18px;
-    margin-bottom: 1.2rem;
-    box-shadow: 0 16px 40px -18px var(--accent-ring);
-  }
-
-  /* ---------------------------------------------------------------- */
-  /* Responsivo                                                       */
-  /* ---------------------------------------------------------------- */
-  @media (max-width: 68rem) {
-    .lol-hero {
-      min-height: min(88vh, 50rem);
-    }
-    .lol-win {
-      transform: none;
-    }
-    .lol-grid,
-    .lol-steps {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .lol-keygrid {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 2rem;
-    }
-    .lol-aside {
-      position: static;
-    }
-  }
-
-  @media (max-width: 46rem) {
-    .lol-hero {
-      min-height: 0;
-      padding-block: 2.5rem 0;
-    }
-    /* En celular el mapa se lleva una franja abajo y el texto la de arriba:
-       si se cruzan, ni se lee el copy ni se entiende el mapa. */
-    .lol-hero {
-      padding-bottom: 70vw;
-    }
-    .lol-hero__mapa {
-      inset: auto 0 0 0;
-      width: 100%;
-      height: 78vw;
-    }
-    .lol-reloj {
-      display: none;
-    }
-    .lol-hero__velo {
-      background: linear-gradient(
-        to bottom,
-        var(--app) 0%,
-        var(--app) 46%,
-        rgba(14, 14, 20, 0.55) 60%,
-        transparent 78%,
-        rgba(14, 14, 20, 0.6) 97%,
-        var(--app) 100%
-      );
-    }
-    .lol-voz {
-      min-height: 6.4rem;
-    }
-    .lol-reloj {
-      top: 1.2rem;
-      font-size: 0.72rem;
-    }
-    .lol-sec {
-      padding-block: 3.5rem;
-    }
-    .lol-grid,
-    .lol-steps {
-      grid-template-columns: minmax(0, 1fr);
-    }
-    .lol-lead {
-      font-size: 1.02rem;
-    }
-    .lol-cta .lol-btn {
-      flex: 1 1 100%;
-      justify-content: center;
-    }
-    /* El overlay flotante no cabe junto a la ventana en móvil */
-    .lol-toast {
-      position: static;
-      max-width: none;
-      margin-top: 1rem;
-    }
-    .lol-win__body {
-      grid-template-columns: 6.5rem minmax(0, 1fr);
-      min-height: 0;
-    }
-    .lol-side__item {
-      font-size: 0.66rem;
-      padding: 0.45rem 0.4rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .lol-voz__i,
-    .lol-reloj,
-    .lol-hero__mapa {
-      transition: none;
-    }
-    .lol-pulse {
-      animation: none;
-    }
+    background: rgba(255, 255, 255, .08);
+    color: rgba(255, 255, 255, .62);
+    box-shadow: none;
   }
 </style>
 
 <script>
-  // La Grieta del hero. Vive en su propio módulo porque arrastra three.js:
-  // así solo se descarga en esta página y no en el resto del sitio.
-  import { montarGrieta } from '../lib/lolsito-grieta';
-
-  let apagar: (() => void) | null = null;
-
-  async function init() {
-    apagar?.();
-    apagar = null;
-    const canvas = document.querySelector<HTMLCanvasElement>('canvas[data-grieta]');
-    if (!canvas) return;
-    apagar = await montarGrieta({
-      canvas,
-      voz: document.querySelector<HTMLElement>('[data-grieta-voz]'),
-      reloj: document.querySelector<HTMLElement>('[data-grieta-reloj]'),
-      minuto: document.querySelector<HTMLElement>('[data-grieta-min]'),
-    });
-  }
-
-  document.addEventListener('astro:page-load', init);
-  document.addEventListener('astro:before-swap', () => {
-    apagar?.();
-    apagar = null;
-  });
+  // Todo el movimiento de la pagina (portada 3D, recorrido, riel y parallax)
+  // vive en su propio modulo: asi three.js solo se descarga aqui.
+  import '../lib/lolsito-landing';
 </script>

@@ -13,3 +13,5 @@ Thumbs.db
 # logs
 *.log
 out/
+# archivos apartados a mano, no forman parte del sitio
+_descartados/
