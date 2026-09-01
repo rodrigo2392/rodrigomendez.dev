@@ -1,0 +1,583 @@
+---
+/**
+ * Sitio oficial de Trama, la plataforma de administración y ventas para
+ * negocios de manufactura y venta de producto con variantes (talla, color).
+ *
+ * Esta página existe por dos razones:
+ *
+ * 1. Es la ficha de producto pública de la plataforma. Programas de apoyo a
+ *    pymes (SEDECO Jalisco entre otros) piden como requisito el nombre y la
+ *    página web oficial de la herramienta digital que se va a implementar,
+ *    más la acreditación de quien la implementa. Aquí queda declarado que el
+ *    fabricante y el implementador son la misma parte.
+ *
+ * 2. Es a donde se manda a un prospecto que ya vio la cotización y quiere
+ *    ver qué es Trama antes de firmar.
+ *
+ * Usa BaseLayout (con nav y footer del sitio) a propósito: aquí sí conviene
+ * que se vea que la plataforma vive dentro del trabajo de una persona real
+ * con blog, proyectos y demos, porque eso es justo lo que se está acreditando.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { AUTHOR, SITE, WHATSAPP, waLink } from '../consts';
+
+const waTrama = waLink('Hola, vi Trama y quiero saber si le sirve a mi negocio.');
+
+const MODULOS = [
+  {
+    id: 'inventario',
+    nombre: 'Inventario por variante',
+    lead: 'Una sola existencia para todos tus canales.',
+    puntos: [
+      'Control por talla, color y ubicación en almacén',
+      'Descuenta igual si la venta entra por la tienda, por WhatsApp o en mostrador',
+      'Alertas de mínimos y de producto detenido',
+      'Historial de movimientos con responsable y fecha',
+    ],
+  },
+  {
+    id: 'ventas',
+    nombre: 'Ventas y punto de venta',
+    lead: 'El pedido y el cobro en un mismo lugar.',
+    puntos: [
+      'Catálogo en línea con carrito y cobro con tarjeta',
+      'Punto de venta para mostrador, con turnos y corte de caja',
+      'Listas de precio de menudeo y mayoreo por volumen',
+      'Nota de venta, guía de envío y seguimiento de entrega',
+    ],
+  },
+  {
+    id: 'produccion',
+    nombre: 'Producción y maquila',
+    lead: 'Para quien fabrica con talleres externos.',
+    puntos: [
+      'Órdenes de fabricación por lote y por taller',
+      'Entrega de insumos y recepción de producto terminado',
+      'Cuenta por pagar de cada maquilador',
+      'Discrepancias entre lo ordenado y lo entregado, a la vista',
+    ],
+  },
+  {
+    id: 'costeo',
+    nombre: 'Costeo y rentabilidad',
+    lead: 'Saber cuánto cuesta cada pieza, de verdad.',
+    puntos: [
+      'Costo por pieza con materiales, mano de obra e indirectos',
+      'Margen real por producto, no estimado',
+      'Comparativo entre costo planeado y costo final',
+      'Rotación y capital detenido en inventario',
+    ],
+  },
+  {
+    id: 'clientes',
+    nombre: 'Clientes y seguimiento',
+    lead: 'La base de datos que hoy vive en el celular.',
+    puntos: [
+      'Historial de compras por cliente',
+      'Tipos de cliente con su propia lista de precios',
+      'Cupones y descuentos por campaña',
+      'Prospectos con seguimiento hasta el cierre',
+    ],
+  },
+  {
+    id: 'facturacion',
+    nombre: 'Facturación y reportes',
+    lead: 'CFDI desde el mismo pedido.',
+    puntos: [
+      'Timbrado de CFDI 4.0, cancelaciones y complemento de pago',
+      'Registro de ingresos y egresos con categorías',
+      'Reportes de venta por periodo, canal y categoría',
+      'Exportación a Excel y PDF para el contador',
+    ],
+  },
+];
+
+const DIFERENCIA = [
+  {
+    titulo: 'Nace del piso, no del catálogo',
+    texto:
+      'Antes de configurar nada se levanta el proceso real del negocio: quién hace cada cosa, cuánto tarda y en qué lo lleva hoy. La plataforma se acomoda a eso, no al revés.',
+  },
+  {
+    titulo: 'La variante es el centro, no un extra',
+    texto:
+      'Quien vende ropa, calzado o mueble no vende un producto: vende una talla y un color. Los sistemas genéricos tratan eso como un campo más, y por eso el control termina en un Excel aparte.',
+  },
+  {
+    titulo: 'Capacitación pegada al arranque',
+    texto:
+      'Cada módulo se capacita el día que entra en operación, no meses antes. Con manual escrito y videos cortos que se quedan del negocio.',
+  },
+  {
+    titulo: 'Trato directo con quien la construye',
+    texto:
+      'No hay mesa de ayuda ni ticket que escala tres niveles. Escribes y contesta la persona que escribió el código.',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Trama',
+  applicationCategory: 'BusinessApplication',
+  applicationSubCategory: 'ERP',
+  operatingSystem: 'Web',
+  url: `${SITE.url}/trama`,
+  inLanguage: 'es-MX',
+  description:
+    'Plataforma de administración y ventas para negocios que fabrican y venden producto con variantes: inventario por talla y color, punto de venta, producción con talleres externos, costeo real y facturación CFDI.',
+  author: {
+    '@type': 'Person',
+    name: AUTHOR.name,
+    url: SITE.url,
+  },
+  publisher: {
+    '@type': 'Person',
+    name: AUTHOR.name,
+    url: SITE.url,
+  },
+  offers: {
+    '@type': 'Offer',
+    priceCurrency: 'MXN',
+    category: 'Licencia de uso anual',
+    availability: 'https://schema.org/InStock',
+  },
+};
+---
+
+<BaseLayout
+  title="Trama — Plataforma de administración y ventas"
+  description="Trama es una plataforma de administración y ventas para negocios que fabrican y venden producto con variantes. Inventario por talla y color, punto de venta, producción con talleres externos, costeo real y facturación CFDI."
+  jsonLd={jsonLd}
+>
+  <!-- ── Hero ───────────────────────────────────────────────────────── -->
+  <section class="container-site hero">
+    <p class="kicker">plataforma de administración y ventas</p>
+    <h1 class="hero__title">
+      Trama
+    </h1>
+    <p class="hero__tag">
+      Un solo inventario para todo lo que vendes,
+      <span class="hero__accent">aunque lo fabriques por fuera.</span>
+    </p>
+    <p class="hero__lead">
+      Hecha para negocios que venden producto con variantes: talla, color, modelo. Reúne
+      inventario, ventas, producción con talleres externos, costeo real y facturación en
+      un mismo lugar, para que dejen de vivir en cuatro archivos distintos.
+    </p>
+
+    <div class="hero__row">
+      <a class="btn-accent" href={waTrama}>
+        Ver si le sirve a tu negocio <span aria-hidden="true">→</span>
+      </a>
+      <a class="btn-outline" href="#modulos">Ver los módulos</a>
+    </div>
+
+    <ul class="hero__marks">
+      <li>Desarrollada y operada en Guadalajara</li>
+      <li>Implementación y capacitación incluidas</li>
+      <li>Tus datos son tuyos y exportables</li>
+    </ul>
+  </section>
+
+  <!-- ── Para quién ─────────────────────────────────────────────────── -->
+  <section class="container-site quien">
+    <div class="quien__box">
+      <p class="kicker">para quién es</p>
+      <h2 class="sec__title">Si tu producto tiene tallas o colores, esto es para ti</h2>
+      <p class="sec__lead">
+        Marcas de ropa, calzado, accesorios, mueble y todo negocio que manda a fabricar
+        por lote y luego vende por varios canales al mismo tiempo. Ahí es donde el
+        inventario se descuadra, se niegan ventas de producto que sí había y nadie sabe
+        cuánto cuesta realmente cada pieza.
+      </p>
+      <ul class="quien__lista">
+        <li>Vendes en tienda en línea, redes, WhatsApp y mostrador, y las existencias no se hablan entre sí.</li>
+        <li>Mandas a fabricar con talleres externos y el control va por mensajes y papel.</li>
+        <li>Manejas precio de menudeo y de mayoreo, y el de mayoreo se calcula a mano.</li>
+        <li>Facturas por fuera, en otro sistema, después de que ya se hizo la venta.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── Módulos ────────────────────────────────────────────────────── -->
+  <section class="container-site modulos" id="modulos">
+    <header class="sec__head">
+      <p class="kicker">módulos</p>
+      <h2 class="sec__title">Seis módulos que trabajan sobre los mismos datos</h2>
+      <p class="sec__lead">
+        No son sistemas separados que después hay que conectar. Una venta descuenta el
+        inventario, alimenta el costeo y deja lista la factura en el mismo movimiento.
+      </p>
+    </header>
+
+    <div class="modulos__grid">
+      {
+        MODULOS.map((m) => (
+          <article class="mod reveal" id={m.id}>
+            <h3 class="mod__name">{m.nombre}</h3>
+            <p class="mod__lead">{m.lead}</p>
+            <ul class="mod__list">
+              {m.puntos.map((p) => (
+                <li>{p}</li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ── Diferencia ─────────────────────────────────────────────────── -->
+  <section class="container-site dif">
+    <header class="sec__head">
+      <p class="kicker">en qué es distinta</p>
+      <h2 class="sec__title">La mayoría de los sistemas se abandonan a los tres meses</h2>
+      <p class="sec__lead">
+        Se instalan, nadie los entiende y el equipo regresa al cuaderno. Trama está armada
+        alrededor de ese problema, no alrededor de la lista de funciones.
+      </p>
+    </header>
+    <div class="dif__grid">
+      {
+        DIFERENCIA.map((d) => (
+          <article class="dcard reveal">
+            <h3 class="dcard__title">{d.titulo}</h3>
+            <p class="dcard__text">{d.texto}</p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ── Ficha técnica y acreditación ───────────────────────────────── -->
+  <section class="container-site ficha" id="ficha">
+    <header class="sec__head">
+      <p class="kicker">ficha de la plataforma</p>
+      <h2 class="sec__title">Datos oficiales</h2>
+      <p class="sec__lead">
+        Para procesos de compra, licitaciones y programas de apoyo a pymes que requieren
+        identificar la herramienta digital y a su implementador.
+      </p>
+    </header>
+
+    <dl class="ficha__tabla">
+      <div class="ficha__row">
+        <dt>Nombre de la plataforma</dt>
+        <dd>Trama</dd>
+      </div>
+      <div class="ficha__row">
+        <dt>Sitio oficial</dt>
+        <dd><a href={`${SITE.url}/trama`}>rodrigomendez.dev/trama</a></dd>
+      </div>
+      <div class="ficha__row">
+        <dt>Categoría</dt>
+        <dd>Planeación de recursos empresariales (ERP) con comercio electrónico y punto de venta</dd>
+      </div>
+      <div class="ficha__row">
+        <dt>Modalidad</dt>
+        <dd>Plataforma web. Licencia de uso anual con alojamiento, respaldos y soporte incluidos</dd>
+      </div>
+      <div class="ficha__row">
+        <dt>Fabricante y titular</dt>
+        <dd>{AUTHOR.name}, {AUTHOR.location}</dd>
+      </div>
+      <div class="ficha__row">
+        <dt>Implementador autorizado</dt>
+        <dd>
+          {AUTHOR.name}. El desarrollo, la implementación y la capacitación los realiza
+          directamente el fabricante, sin distribuidores ni terceros
+        </dd>
+      </div>
+      <div class="ficha__row">
+        <dt>Implementación</dt>
+        <dd>Obligatoria y siempre incluida. Levantamiento de procesos, configuración, migración de datos, capacitación y puesta en marcha asistida</dd>
+      </div>
+      <div class="ficha__row">
+        <dt>Contacto</dt>
+        <dd><a href={`mailto:${AUTHOR.email}`}>{AUTHOR.email}</a> · {WHATSAPP.display}</dd>
+      </div>
+    </dl>
+
+    <p class="ficha__nota">
+      Se emite carta de acreditación del fabricante, constancia de situación fiscal y
+      cotizaciones separadas de herramienta e implementación a solicitud del cliente o de
+      la instancia evaluadora.
+    </p>
+  </section>
+
+  <!-- ── Cierre ─────────────────────────────────────────────────────── -->
+  <section class="container-site cierre">
+    <div class="cierre__box">
+      <h2 class="cierre__title">Cuéntame cómo llevas hoy tu inventario</h2>
+      <p class="cierre__lead">
+        Con eso te digo en una llamada si Trama te resuelve o no. Si lo que necesitas es
+        otra cosa, también te lo digo: no me sirve venderte algo que vas a dejar de usar.
+      </p>
+      <a class="btn-accent cierre__cta" href={waTrama}>
+        Escríbeme por WhatsApp <span aria-hidden="true">→</span>
+      </a>
+      <p class="cierre__num">{WHATSAPP.display}</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ── Bloques compartidos ─────────────────────────────────────────── */
+  .sec__head {
+    max-width: 60ch;
+  }
+  .sec__title {
+    font-size: clamp(1.9rem, 4vw, 2.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0.5rem 0 1rem;
+  }
+  .sec__lead {
+    color: var(--color-muted);
+    font-size: 1.1rem;
+    max-width: 58ch;
+  }
+
+  /* ── Hero ────────────────────────────────────────────────────────── */
+  .hero {
+    padding-block: clamp(2.5rem, 7vw, 5rem) 3rem;
+  }
+  .hero__title {
+    font-family: var(--font-mono);
+    font-size: clamp(3rem, 9vw, 5.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin: 0.6rem 0 0.9rem;
+  }
+  .hero__tag {
+    font-size: clamp(1.5rem, 3.6vw, 2.4rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    max-width: 22ch;
+    margin: 0 0 1.3rem;
+  }
+  .hero__accent {
+    color: var(--color-accent);
+  }
+  .hero__lead {
+    color: var(--color-muted);
+    font-size: clamp(1.02rem, 1.8vw, 1.22rem);
+    max-width: 58ch;
+  }
+  .hero__row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .hero__marks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.6rem;
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--color-faint);
+  }
+  .hero__marks li::before {
+    content: '· ';
+    color: var(--color-accent);
+  }
+
+  /* ── Para quién ──────────────────────────────────────────────────── */
+  .quien {
+    padding-block: 2rem;
+  }
+  .quien__box {
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    background: var(--color-surface);
+    padding: clamp(1.5rem, 4vw, 2.6rem);
+  }
+  .quien__lista {
+    margin: 1.6rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.75rem;
+    max-width: 70ch;
+  }
+  .quien__lista li {
+    position: relative;
+    padding-left: 1.5rem;
+    color: var(--color-muted);
+  }
+  .quien__lista li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+  }
+
+  /* ── Módulos ─────────────────────────────────────────────────────── */
+  .modulos {
+    padding-block: clamp(3rem, 7vw, 5rem) 2rem;
+  }
+  .modulos__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+    gap: 1.1rem;
+    margin-top: 2.4rem;
+  }
+  .mod {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface);
+    padding: 1.5rem 1.4rem 1.6rem;
+    scroll-margin-top: 6rem;
+  }
+  .mod__name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .mod__lead {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    margin: 0.45rem 0 1.1rem;
+  }
+  .mod__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .mod__list li {
+    position: relative;
+    padding-left: 1.1rem;
+    font-size: 0.95rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+  }
+  .mod__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6rem;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-faint);
+  }
+
+  /* ── Diferencia ──────────────────────────────────────────────────── */
+  .dif {
+    padding-block: clamp(3rem, 7vw, 5rem) 2rem;
+  }
+  .dif__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 1.1rem;
+    margin-top: 2.4rem;
+  }
+  .dcard {
+    border-top: 2px solid var(--color-accent);
+    background: var(--color-surface-2);
+    padding: 1.4rem 1.3rem 1.5rem;
+    border-radius: 0 0 10px 10px;
+  }
+  .dcard__title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.01em;
+  }
+  .dcard__text {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── Ficha ───────────────────────────────────────────────────────── */
+  .ficha {
+    padding-block: clamp(3rem, 7vw, 5rem) 2rem;
+  }
+  .ficha__tabla {
+    margin: 2.2rem 0 0;
+    border-top: 1px solid var(--color-border);
+  }
+  .ficha__row {
+    display: grid;
+    grid-template-columns: 15rem 1fr;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .ficha__row dt {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+    padding-top: 0.15rem;
+  }
+  .ficha__row dd {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+  .ficha__row dd a {
+    color: var(--color-accent);
+  }
+  .ficha__nota {
+    margin-top: 1.4rem;
+    font-size: 0.9rem;
+    color: var(--color-faint);
+    max-width: 70ch;
+  }
+  @media (max-width: 44rem) {
+    .ficha__row {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+  }
+
+  /* ── Cierre ──────────────────────────────────────────────────────── */
+  .cierre {
+    padding-block: clamp(3rem, 7vw, 5rem);
+  }
+  .cierre__box {
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    background: var(--color-surface);
+    padding: clamp(2rem, 5vw, 3.2rem);
+    text-align: center;
+  }
+  .cierre__title {
+    font-size: clamp(1.7rem, 3.6vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0 0 0.9rem;
+  }
+  .cierre__lead {
+    color: var(--color-muted);
+    max-width: 52ch;
+    margin: 0 auto 1.8rem;
+    font-size: 1.05rem;
+  }
+  .cierre__num {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-faint);
+    margin: 1.1rem 0 0;
+  }
+</style>
