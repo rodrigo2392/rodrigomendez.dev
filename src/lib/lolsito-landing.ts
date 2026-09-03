@@ -379,13 +379,15 @@ addEventListener('resize', () => {
 }, {passive:true});
 
 /* ═══════════════════════════════════════════════════════════════
-   RECORRIDO: seis pantallas de la app, una por cada 100vh
+   RECORRIDO: siete pantallas de la app, una por cada 100vh
    ═══════════════════════════════════════════════════════════════ */
 const BEATS = [
   {tono:'neg', tilt:[ 1.4, -3.2], aspecto:1.370},  // Meta juego
   {tono:'neg', tilt:[ 1.0,  3.0], aspecto:1.557},  // Draft de IA
   {tono:'ind', tilt:[ 2.0, -1.4], aspecto:1.557},  // Coach en vivo
   {tono:'neg', tilt:[-1.6, -2.6], aspecto:1.370},  // Análisis
+  {tono:'ind', tilt:[ 1.6,  2.6], aspecto:1.697},  // Coach Q&A
+  {tono:'neg', tilt:[-1.2, -2.8], aspecto:1.697},  // Destilteo
   {tono:'ind', tilt:[ 0.8,  2.2], aspecto:1.370},  // Configuración
 ];
 

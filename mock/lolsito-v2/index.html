@@ -169,7 +169,7 @@ main{position:relative;z-index:10}
    3. RECORRIDO — la ventana clavada
    ═══════════════════════════════════════════════════════════════ */
 .tour{position:relative}
-.tour__pages{height:660vh}
+.tour__pages{height:884vh}
 .tour__stick{
   position:sticky;top:0;height:100vh;overflow:clip;
   display:grid;grid-template-columns:minmax(0,100%);grid-template-rows:1fr auto;
@@ -434,7 +434,9 @@ main{position:relative;z-index:10}
       <div class="tour__word" data-w="1">DRAFT</div>
       <div class="tour__word" data-w="2">VOZ</div>
       <div class="tour__word" data-w="3">ANÁLISIS</div>
-      <div class="tour__word" data-w="4">LLAVE</div>
+      <div class="tour__word" data-w="4">DUDAS</div>
+      <div class="tour__word" data-w="5">CALMA</div>
+      <div class="tour__word" data-w="6">LLAVE</div>
 
       <div class="tour__mid">
         <div class="win" id="win">
@@ -444,7 +446,9 @@ main{position:relative;z-index:10}
           <img class="win__foto"    data-f="1" src="capturas/draft-de-ia.webp"  alt="Lolsito recomendando a quién escoger en la selección de campeón" width="1294" height="831" loading="lazy" />
           <img class="win__foto"    data-f="2" src="capturas/coach-en-vivo.webp" alt="Lolsito narrando lo que pasa en la partida" width="1294" height="831" loading="lazy" />
           <img class="win__foto"    data-f="3" src="capturas/analisis.webp"     alt="Lolsito analizando la partida terminada" width="1410" height="1029" loading="lazy" />
-          <img class="win__foto"    data-f="4" src="capturas/configuracion.webp" alt="La configuración de Lolsito con el campo de la llave de Gemini" width="1410" height="1029" loading="lazy" />
+          <img class="win__foto"    data-f="4" src="capturas/coach-qa.webp"     alt="Lolsito respondiendo dudas del parche en el chat del coach" width="1410" height="831" loading="lazy" />
+          <img class="win__foto"    data-f="5" src="capturas/destilteo.webp"    alt="Los ejercicios de relajación de Lolsito para despejarse entre partidas" width="1410" height="831" loading="lazy" />
+          <img class="win__foto"    data-f="6" src="capturas/configuracion.webp" alt="La configuración de Lolsito con el campo de la llave de Gemini" width="1410" height="1029" loading="lazy" />
         </div>
 
         <div class="tour__copy" id="tourCopy">
@@ -452,7 +456,9 @@ main{position:relative;z-index:10}
           <p data-c="1">Ve a los cinco de enfrente y te dice <b>a quién escoger</b>, con el porqué de cada uno.</p>
           <p data-c="2">Te habla <b>en español mientras juegas</b> y deja escrito todo lo que pasó, con su minuto.</p>
           <p data-c="3">Al terminar te <b>califica y te dice en qué la regaste</b>, con tus números en la mano.</p>
-          <p data-c="4">Lo único que configuras: <b>pegas tu llave de Gemini</b> y ya. Nada más.</p>
+          <p data-c="4">Le preguntas lo que sea del parche y te contesta <b>con tus objetos y tus campeones</b>, no en abstracto.</p>
+          <p data-c="5">Y cuando la partida te quemó, <b>seis ejercicios para bajarle</b> antes de entrar a la que sigue.</p>
+          <p data-c="6">Lo único que configuras: <b>pegas tu llave de Gemini</b> y ya. Nada más.</p>
         </div>
       </div>
 
@@ -462,7 +468,9 @@ main{position:relative;z-index:10}
           <button data-b="1">Draft</button>
           <button data-b="2">Voz</button>
           <button data-b="3">Análisis</button>
-          <button data-b="4">Llave</button>
+          <button data-b="4">Dudas</button>
+          <button data-b="5">Calma</button>
+          <button data-b="6">Llave</button>
         </div>
         <button class="chips__skip" id="skip">Saltar</button>
       </div>
@@ -902,13 +910,15 @@ addEventListener('resize', () => {
 }, {passive:true});
 
 /* ═══════════════════════════════════════════════════════════════
-   RECORRIDO: seis pantallas de la app, una por cada 100vh
+   RECORRIDO: siete pantallas de la app, una por cada 100vh
    ═══════════════════════════════════════════════════════════════ */
 const BEATS = [
   {tono:'neg', tilt:[ 1.4, -3.2], aspecto:1.370},  // Meta juego
   {tono:'neg', tilt:[ 1.0,  3.0], aspecto:1.557},  // Draft de IA
   {tono:'ind', tilt:[ 2.0, -1.4], aspecto:1.557},  // Coach en vivo
   {tono:'neg', tilt:[-1.6, -2.6], aspecto:1.370},  // Análisis
+  {tono:'ind', tilt:[ 1.6,  2.6], aspecto:1.697},  // Coach Q&A
+  {tono:'neg', tilt:[-1.2, -2.8], aspecto:1.697},  // Destilteo
   {tono:'ind', tilt:[ 0.8,  2.2], aspecto:1.370},  // Configuración
 ];
 
