@@ -1,0 +1,110 @@
+---
+// Términos de uso de subidor-videos. Las Developer Policies de YouTube API
+// Services piden que digan que al usar la herramienta se aceptan los YouTube
+// Terms of Service, con liga. En inglés porque la revisa el equipo de YouTube.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const CONTACT = 'itic.rodrigomg@gmail.com';
+---
+
+<BaseLayout
+  title="Terms of Service · subidor-videos"
+  description="Terms of Service of subidor-videos, a private tool that uses YouTube API Services."
+>
+  <section class="container-site legal">
+    <header>
+      <p class="kicker"><a href="/subidor-videos">subidor-videos</a></p>
+      <h1>Terms of Service</h1>
+      <p class="muted">
+        Effective November 5, 2026 · Applies to <strong>subidor-videos</strong>, operated by
+        Rodrigo Ricardo Méndez Gallegos, Jalisco, Mexico.
+      </p>
+    </header>
+
+    <h2>1. What subidor-videos is</h2>
+    <p>
+      subidor-videos is a private command line tool used by its owner to upload his own
+      videos to the YouTube channels he owns. It is not offered, sold or distributed to
+      anyone else.
+    </p>
+
+    <h2>2. YouTube Terms of Service</h2>
+    <p>
+      subidor-videos uses YouTube API Services. <strong>By using subidor-videos you agree
+      to be bound by the
+      <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a></strong>
+      (https://www.youtube.com/t/terms). Google's handling of data is described in the
+      <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.
+    </p>
+
+    <h2>3. Acceptable use</h2>
+    <ul>
+      <li>Only upload content you own or have the rights to publish.</li>
+      <li>Follow YouTube's Community Guidelines and policies, including the disclosure of realistic altered or synthetic content.</li>
+      <li>Only authorize channels you own or manage.</li>
+    </ul>
+
+    <h2>4. Privacy</h2>
+    <p>
+      How the tool handles information is described in the
+      <a href="/subidor-videos/privacy">Privacy Policy</a>, including how to revoke access
+      and delete stored data.
+    </p>
+
+    <h2>5. No warranty</h2>
+    <p>
+      The tool is provided as is, without warranties of any kind. Availability depends on
+      YouTube API Services.
+    </p>
+
+    <h2>6. Changes</h2>
+    <p>
+      These terms may change; the current version is always published on this page with its
+      effective date.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      <a href={`mailto:${CONTACT}`}>{CONTACT}</a>
+    </p>
+
+    <p class="links">
+      <a href="/subidor-videos">subidor-videos</a> ·
+      <a href="/subidor-videos/privacy">Privacy Policy</a>
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal {
+    max-width: 46rem;
+    padding-block: 3.5rem 4rem;
+  }
+  .legal h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin: 0.4rem 0 0.6rem;
+  }
+  .legal h2 {
+    font-size: 1.15rem;
+    margin: 2rem 0 0.6rem;
+  }
+  .legal p,
+  .legal li {
+    line-height: 1.65;
+  }
+  .legal ul {
+    padding-left: 1.2rem;
+  }
+  .legal li + li {
+    margin-top: 0.35rem;
+  }
+  .links {
+    margin-top: 2.5rem;
+    font-weight: 600;
+  }
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+</style>

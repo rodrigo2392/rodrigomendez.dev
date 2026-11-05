@@ -1,0 +1,154 @@
+---
+// Política de privacidad de subidor-videos. Cubre lo que piden las Developer
+// Policies de YouTube API Services: aviso de que usa YouTube API Services, liga a
+// la Google Privacy Policy, qué datos toca, cómo se guardan, cómo se revoca el
+// acceso y cómo se borran. En inglés porque la revisa el equipo de YouTube.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const CONTACT = 'itic.rodrigomg@gmail.com';
+---
+
+<BaseLayout
+  title="Privacy Policy · subidor-videos"
+  description="Privacy Policy of subidor-videos, a private tool that uses YouTube API Services."
+>
+  <section class="container-site legal">
+    <header>
+      <p class="kicker"><a href="/subidor-videos">subidor-videos</a></p>
+      <h1>Privacy Policy</h1>
+      <p class="muted">
+        Effective November 5, 2026 · Applies to <strong>subidor-videos</strong>, operated by
+        Rodrigo Ricardo Méndez Gallegos, Camino del Teca 580, Tlajomulco, Jalisco, Mexico.
+      </p>
+    </header>
+
+    <h2>The essentials</h2>
+    <p>
+      subidor-videos is a private command line tool that I use to upload my own videos to
+      the YouTube channels I own. It runs only on my computer and has no other users.
+      <strong>subidor-videos uses YouTube API Services.</strong> It does not sell, share or
+      use any data for advertising, profiling or analytics.
+    </p>
+
+    <h2>YouTube API Services and Google</h2>
+    <p>
+      subidor-videos uses YouTube API Services (YouTube Data API v3). When you authorize it
+      with your Google Account, Google processes that data under the
+      <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>
+      (http://www.google.com/policies/privacy). Use of YouTube is subject to the
+      <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a>.
+    </p>
+
+    <h2>Information accessed and how it is used</h2>
+    <ul>
+      <li>
+        <strong>OAuth authorization:</strong> scopes <code>youtube.upload</code> and
+        <code>youtube.readonly</code> for the channel you choose during authorization.
+      </li>
+      <li>
+        <strong>Channel identity:</strong> the authorized channel's ID, title and handle, read
+        with <code>channels.list</code> only to confirm that uploads go to the right channel.
+      </li>
+      <li>
+        <strong>Videos you upload:</strong> the video file and the metadata you provide (title,
+        description, tags, category, privacy, publish date, thumbnail) are sent to YouTube
+        with <code>videos.insert</code> and <code>thumbnails.set</code>.
+      </li>
+    </ul>
+    <p>
+      The tool does not read, collect or store any other YouTube data: no comments,
+      analytics, subscribers, playlists or data from other users or channels.
+    </p>
+
+    <h2>Information stored</h2>
+    <ul>
+      <li>
+        <strong>OAuth refresh token</strong> and the authorized channel's ID, title and handle,
+        stored in a local file on my computer. They are never sent anywhere except to Google
+        to obtain access tokens.
+      </li>
+      <li>
+        <strong>Upload log:</strong> date, channel, YouTube video ID, URL and title of each
+        video uploaded with the tool, stored in a local file on my computer.
+      </li>
+    </ul>
+    <p>
+      Nothing is stored on any server. No cookies, trackers or third party services are
+      used by the tool.
+    </p>
+
+    <h2>Sharing</h2>
+    <p>
+      No information is shared with, sold to or disclosed to any third party. The only
+      recipient is Google, as part of using YouTube API Services.
+    </p>
+
+    <h2>Revoking access</h2>
+    <p>
+      You can revoke subidor-videos' access to your Google Account at any time from the
+      Google security settings page:
+      <a href="https://security.google.com/settings/security/permissions" target="_blank" rel="noopener">https://security.google.com/settings/security/permissions</a>.
+      After revoking it, the stored refresh token stops working and the tool can no longer
+      upload to that channel.
+    </p>
+
+    <h2>Deleting your data</h2>
+    <p>
+      The refresh token and upload log can be deleted at any time by removing the local
+      files, which immediately stops all access. To request
+      deletion of any data related to your account, write to
+      <a href={`mailto:${CONTACT}`}>{CONTACT}</a> and it will be deleted within 7 days.
+      Videos already uploaded to YouTube are managed and deleted from YouTube Studio.
+    </p>
+
+    <h2>Changes</h2>
+    <p>
+      If this policy changes, the new version will be published on this page with its
+      effective date.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about this policy: <a href={`mailto:${CONTACT}`}>{CONTACT}</a>
+    </p>
+
+    <p class="links">
+      <a href="/subidor-videos">subidor-videos</a> ·
+      <a href="/subidor-videos/terms">Terms of Service</a>
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal {
+    max-width: 46rem;
+    padding-block: 3.5rem 4rem;
+  }
+  .legal h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin: 0.4rem 0 0.6rem;
+  }
+  .legal h2 {
+    font-size: 1.15rem;
+    margin: 2rem 0 0.6rem;
+  }
+  .legal p,
+  .legal li {
+    line-height: 1.65;
+  }
+  .legal ul {
+    padding-left: 1.2rem;
+  }
+  .legal li + li {
+    margin-top: 0.35rem;
+  }
+  .links {
+    margin-top: 2.5rem;
+    font-weight: 600;
+  }
+  .muted {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+</style>
