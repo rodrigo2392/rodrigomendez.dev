@@ -1,5 +1,23 @@
 [
   {
+    "id": "0CMo-wFZOXw",
+    "title": "10 CONCEPTOS de INGENIERÍA de SOFTWARE que DEBES conocer",
+    "url": "https://www.youtube.com/watch?v=0CMo-wFZOXw",
+    "description": "Hay bugs que no están en ninguna línea de tu código: aparecen cuando dos usuarios compran al mismo tiempo, cuando la red tarda un segundo de más o…",
+    "duration": "10:53",
+    "thumbnail": "/img/videos/0CMo-wFZOXw.jpg",
+    "publishedAt": "2026-11-05T05:00:34-08:00"
+  },
+  {
+    "id": "s-zZLsWaTu0",
+    "title": "La falla de PHP que obligó a medio internet a actualizar (y el malware en Python)",
+    "url": "https://www.youtube.com/watch?v=s-zZLsWaTu0",
+    "description": "PHP2Shell es la falla de seguridad en PHP que en octubre de 2026 puso en riesgo a casi el 70% de los sitios web: permite ejecutar código en tu…",
+    "duration": "7:37",
+    "thumbnail": "/img/videos/s-zZLsWaTu0.jpg",
+    "publishedAt": "2026-11-02T20:31:25-08:00"
+  },
+  {
     "id": "28YL6HtuInc",
     "title": "Hice mi propio Jira (gratis, open source y con IA)",
     "url": "https://www.youtube.com/watch?v=28YL6HtuInc",
@@ -34,23 +52,5 @@
     "duration": "10:25",
     "thumbnail": "/img/videos/Wmw5BsL844I.jpg",
     "publishedAt": "2025-04-12T16:59:13-07:00"
-  },
-  {
-    "id": "hvxZcYLMTkk",
-    "title": "Por esto las empresas NO CONTRATAN juniors",
-    "url": "https://www.youtube.com/watch?v=hvxZcYLMTkk",
-    "description": "Platicamos un poco de las softskills que muchas veces nos hacen falta como desarrolladores, la mayoría de las veces no se trata de nuestro código…",
-    "duration": "13:16",
-    "thumbnail": "/img/videos/hvxZcYLMTkk.jpg",
-    "publishedAt": "2025-03-27T19:31:08-07:00"
-  },
-  {
-    "id": "JGEeSR6qQG4",
-    "title": "EP02 - ¿La IA va a reemplazar a los programadores? | #DEPURA2",
-    "url": "https://www.youtube.com/watch?v=JGEeSR6qQG4",
-    "description": "En este video te doy mi punto de vista relacionado al tema de la inteligencia artificial y como mucha gente piensa que va a reemplazar a los…",
-    "duration": "25:33",
-    "thumbnail": "/img/videos/JGEeSR6qQG4.jpg",
-    "publishedAt": "2025-01-08T16:00:12-08:00"
   }
 ]

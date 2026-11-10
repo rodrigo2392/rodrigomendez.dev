@@ -1,0 +1,366 @@
+---
+title: "10 conceptos de ingeniería de software que debes conocer"
+description: "Caché, N+1, condición de carrera, idempotencia y seis más: los conceptos detrás de los bugs que no están en ninguna línea de tu código, con un ejemplo de la vida diaria y código para cada uno."
+pubDate: 2026-11-10
+tags: ["backend", "diseno-de-sistemas"]
+heroImage: "/img/blog/diez-conceptos-mapa.jpg"
+heroCaption: "fig. 1: los 10 conceptos en tres grupos, rápido, correcto y de pie"
+---
+
+Hay bugs que no están en ninguna línea de tu código. Aparecen cuando dos personas compran
+al mismo tiempo, cuando la red tarda un segundo de más o cuando tu aplicación pasa de cien
+usuarios a cien mil. En tu computadora todo funcionaba, las pruebas pasaban en verde, y aun
+así algo se rompe en producción.
+
+Detrás de casi todos esos bugs hay uno de estos diez conceptos. Lo curioso es que ya los
+viviste todos fuera de la computadora: en la cocina, en el súper, frente a un elevador. Aquí
+va cada uno con su ejemplo de la vida diaria, lo que de verdad pasa en tu código y cómo se
+arregla.
+
+<Nota titulo="VIDEO">
+Este post acompaña mi video
+[10 conceptos de ingeniería de software que debes conocer](https://www.youtube.com/watch?v=0CMo-wFZOXw).
+Si prefieres verlo con animaciones, ahí está cada concepto en un minuto.
+</Nota>
+
+## 1. Caché
+
+Si cada vez que vas a cocinar tuvieras que ir a la tienda por azúcar, cocinar te llevaría
+horas. Por eso tienes una alacena: guardas cerca lo que usas seguido. Eso es un caché, **una
+copia de un dato en un lugar más rápido de leer**.
+
+En software, en vez de ir a la base de datos cada vez que alguien abre la página de un
+producto, guardas el resultado en memoria, por ejemplo en Redis. La primera visita va hasta
+la base de datos y tarda, digamos, 50 milisegundos. Las siguientes leen la copia en menos de
+un milisegundo.
+
+```js title="producto.js"
+async function obtenerProducto(id) {
+  const copia = await redis.get(`producto:${id}`);
+  if (copia) return JSON.parse(copia);
+
+  const producto = await db.productos.buscar(id);
+  // La copia vive 5 minutos y luego se vuelve a leer de la base de datos
+  await redis.set(`producto:${id}`, JSON.stringify(producto), { EX: 300 });
+  return producto;
+}
+```
+
+El problema es que lo que guardas puede caducar. Si el precio cambia y tu caché sigue con el
+viejo, le estás mostrando a tu usuario un dato que ya no es cierto.
+
+<Figura
+  src="/img/blog/diez-conceptos-cache.jpg"
+  alt="Dos tarjetas: la base de datos dice que los audífonos cuestan 549 y el caché sigue en 499, con un sello de dato viejo."
+  caption="fig. 2: el precio ya cambió y la copia sigue con el viejo"
+/>
+
+Por eso cada copia lleva un tiempo de vida, como los 300 segundos del ejemplo, o se borra en
+cuanto cambia el dato original (`redis.del` al guardar el precio nuevo). Guardar la copia es
+fácil. **Lo difícil del caché es saber cuándo tirarla.**
+
+## 2. El problema N+1
+
+Imagina que tienes una lista del súper con veinte cosas y, en lugar de ir una vez, vas veinte
+veces: una por cada cosa. Nadie lo haría así, pero tu código lo hace todo el tiempo.
+
+```js title="productos.js"
+const productos = await db.query('SELECT * FROM productos');   // 1 consulta
+
+for (const p of productos) {
+  // N consultas más: una por cada producto
+  p.categoria = await db.query(
+    'SELECT * FROM categorias WHERE id = $1', [p.categoria_id]
+  );
+}
+```
+
+Con 10 productos son 11 consultas y nadie lo nota. Con 10,000 son 10,001. Si cada una tarda
+un milisegundo, tu pantalla tarda diez segundos, y es el mismo código que en tu computadora
+volaba.
+
+Lo más común es que ni siquiera lo escribas tú: el ORM (la librería que usas para hablar con
+la base de datos) lo hace solo cuando lees la categoría dentro de un ciclo. La solución es ir
+una vez con la lista completa:
+
+```sql title="productos.sql"
+SELECT p.*, c.nombre AS categoria
+FROM productos p
+JOIN categorias c ON c.id = p.categoria_id;
+```
+
+Casi todos los ORM tienen su forma de pedirlo: `include` en Prisma y Sequelize,
+`select_related` en Django. Pasas de 10,001 consultas a una o dos. Por eso, cuando revises
+una pantalla lenta, no mires solo cuánto tarda. **Cuenta cuántas consultas hace.**
+
+## 3. Condición de carrera (race condition)
+
+Vives con alguien. Abres el refri, no hay leche y sales a comprar. Diez minutos después, la
+otra persona abre el refri, tampoco ve leche y también sale. Resultado: dos litros de leche.
+Ninguno hizo nada mal. Los dos revisaron y luego actuaron, pero entre revisar y actuar, el
+otro hizo lo mismo.
+
+En software pasa con el último boleto de un concierto:
+
+```js title="comprar.js"
+// Revisar y descontar son dos pasos separados
+const { rows } = await db.query('SELECT quedan FROM boletos WHERE id = $1', [id]);
+if (rows[0].quedan > 0) {
+  await db.query('UPDATE boletos SET quedan = quedan - 1 WHERE id = $1', [id]);
+}
+```
+
+Dos compras llegan casi juntas, las dos leen que queda uno, las dos confirman que hay y las
+dos descuentan. Tu inventario termina en menos uno y tienes a dos personas para un solo
+asiento. Tus pruebas no lo encuentran, porque ahí las compras llegan de una en una.
+
+El arreglo es que revisar y descontar sean **un solo paso**: le pides a la base de datos que
+descuente uno, pero solo si queda alguno.
+
+```js title="comprar.js"
+const r = await db.query(
+  'UPDATE boletos SET quedan = quedan - 1 WHERE id = $1 AND quedan > 0', [id]
+);
+if (r.rowCount === 0) throw new Error('Agotado');
+```
+
+Si no cambió ninguna fila, ya se agotaron. Es el equivalente a dejar una nota en el refri que
+diga "ya fui por leche". Este bug no está en ninguna línea de tu código. **Está entre dos
+líneas.**
+
+## 4. Interbloqueo (deadlock)
+
+Dos personas cocinan juntas. Una toma la sartén y necesita el aceite. La otra ya tomó el
+aceite y necesita la sartén. Ninguna suelta lo que tiene hasta tener lo otro, así que las dos
+se quedan esperando para siempre.
+
+En una base de datos pasa con los bloqueos. Una transferencia bloquea la cuenta A y luego
+quiere la B. Al mismo tiempo, otra transferencia en sentido contrario ya bloqueó la B y ahora
+quiere la A. Cada una espera a la otra y ninguna avanza.
+
+Las bases de datos detectan ese ciclo y cancelan una de las dos para destrabar la otra (en
+PostgreSQL llega como el error `40P01`), así que tu código tiene que estar listo para
+reintentar. Pero la forma de evitarlo es más simple: **pide los recursos siempre en el mismo
+orden**.
+
+```js title="transferir.js"
+// Siempre se bloquea primero la cuenta con el número más bajo
+const [primera, segunda] = [origen, destino].sort((a, b) => a - b);
+
+await tx.query('SELECT * FROM cuentas WHERE id = $1 FOR UPDATE', [primera]);
+await tx.query('SELECT * FROM cuentas WHERE id = $1 FOR UPDATE', [segunda]);
+```
+
+Si todas las transferencias bloquean primero la cuenta más baja, la segunda se forma detrás
+de la primera y nunca se cruzan.
+
+## 5. Idempotencia
+
+Cuando llamas al elevador, puedes apretar el botón una vez o diez veces, y el elevador viene
+una sola vez. Eso es una operación idempotente: **hacerla varias veces deja todo igual que
+hacerla una**.
+
+Ahora piensa en el botón de pagar. Tu usuario le da clic, la red tarda, se desespera y le da
+clic otra vez. Si tu servidor procesa las dos peticiones, le cobraste dos veces.
+
+La solución es que cada intento de pago lleve una llave única que el cliente genera una sola
+vez. El servidor guarda esa llave junto con el resultado, y si llega otra petición con la
+misma llave, no vuelve a cobrar: devuelve lo que ya tenía. Así lo resuelven las plataformas
+de pago, con un encabezado `Idempotency-Key`.
+
+```js title="pagos.js"
+app.post('/pagos', async (req, res) => {
+  const llave = req.get('Idempotency-Key');
+
+  const previo = await db.pagos.buscarPorLlave(llave);
+  if (previo) return res.json(previo.resultado);
+
+  const resultado = await cobrar(req.body);
+  await db.pagos.guardar({ llave, resultado });
+  res.json(resultado);
+});
+```
+
+<Figura
+  src="/img/blog/diez-conceptos-idempotencia.jpg"
+  alt="Un celular con el botón de pagar 499, el servidor con una tabla de llaves que ya dice cobrado y el banco con un solo cargo."
+  caption="fig. 3: la misma llave regresa el mismo resultado, un solo cargo"
+/>
+
+<Nota tipo="aviso">
+Ojo con el ejemplo: si dos peticiones con la misma llave llegan al mismo tiempo, las dos
+pueden pasar la búsqueda. Es la condición de carrera del punto 3. Ponle a la columna de la
+llave un índice único para que la base de datos rechace la segunda.
+</Nota>
+
+Esto importa más de lo que parece, porque en un sistema real todo se repite: los clics, los
+reintentos y los mensajes.
+
+## 6. Cola de mensajes
+
+En una taquería llena, quien toma tu orden no se queda parado junto al trompo hasta que
+salgan tus tacos. Anota la orden, la cuelga en la fila de comandas y sigue atendiendo. La
+cocina las va sacando a su ritmo. Eso es una cola: **quien pide deja el trabajo anotado, y
+quien lo hace lo toma cuando puede**.
+
+Piensa en el registro de tu aplicación. Al crear una cuenta tienes que mandar un correo,
+generar una factura y avisar a tu sistema de métricas. Si haces todo eso antes de responder,
+tu usuario espera cinco segundos, y si el servicio de correo se cae, el registro completo
+falla.
+
+Con una cola, guardas la cuenta, dejas las tareas en la fila y respondes de inmediato:
+
+```js title="registro.js"
+const usuario = await db.usuarios.crear(datos);
+
+await cola.add('correo-bienvenida', { usuarioId: usuario.id });
+await cola.add('factura', { usuarioId: usuario.id });
+await cola.add('metricas', { usuarioId: usuario.id });
+
+res.status(201).json(usuario);   // responde en milisegundos
+```
+
+Unos procesos aparte, los trabajadores, las van resolviendo. Si llega un pico de registros,
+la fila crece y luego se vacía, en vez de tumbar tu servidor.
+
+Pero casi todas las colas te garantizan que cada mensaje llega **al menos una vez**, no
+exactamente una. El mismo correo puede salir dos veces de la fila, así que tus trabajadores
+tienen que ser idempotentes, como en el punto 5.
+
+## 7. Reintentos con espera exponencial (backoff)
+
+Si llamas a alguien y te sale ocupado, no marcas cada segundo: esperas un rato, y si sigue
+ocupado, esperas más.
+
+Cuando un servicio falla, lo natural es reintentar. El problema es cuando todos reintentan de
+inmediato. Si 100 clientes fallan y cada uno repite su llamada cuatro veces seguidas, ya son
+500 peticiones contra un servicio que ya estaba saturado. Tus reintentos lo terminan de
+tumbar.
+
+Por eso la espera crece: un segundo, luego dos, luego cuatro, hasta un máximo. Eso es el
+backoff exponencial. Y se le agrega algo de azar, el jitter, para que cada cliente espere un
+tiempo un poco distinto y no regresen todos en el mismo instante como una sola ola.
+
+```js title="reintentos.js"
+async function conReintentos(fn, intentos = 5) {
+  for (let i = 0; i < intentos; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      // Un dato inválido va a fallar igual la décima vez: no se reintenta
+      if (!esTemporal(err) || i === intentos - 1) throw err;
+
+      const tope = Math.min(1000 * 2 ** i, 30_000);   // 1 s, 2 s, 4 s... máximo 30 s
+      await dormir(Math.random() * tope);              // el azar reparte los regresos
+    }
+  }
+}
+```
+
+Fíjate en la primera línea del `catch`: **no todo se reintenta**. Reintentas lo que es
+temporal, como un servicio saturado o un tiempo agotado, y siempre con un tope de intentos.
+
+## 8. Circuit breaker
+
+En tu casa, en el centro de carga, hay pastillas. Cuando hay un corto, la pastilla se bota y
+corta la luz antes de que se queme un cable. No sigue mandando corriente esperando que el
+problema se arregle solo.
+
+Si el servicio de pagos lleva diez fallas seguidas, seguir llamándolo solo hace que cada
+petición de tu aplicación espere treinta segundos para fallar igual. Mientras tanto, esas
+peticiones ocupan memoria y conexiones, y la falla de un servicio se convierte en la caída de
+todo.
+
+Con un circuit breaker, después de cierto número de fallas el circuito se abre: dejas de
+llamar a ese servicio y respondes de inmediato con un error claro o con un plan B. Pasado un
+rato, deja pasar una sola petición de prueba. Si funciona, el circuito se cierra y todo vuelve
+a la normalidad. Si falla, se queda abierto otro rato.
+
+```js title="pagos.js"
+import CircuitBreaker from 'opossum';
+
+const circuito = new CircuitBreaker(cobrar, {
+  timeout: 3000,                 // más de 3 s cuenta como falla
+  errorThresholdPercentage: 50,  // con la mitad fallando, se abre
+  resetTimeout: 30_000,          // a los 30 s deja pasar una de prueba
+});
+
+circuito.fallback(() => ({ error: 'Pagos no disponible, intenta en un momento' }));
+
+const resultado = await circuito.fire(datosDelPago);
+```
+
+En Node está `opossum`, en Java `resilience4j` y en .NET `Polly`. Es la diferencia entre que
+se caiga una parte de tu aplicación, o que se caiga toda.
+
+## 9. Límite de peticiones (rate limiting)
+
+Tu banco no te deja sacar del cajero todo el dinero que quieras en un día. Hay un tope, y ese
+tope te protege a ti y al banco si alguien se roba tu tarjeta.
+
+Una API hace lo mismo. Cada usuario puede hacer, por ejemplo, 100 peticiones por minuto. Si
+se pasa, el servidor responde con el error `429 Too Many Requests` en lugar de dejar que un
+solo cliente acapare todo.
+
+Una forma común de hacerlo es la cubeta de fichas. Cada usuario tiene una cubeta que se
+rellena sola a ritmo constante, y cada petición gasta una ficha. Si la cubeta está vacía,
+esperas. Así permites ráfagas cortas, pero no un abuso sostenido.
+
+```js title="cubeta.js"
+function crearCubeta(capacidad, fichasPorSegundo) {
+  let fichas = capacidad;
+  let ultima = Date.now();
+
+  return function permitir() {
+    const ahora = Date.now();
+    fichas = Math.min(capacidad, fichas + ((ahora - ultima) / 1000) * fichasPorSegundo);
+    ultima = ahora;
+
+    if (fichas < 1) return false;   // responde 429
+    fichas -= 1;
+    return true;
+  };
+}
+```
+
+Este ejemplo vive en la memoria de un solo servidor. Si tienes varios, la cubeta de cada
+usuario se guarda en un lugar compartido como Redis.
+
+Te protege de un bot, de un cliente con un bug que llama en un ciclo infinito y de un ataque.
+Y es la otra cara de los reintentos: ahí el cliente cuidaba al servidor; aquí **el servidor se
+cuida solo**.
+
+## 10. Consistencia eventual
+
+Cuando cambias de número de celular, no todos tus contactos se enteran en el mismo segundo.
+Unos lo saben hoy, otros mañana, pero al final todos tienen el número nuevo.
+
+En sistemas grandes, los datos viven copiados en varios servidores, a veces en varios países,
+para aguantar más lecturas y para que una falla no tire todo. Cuando escribes en uno, las
+copias tardan un poco en enterarse. Por eso a veces cambias tu foto de perfil, recargas la
+página y sigues viendo la vieja. No se perdió nada: leíste de una copia que todavía no se
+actualizaba.
+
+Eso es consistencia eventual: **si dejas de escribir, todas las copias terminan iguales, pero
+no al mismo tiempo**. Un truco común es que, justo después de escribir, ese usuario lea del
+servidor principal por unos segundos, para que vea su propio cambio aunque las copias sigan
+atrasadas.
+
+Para los likes de una publicación, la consistencia eventual está perfecta. Para el saldo de
+una cuenta bancaria, no. Saber qué datos pueden esperar y cuáles no es una de las decisiones
+más importantes al diseñar un sistema.
+
+## La misma historia, diez veces
+
+Si te fijas, casi todos estos conceptos cuentan la misma historia: qué pasa cuando varias
+cosas suceden al mismo tiempo, y qué pasa cuando algo falla a la mitad.
+
+- **Rápido:** el caché y el N+1.
+- **Correcto cuando todo pasa a la vez:** la condición de carrera, el interbloqueo y la
+  idempotencia.
+- **De pie cuando algo falla:** las colas, los reintentos, el circuit breaker, el límite de
+  peticiones y la consistencia eventual.
+
+No tienes que memorizarlos. Tienes que reconocerlos cuando aparezcan, y ahora ya sabes cómo
+se ven. Si quieres verlos animados, aquí está el
+[video completo en YouTube](https://www.youtube.com/watch?v=0CMo-wFZOXw).
