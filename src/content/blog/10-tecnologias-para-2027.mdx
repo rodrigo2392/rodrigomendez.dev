@@ -1,0 +1,364 @@
+---
+title: "10 tecnologías que debes dominar para 2027"
+description: "Diez ejercicios para ejecutar, desplegar y diagnosticar una app, desde Linux y Git hasta Terraform y Kubernetes."
+pubDate: 2026-11-11
+tags: ["backend", "devops", "ia"]
+heroImage: "/img/blog/diez-tecnologias-2027.jpg"
+heroCaption: "fig. 1: las diez piezas del top, de Kubernetes a Linux"
+featured: true
+---
+
+El equipo azul abre su lista de tareas y espera ocho segundos. El cambio que la puso lenta lo
+escribió un agente, pasó las pruebas y llegó a producción. Imagina que te toca atender el
+reporte. ¿Dónde buscarías primero?
+
+La búsqueda empieza en el clúster que mantiene la app de pie y termina en el proceso que
+la ejecuta. El incidente y sus tiempos son inventados. Los ejercicios usan versiones pequeñas
+del problema para que puedas practicar por tu cuenta.
+
+<Nota titulo="VIDEO">
+Este post acompaña mi video
+[10 tecnologías que debes dominar para 2027](https://www.youtube.com/watch?v=SUzB4_FNOrw).
+Ahí sigues la falla con animaciones; aquí tienes un ejercicio para practicar cada tecnología.
+</Nota>
+
+## 10. Kubernetes
+
+Alguien propone subir el número de copias de la app. Con un Deployment de Kubernetes declaras
+cuántas réplicas quieres y el clúster intenta mantener esa cantidad. Repartir tráfico entre más
+copias puede aliviar la saturación. Si cada copia espera la misma consulta lenta, esa consulta
+sigue ahí. [Documentación de Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
+
+### Borra un Pod y mira qué hace el clúster
+
+Usa Minikube y `kubectl` para levantar un clúster local. Aquí Nginx hace de app de prueba.
+[Instalación de Minikube](https://minikube.sigs.k8s.io/docs/start/)
+
+~~~bash
+minikube start -p tareas-lab
+kubectl --context tareas-lab create deployment tareas --image=nginx:alpine --replicas=2
+kubectl --context tareas-lab rollout status deployment/tareas
+kubectl --context tareas-lab scale deployment/tareas --replicas=3
+kubectl --context tareas-lab get pods -l app=tareas
+~~~
+
+Cuando veas tres Pods listos, copia el nombre de uno. Sustituye `NOMBRE_DEL_POD` por ese nombre.
+
+~~~bash
+kubectl --context tareas-lab delete pod NOMBRE_DEL_POD
+kubectl --context tareas-lab get pods -l app=tareas --watch
+~~~
+
+El ejercicio termina cuando vuelves a ver tres Pods listos y uno tiene un nombre nuevo.
+Sal de la vista con Ctrl+C y elimina el clúster de práctica con `minikube delete -p tareas-lab`.
+[Escalar un Deployment](https://kubernetes.io/docs/tutorials/kubernetes-basics/scale/scale-intro/)
+
+## 9. Terraform
+
+Para investigar con calma quieres un ambiente de pruebas que se parezca al de producción.
+Terraform permite describir recursos como redes y bases de datos en archivos que puedes
+versionar. Su plan te dice qué propone crear, actualizar o reemplazar. Esa diferencia importa
+mucho cuando el recurso guarda los datos de tu app.
+[Qué hace `terraform plan`](https://developer.hashicorp.com/terraform/cli/commands/plan)
+
+### Encuentra un reemplazo en el plan
+
+En una carpeta vacía, guarda este `main.tf`. `terraform_data` es un recurso integrado que en
+este ejercicio solo guarda estado local.
+
+~~~hcl title="main.tf"
+resource "terraform_data" "entorno" {
+  input            = "pruebas"
+  triggers_replace = "v1"
+}
+~~~
+
+Corre `terraform init` y luego `terraform apply`. Confirma la creación del recurso de prueba.
+Cambia `triggers_replace` a `"v2"` y corre `terraform plan`. Busca el marcador `-/+` y un
+resumen con un recurso por agregar y otro por destruir. Esa es la señal de que Terraform
+propone reemplazarlo. [Referencia de `terraform_data`](https://developer.hashicorp.com/terraform/language/resources/terraform-data)
+
+## 8. Cloudflare
+
+Cuando tu dominio está detrás del proxy de Cloudflare, la petición web pasa por su red antes
+de llegar al servidor de origen. Ahí pueden aplicarse reglas de seguridad y de caché. Para
+investigar una petición lenta, el encabezado `cf-ray` te da un identificador que también puede
+quedar en el log del origen.
+[Proxy de Cloudflare](https://developers.cloudflare.com/dns/proxy-status/)
+
+### Encuentra el Ray ID de una petición
+
+Pide los encabezados de esta página pública con `curl`. Si usas PowerShell, puedes escribir
+`curl.exe`.
+
+~~~bash
+curl -sSI https://developers.cloudflare.com/fundamentals/reference/cloudflare-ray-id/
+~~~
+
+Busca `cf-ray` en la respuesta. Si tienes un dominio de pruebas detrás de Cloudflare, repite
+la petición contra una ruta que llegue al origen y registra allí el encabezado `CF-Ray` de la
+petición. Busca la coincidencia con el ID y la hora aproximada. En nuestra app, ese log
+también guarda cuánto tardó el servidor en responder. Ese tiempo te ayuda a decidir dónde
+buscar los ocho segundos. [Cómo leer un Ray ID](https://developers.cloudflare.com/fundamentals/reference/cloudflare-ray-id/)
+
+## 7. AWS
+
+En AWS puedes poner un balanceador delante de una API que corre en Amazon ECS y guardar sus
+datos en PostgreSQL administrado por Amazon RDS. Para que el recorrido funcione, cada salto
+necesita permiso para hablar con el siguiente. Los *security groups* controlan qué tráfico
+puede entrar y salir de cada recurso.
+[Reglas de los grupos de seguridad](https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html)
+
+### Encuentra el salto bloqueado
+
+En papel, dibuja tres cajas en la misma red de AWS, el balanceador, la API y RDS. La página de
+salud de la API responde por el puerto `8080`, pero la API se queda esperando al intentar
+conectar con PostgreSQL en el `5432`. Supón que la salida y las rutas ya permiten el tráfico.
+Revisa solo las reglas de entrada.
+
+| Destino | Puerto TCP | Origen permitido |
+| --- | --- | --- |
+| Balanceador, grupo `balanceador` | `443` | Internet |
+| API, grupo `api` | `8080` | `balanceador` |
+| RDS, grupo `base` | `5432` | `balanceador` |
+
+Traza las flechas y corrige una regla. Para comprobarte, mira quién abre la conexión a la base.
+Es la API, así que la regla de entrada de `base` debe aceptar TCP `5432` desde `api`.
+[Ejemplo de acceso entre la aplicación y RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.RDSSecurityGroups.html)
+
+## 6. Agentes de código
+
+Un agente puede explorar el repo, preparar un cambio y correr pruebas según las herramientas y
+permisos que tenga. En el incidente del equipo azul, le darías la ruta lenta y la consulta que
+encontraste. Para practicar la revisión del cambio, vamos a usar un bug más pequeño en esa
+misma lista de tareas. [Cómo trabaja un agente de código en un repositorio](https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github)
+
+### Dale al agente un bug con una salida esperada
+
+En un repo de práctica, guarda y registra este archivo en un commit.
+
+~~~js title="tareas.cjs"
+function listarAbiertas(tareas, equipoId) {
+  return tareas.filter((tarea) => tarea.abierta);
+}
+
+module.exports = { listarAbiertas };
+~~~
+
+Pídele al agente que arregle el filtro en `tareas.cjs` y limite el cambio a ese archivo.
+Dale tres casos. Una tarea abierta del equipo azul debe aparecer. Una abierta del equipo
+verde y una cerrada del azul deben quedar fuera. Pídele que muestre el diff y cómo comprobó
+los tres casos.
+
+Revisa `git diff HEAD` antes de hacer commit. Debes poder señalar dónde se comprueba el equipo
+y dónde se comprueba el estado. Corre tú también la prueba de la siguiente sección.
+
+## 5. GitHub Actions
+
+GitHub Actions puede correr las mismas pruebas cada vez que alguien abre o actualiza un pull
+request. Aquí lo que quieres comprobar es que la lista del equipo azul siga excluyendo las
+tareas de otros equipos. Una prueba en verde cubre lo que le pediste que comprobara. El
+arranque en el ambiente de pruebas es otra comprobación.
+[Cómo funcionan los flujos de GitHub Actions](https://docs.github.com/en/actions/get-started/understand-github-actions)
+
+### Haz que un pull request falle por el bug correcto
+
+Usa un repo de práctica en GitHub. Copia `tareas.cjs` del ejercicio anterior con el filtro
+corregido. Si empiezas aquí, cambia la condición de `filter` a
+`tarea.equipoId === equipoId && tarea.abierta`. Agrega estos dos archivos.
+
+~~~js title="tareas.test.cjs"
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const { listarAbiertas } = require('./tareas.cjs');
+
+test('lista solo las tareas abiertas del equipo solicitado', () => {
+  const tareas = [
+    { id: 1, equipoId: 'azul', abierta: true },
+    { id: 2, equipoId: 'verde', abierta: true },
+    { id: 3, equipoId: 'azul', abierta: false },
+  ];
+
+  assert.deepEqual(listarAbiertas(tareas, 'azul'), [tareas[0]]);
+});
+~~~
+
+~~~yaml title=".github/workflows/pruebas.yml"
+name: Pruebas
+on: pull_request
+permissions:
+  contents: read
+
+jobs:
+  tareas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - run: node --test tareas.test.cjs
+~~~
+
+Con los archivos en la rama principal, abre un pull request que quite el filtro por equipo.
+Busca en el log de Actions la tarea del equipo verde que se coló. Restablece el filtro en
+otro commit de esa misma rama. El check del pull request debe pasar de rojo a verde.
+[Evento `pull_request`](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request)
+
+## 4. PostgreSQL
+
+La pista que buscábamos está en la consulta. Si PostgreSQL recorre la tabla de punta a punta
+para encontrar unas pocas tareas, un índice puede darle un camino más corto. El plan de
+ejecución te permite comprobar qué camino eligió. [Cómo leer `EXPLAIN`](https://www.postgresql.org/docs/current/using-explain.html)
+
+### Compara la misma consulta con y sin índice
+
+En una base de pruebas, abre una sesión de PostgreSQL y crea una tabla temporal con datos
+ficticios. Ejecuta todos los bloques SQL en esa misma sesión.
+
+~~~sql
+CREATE TEMP TABLE lab_tareas (
+  id integer,
+  equipo_id integer,
+  abierta boolean
+);
+
+INSERT INTO lab_tareas
+SELECT n, 1 + n % 1000, n % 7 = 0
+FROM generate_series(1, 200000) AS serie(n);
+
+ANALYZE lab_tareas;
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT id
+FROM lab_tareas
+WHERE equipo_id = 42 AND abierta
+ORDER BY id DESC
+LIMIT 20;
+~~~
+
+Crea un índice parcial para las tareas abiertas y vuelve a ejecutar el mismo `EXPLAIN`.
+
+~~~sql
+CREATE INDEX lab_tareas_abiertas_equipo
+ON lab_tareas (equipo_id, id DESC)
+WHERE abierta;
+~~~
+
+Busca si el plan pasa de `Seq Scan` a una lectura que nombra el índice. Compara cuántas filas
+tuvo que descartar y qué dice `BUFFERS`. Los tiempos dependen de tu máquina. El cambio de plan
+te muestra cómo encontró la base esas mismas tareas.
+[Índices parciales en PostgreSQL](https://www.postgresql.org/docs/current/indexes-partial.html)
+
+## 3. Docker
+
+En el ambiente de pruebas quieres saber qué versión está corriendo. Docker empaqueta el
+programa y sus dependencias en una imagen. Si construyes la imagen desde un commit limpio y
+guardas su hash como etiqueta, puedes volver de la imagen al código que usaste para construirla.
+[Etiquetas de revisión en la especificación OCI](https://github.com/opencontainers/image-spec/blob/main/annotations.md)
+
+### Encuentra el commit dentro de una imagen
+
+En un repo local de práctica con Docker, guarda un `index.html` con el texto
+`<h1>Tareas del equipo azul</h1>` y este `Dockerfile`. Haz commit de ambos archivos.
+
+~~~dockerfile title="Dockerfile"
+FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/index.html
+~~~
+
+Desde esa carpeta, construye y levanta el contenedor.
+
+~~~bash
+docker build --label "org.opencontainers.image.revision=$(git rev-parse HEAD)" -t tareas:lab .
+docker run --rm -d --name tareas-lab -p 127.0.0.1:8088:80 tareas:lab
+docker image inspect tareas:lab --format '{{json .Config.Labels}}'
+git rev-parse HEAD
+~~~
+
+Abre `http://127.0.0.1:8088` en tu navegador. Debe aparecer el texto de tu página, y la etiqueta
+`org.opencontainers.image.revision` debe coincidir con el hash que imprimió Git. Cuando termines,
+corre `docker stop tareas-lab`. [Inspeccionar objetos en Docker](https://docs.docker.com/reference/cli/docker/inspect/)
+
+## 2. Git
+
+Con el hash de la imagen puedes abrir el commit exacto con `git show`. En nuestra historia, al
+leer el cambio completo ves algo más aparte del índice. También cambió el nombre de una
+variable de configuración. Ese detalle explica por qué el arreglo pasó las pruebas y se
+atoró al arrancar en otro ambiente.
+[Consultar un commit con `git show`](https://git-scm.com/docs/git-show)
+
+### Revierte un cambio y conserva el historial
+
+En un repo local de práctica, guarda un archivo llamado `config.env.example` con esta línea.
+Regístralo en tu primer commit.
+
+~~~dotenv title="config.env.example"
+PORT=8091
+~~~
+
+Cambia `PORT` a `APP_PORT` y guarda otro commit. Ahora revisa y revierte ese último cambio.
+
+~~~bash
+git show HEAD
+git revert --no-edit HEAD
+git log --oneline -3
+~~~
+
+Abre el archivo. Debe volver a decir `PORT=8091`. En el historial deben aparecer los dos
+commits originales y el nuevo commit que deshace el segundo.
+[Revertir un commit con `git revert`](https://git-scm.com/docs/git-revert)
+
+## 1. Linux
+
+La versión nueva llega al ambiente de pruebas y se apaga. Ahí importan las cosas que puedes
+comprobar en la máquina. Si existe el proceso, si escucha en un puerto y qué escribió antes
+de salir. En nuestro ejemplo, al servidor le falta la variable con el nombre que ahora espera
+el código.
+
+### Provoca un fallo de arranque y encuéntralo en el log
+
+En Linux, usa una carpeta de práctica, Python 3 y el comando `ss` de iproute2. Guarda este
+script como `arranque.sh`.
+
+~~~bash title="arranque.sh"
+exec python3 -m http.server "${PORT:?Falta PORT}" --bind 127.0.0.1
+~~~
+
+Arráncalo una vez sin `PORT` y lee el error. Después dale un puerto libre, como el `8091`.
+
+~~~bash
+env -u PORT sh arranque.sh 2>inicio.log
+cat inicio.log
+PORT=8091 sh arranque.sh
+~~~
+
+En otra terminal, verifica el puerto y haz una petición local.
+
+~~~bash
+ss -ltnp 'sport = :8091'
+curl -sSI http://127.0.0.1:8091/
+~~~
+
+Primero debes ver `Falta PORT` en el log. Con la variable definida, `ss` debe mostrar el
+proceso escuchando y `curl` debe recibir un `200`. Detén el servidor con Ctrl+C en la
+primera terminal. [Servidor HTTP de Python](https://docs.python.org/3/library/http.server.html)
+· [Manual de `ss`](https://man7.org/linux/man-pages/man8/ss.8.html)
+
+## Por dónde empezar
+
+Si vas empezando, recorre la lista desde abajo con una app pequeña. Haz que arranque en
+Linux, guarda un cambio en Git y construye una imagen que puedas asociar a ese commit.
+Agrega PostgreSQL y una prueba que falle si mezclas datos de dos equipos. Cuando uses
+un agente, dale esa prueba y revisa el diff. Así puedes comprobar cada paso antes de
+sumar la red y la infraestructura.
+
+En el ejemplo, el índice acelera la consulta y la configuración corregida permite que la
+versión arranque. Para practicar con tu app, guarda el plan de la consulta, el resultado de
+la prueba y el log de arranque. Son las pistas que vas a querer tener a la mano la próxima
+vez que alguien del equipo azul te escriba.
+
+Si quieres ver la falla completa con animaciones, aquí está el
+[video en YouTube](https://www.youtube.com/watch?v=SUzB4_FNOrw).

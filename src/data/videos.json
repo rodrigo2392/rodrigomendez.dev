@@ -1,5 +1,14 @@
 [
   {
+    "id": "SUzB4_FNOrw",
+    "title": "10 tecnologías que debes dominar para 2027",
+    "url": "https://www.youtube.com/watch?v=SUzB4_FNOrw",
+    "description": "Una lista de tareas tarda ocho segundos en cargar. El cambio que la hizo lenta pasó las pruebas y ya llegó a producción. ¿Por dónde empiezas?",
+    "duration": "9:36",
+    "thumbnail": "/img/videos/SUzB4_FNOrw.jpg",
+    "publishedAt": "2026-11-11T18:00:14-08:00"
+  },
+  {
     "id": "0CMo-wFZOXw",
     "title": "10 CONCEPTOS de INGENIERÍA de SOFTWARE que DEBES conocer",
     "url": "https://www.youtube.com/watch?v=0CMo-wFZOXw",
@@ -43,14 +52,5 @@
     "duration": "6:35",
     "thumbnail": "/img/videos/5cDsm-Zep9A.jpg",
     "publishedAt": "2025-06-17T23:31:03-07:00"
-  },
-  {
-    "id": "Wmw5BsL844I",
-    "title": "¿Eres DESARROLLADOR o sólo PROGRAMADOR?",
-    "url": "https://www.youtube.com/watch?v=Wmw5BsL844I",
-    "description": "En este video te doy mi punto de vista sobre lo que es ser un desarrollador de software y lo que es ser programnador.",
-    "duration": "10:25",
-    "thumbnail": "/img/videos/Wmw5BsL844I.jpg",
-    "publishedAt": "2025-04-12T16:59:13-07:00"
   }
 ]
