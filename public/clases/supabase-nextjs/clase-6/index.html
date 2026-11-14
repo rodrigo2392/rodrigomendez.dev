@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clase 6 · Eventos y Broadcast</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@500;700&display=swap"
+    />
+    <link rel="stylesheet" href="../motor/motor.css" />
+    <link rel="stylesheet" href="../motor/comun.css" />
+    <link rel="stylesheet" href="../motor/codigofacilito.css" />
+    <link rel="stylesheet" href="../motor/piezas.css" />
+    <link rel="stylesheet" href="clase-6.css" />
+  </head>
+  <body>
+    <!--
+      Clase 6 del bootcamp: eventos y Broadcast (vie 6 nov 2026).
+      La teoría y sus tiempos están en las notas de cada lámina; la práctica, en el vault: 10-proyectos/bootcamp-clase-6-guion.
+      El código de la clase: branches clase-6-inicio, clase-6-rescate y clase-6-final del repo.
+    -->
+    <div class="escenario" data-nombre="clase-6" role="region" aria-roledescription="presentación" aria-label="Clase 6: eventos y Broadcast">
+      <div class="lienzo">
+        <div class="registro" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+        <!-- 1. Portada -->
+        <section class="lamina portada fondo-portada" data-titulo="Portada: eventos y Broadcast" data-min="0">
+          <p class="portada-bootcamp">Bootcamp · Módulo 5: Edge, Storage y serverless</p>
+          <h1 class="t1">Eventos<br />y Broadcast</h1>
+          <p class="portada-clase">Clase 6 de 6 · Supabase + Next.js</p>
+          <p class="portada-autor">Rodrigo Méndez<small>rodrigomendez.dev</small></p>
+          <div class="deco fichas-tec" aria-hidden="true" data-anima="aparece" style="--d:300ms">
+            <span class="ficha-tec next">Next.js</span>
+            <span class="ficha-tec supa">Supabase</span>
+            <span class="ficha-tec ts">TS</span>
+          </div>
+          <img class="deco destellos" src="../marca/destellos.png" alt="" data-anima="pop" style="--d:800ms" />
+          <img class="deco mascota-portada" src="../marca/mascota-portada.png" alt="" />
+          <aside class="notas">
+            <p>Bienvenida a la última clase. Hoy Rastro se completa: el historial del pedido que se llena solo y la moto moviéndose en el mapa.</p>
+            <p>Y lo que hay detrás: arquitectura basada en eventos y Realtime más allá de los cambios de la base.</p>
+          </aside>
+        </section>
+
+        <!-- 2. Tabla de contenido -->
+        <section class="lamina" data-titulo="Tabla de contenido" data-min="0 a 1">
+          <h2 class="temario-titulo"><img src="../marca/tabla.png" alt="" />Tabla de contenido</h2>
+          <ol class="temario">
+            <li class="entra" style="--i:1"><span class="chip-seccion">/01</span>El problema y la meta</li>
+            <li class="entra" style="--i:2"><span class="chip-seccion c2">/02</span>Arquitectura basada en eventos</li>
+            <li class="entra" style="--i:3"><span class="chip-seccion c3">/03</span>Broadcast</li>
+            <li class="entra" style="--i:4"><span class="chip-seccion c4">/04</span>Binario y escala</li>
+            <li class="entra" style="--i:5"><span class="chip-seccion c5">/05</span>Para cerrar el curso</li>
+          </ol>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>El mapa de hoy: cuatro partes de teoría y, en cuanto terminen, construyo en vivo mientras ustedes miran. La parte 5 cierra la clase y el curso.</p></aside>
+        </section>
+
+        <!-- 3. Sección 1 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 1: el problema y la meta" data-min="1">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion">/01</span>
+            <div><h2 class="t1">El problema y la meta</h2><p>Qué vamos a construir hoy, y por qué.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Primera parte: por qué no conviene que un botón haga todo, y lo que vamos a construir hoy.</p></aside>
+        </section>
+
+        <!-- 4. El problema -->
+        <section class="lamina" data-titulo="El problema: un botón que hace todo" data-min="1 a 4">
+          <p class="ceja">El problema</p>
+          <h2 class="t2 pregunta">Cuando rastreas un paquete ves cada paso con su hora. ¿Cómo se registra sin que nadie lo anote a mano?</h2>
+          <figure class="problema">
+            <svg viewBox="0 0 1384 330" role="img" aria-label="Si el botón de la tienda hace todo en cadena, guardar el estado, anotar el historial y avisar, y una parte falla, falla todo. La solución: un solo cambio en la base y varias reacciones independientes que el botón no conoce.">
+              <defs>
+                <marker id="punta-problema-6" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-senal"/>
+                </marker>
+                <marker id="punta-cadena" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <text x="0" y="22" font-size="17" class="t-suave t-fuerte" letter-spacing="2">EN CADENA: EL BOTÓN HACE TODO</text>
+              <g data-anima="pop" style="--d:300ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="44" width="170" height="54" rx="10"/>
+                <text x="85" y="78" font-size="18" class="t-fuerte" text-anchor="middle">el botón</text>
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="118" width="170" height="54" rx="10"/>
+                <text x="85" y="152" font-size="18" class="t-fuerte" text-anchor="middle">guarda</text>
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="192" width="170" height="54" rx="10"/>
+                <text x="85" y="226" font-size="18" class="t-fuerte" text-anchor="middle">anota historial</text>
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="230" y="118" width="170" height="54" rx="10"/>
+                <text x="315" y="152" font-size="18" class="t-fuerte" text-anchor="middle">avisa pantallas</text>
+                <rect class="f-papel s-rojo" style="stroke-width:1.5" x="230" y="192" width="170" height="54" rx="10"/>
+                <text x="315" y="226" font-size="18" class="t-rojo t-fuerte" text-anchor="middle">manda correo ✕</text>
+              </g>
+              <path class="svg-linea s-plano" style="stroke-width:2" d="M85 98 V114" marker-end="url(#punta-cadena)"/>
+              <path class="svg-linea s-plano" style="stroke-width:2" d="M85 172 V188" marker-end="url(#punta-cadena)"/>
+              <path class="svg-linea s-plano" style="stroke-width:2" d="M170 219 C200 219 200 145 226 145" marker-end="url(#punta-cadena)"/>
+              <path class="svg-linea s-plano" style="stroke-width:2" d="M315 172 V188" marker-end="url(#punta-cadena)"/>
+              <text x="0" y="296" font-size="23" class="t-rojo t-fuerte" data-anima="aparece" style="--d:900ms">Si una parte falla, falla todo</text>
+
+              <g data-paso="1" data-en="2200">
+                <path class="svg-linea s-senal" style="stroke-width:3" d="M476 144 H548" marker-end="url(#punta-problema-6)"/>
+                <text x="590" y="22" font-size="17" class="t-senal t-fuerte" letter-spacing="2">CON EVENTOS: UN CAMBIO, VARIAS REACCIONES</text>
+                <g data-anima="pop" style="--d:150ms">
+                  <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="590" y="100" width="280" height="90" rx="12"/>
+                  <text x="614" y="138" font-size="21" class="t-fuerte">Cambia el pedido</text>
+                  <text x="614" y="168" font-size="17" class="t-suave mono">update pedidos</text>
+                </g>
+                <path class="svg-linea s-senal" data-anima="traza" style="--d:400ms; stroke-width:2.2" d="M878 145 C930 145 930 70 982 70" marker-end="url(#punta-problema-6)"/>
+                <path class="svg-linea s-senal" data-anima="traza" style="--d:500ms; stroke-width:2.2" d="M878 145 H982" marker-end="url(#punta-problema-6)"/>
+                <path class="svg-linea s-senal" data-anima="traza" style="--d:600ms; stroke-width:2.2" d="M878 145 C930 145 930 220 982 220" marker-end="url(#punta-problema-6)"/>
+                <g data-anima="pop" style="--d:800ms">
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="990" y="44" width="394" height="52" rx="10"/>
+                  <text x="1012" y="77" font-size="19" class="t-fuerte">historial</text><text x="1362" y="77" font-size="17" class="t-suave" text-anchor="end">trigger</text>
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="990" y="119" width="394" height="52" rx="10"/>
+                  <text x="1012" y="152" font-size="19" class="t-fuerte">pantallas</text><text x="1362" y="152" font-size="17" class="t-suave" text-anchor="end">Realtime</text>
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="990" y="194" width="394" height="52" rx="10"/>
+                  <text x="1012" y="227" font-size="19" class="t-fuerte">correo</text><text x="1362" y="227" font-size="17" class="t-suave" text-anchor="end">webhook</text>
+                </g>
+                <text x="590" y="296" font-size="23" class="t-verde t-fuerte">Cada reacción es independiente</text>
+              </g>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>Pregunta de arranque: cuando rastreas un paquete ves "salió del almacén, va en ruta, entregado", cada paso con su hora, y en la app de comida ves la moto moverse. ¿Cómo se construye sin que nadie lo anote a mano?</p>
+            <p>La forma ingenua: que el botón de la tienda haga todo en cadena. Si una parte falla, por ejemplo el correo, falla todo. A los dos segundos aparece la otra forma: un solo cambio en la base y varias reacciones independientes que el botón no conoce.</p>
+          </aside>
+        </section>
+
+        <!-- 5. La meta de hoy -->
+        <section class="lamina llevas" data-titulo="La meta de hoy: el historial y la moto en el mapa" data-min="4 a 7">
+          <p class="ceja">La meta de hoy</p>
+          <h2 class="t2">El historial y la moto en el mapa</h2>
+          <div class="demo">
+            <div class="navegador app-demo entra" style="--i:2">
+              <div class="navegador-barra"><i></i><i></i><i></i><span>localhost:3000</span></div>
+              <div class="app-demo-cuerpo cuerpo-moto">
+                <div class="app-demo-pedido">
+                  <p><span>Pedido 3 · 01:20 p.m.</span><em class="edo edo-camino">En camino</em></p>
+                  <b>Pozole grande para llevar</b>
+                  <ol class="linea-demo marca-1">
+                    <li><b>Recibido</b> 01:20 p.m.</li>
+                    <li><b>Preparando</b> 01:24 p.m.</li>
+                    <li><b>En camino</b> 01:41 p.m.</li>
+                  </ol>
+                </div>
+                <div class="mapa-demo marca-2">
+                  <span class="calle c1"></span><span class="calle c2"></span><span class="calle c3"></span>
+                  <span class="ruta-demo"></span>
+                  <span class="moto-demo">🛵</span>
+                </div>
+                <p class="peso-demo marca-3">Último aviso de la moto: 8 bytes en binario</p>
+              </div>
+            </div>
+            <ol class="llamadas">
+              <li class="llamada" data-paso="1"><span class="parte-num">1</span><div><b>El historial se llena solo</b><p>Cada cambio de estado con su hora.</p></div></li>
+              <li class="llamada" data-paso="2"><span class="parte-num">2</span><div><b>La moto se mueve en el mapa</b><p>Una posición por segundo, en vivo.</p></div></li>
+              <li class="llamada" data-paso="3"><span class="parte-num">3</span><div><b>Cada aviso pesa 8 bytes</b><p>Empacado en binario.</p></div></li>
+            </ol>
+          </div>
+          <div class="llevas-curso" data-paso="4">
+            <p class="etiqueta">Rastro, sigue tu pedido · una sola app que crece clase a clase</p>
+            <div class="ruta-curso">
+              <div class="ruta-fila">
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:150ms"></i></div>
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:300ms"></i></div>
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:450ms"></i></div>
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:600ms"></i></div>
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:750ms"></i></div>
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:900ms"></i><span class="aqui" data-anima="aparece" style="--d:1200ms">Hoy</span></div>
+              </div>
+              <div class="ruta-fila ruta-partes">
+                <p><b>Clase 1</b>Base de datos</p>
+                <p><b>Clase 2</b>Auth y RLS</p>
+                <p><b>Clase 3</b>Realtime</p>
+                <p><b>Clase 4</b>Edge Functions</p>
+                <p><b>Clase 5</b>Storage</p>
+                <p class="actual"><b>Clase 6</b>Eventos y Broadcast</p>
+              </div>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>La meta de hoy: el historial del pedido se llena solo, y un mapa donde el cliente ve la moto moverse en vivo. El mapa, la ruta grabada y el simulador del repartidor vienen hechos; en vivo se escribe lo que es de Supabase.</p>
+            <p>Abajo, el camino del curso: hoy la última pieza.</p>
+          </aside>
+        </section>
+
+        <!-- 6. Sección 2 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 2: arquitectura basada en eventos" data-min="7">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c2">/02</span>
+            <div><h2 class="t1">Arquitectura basada en eventos</h2><p>Cuando pasa algo, otras partes reaccionan solas.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Segunda parte: qué es un evento, el recuento de lo que ya construyeron así, y el historial con un trigger.</p></aside>
+        </section>
+
+        <!-- 7. Ya lo hicieron sin saber -->
+        <section class="lamina" data-titulo="Ya lo hiciste sin saber: tres reacciones a un cambio" data-min="7 a 10">
+          <p class="ceja">Un evento es algo que pasó</p>
+          <h2 class="t2">Ya lo hiciste sin saber</h2>
+          <div class="col3 ideas">
+            <article class="idea entra" style="--i:2"><p class="etiqueta">Clase 2</p><h3 class="t3">Te registras y nace tu perfil</h3><p class="texto">Un trigger en <code>auth.users</code> crea la fila en <code>perfiles</code>.</p></article>
+            <article class="idea entra" style="--i:3"><p class="etiqueta">Clase 3</p><h3 class="t3">Cambia un pedido y la pantalla avanza</h3><p class="texto">Realtime avisa a los navegadores suscritos.</p></article>
+            <article class="idea entra" style="--i:4"><p class="etiqueta">Clase 4</p><h3 class="t3">Sale el pedido y llega el correo</h3><p class="texto">Un webhook llama a la Edge Function.</p></article>
+          </div>
+          <p class="dicho" data-paso="1" data-en="2000">En los tres, quien causó el cambio no sabe quién reacciona: eso es una arquitectura basada en eventos.</p>
+          <aside class="notas">
+            <p>El recuento, con la clase donde lo hicieron. Registrarse no crea el perfil desde la app: lo crea un trigger. El botón de la tienda no avisa a las pantallas: Realtime lo hace. Y nadie manda el correo: un webhook reacciona al cambio.</p>
+            <p>Un evento es algo que pasó. Varias partes reaccionan a él sin que quien lo causó sepa de ellas. Si mañana agregas otra reacción, el botón no cambia.</p>
+          </aside>
+        </section>
+
+        <!-- 8. El historial con un trigger -->
+        <section class="lamina" data-titulo="El historial se llena con un trigger" data-min="10 a 14">
+          <p class="ceja">Trigger</p>
+          <h2 class="t2">El historial se llena solo</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 250" role="img" aria-label="Después de cada insert o update en pedidos, la base corre la función anotar_en_historial. Si el pedido es nuevo o su estado cambió, inserta una fila en historial con el pedido, el estado y la hora. La página trae cada pedido con su historial.">
+              <defs>
+                <marker id="punta-trigger" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="20" width="290" height="180" rx="14"/>
+                <text x="24" y="62" font-size="25" class="t-fuerte mono">pedidos</text>
+                <text x="24" y="96" font-size="18" class="t-suave">after insert</text>
+                <text x="24" y="124" font-size="18" class="t-suave">or update,</text>
+                <text x="24" y="152" font-size="18" class="t-suave">por cada fila</text>
+              </g>
+              <g data-anima="pop" style="--d:450ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="354" y="0" width="420" height="220" rx="14"/>
+                <text x="378" y="42" font-size="22" class="t-fuerte mono">anotar_en_historial()</text>
+                <text x="378" y="76" font-size="18" class="t-suave">solo si el pedido es nuevo</text>
+                <text x="378" y="102" font-size="18" class="t-suave">o su estado cambió:</text>
+                <rect x="378" y="124" width="372" height="72" rx="8" class="f-codigo"/>
+                <text x="394" y="154" font-size="16" class="mono t-codigo">tg_op = 'INSERT' or</text>
+                <text x="394" y="180" font-size="16" class="mono t-codigo">new.estado is distinct from old.estado</text>
+              </g>
+              <g data-anima="pop" style="--d:750ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="838" y="20" width="514" height="180" rx="14"/>
+                <text x="862" y="62" font-size="25" class="t-fuerte mono">historial</text>
+                <text x="862" y="100" font-size="18" class="t-suave mono">pedido 3 · recibido · 13:20</text>
+                <text x="862" y="130" font-size="18" class="t-suave mono">pedido 3 · preparando · 13:24</text>
+                <text x="862" y="160" font-size="18" class="t-fuerte mono">pedido 3 · en_camino · 13:41</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1000ms; stroke-width:2.4" d="M298 110 H346" marker-end="url(#punta-trigger)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1200ms; stroke-width:2.4" d="M782 110 H830" marker-end="url(#punta-trigger)"/>
+              <text x="0" y="246" font-size="21" class="t-suave" data-anima="aparece" style="--d:1500ms">La página trae cada pedido con su historial en una sola consulta; el de la clase 3 lo muestra en vivo.</text>
+            </svg>
+          </figure>
+          <ul class="claves">
+            <li data-paso="1" data-en="2200">RLS: ves el historial si puedes ver el pedido</li>
+            <li data-paso="1"><code>select("*, historial(...)")</code> trae la relación</li>
+          </ul>
+          <aside class="notas">
+            <p>El historial no lo escribe ningún botón. Un trigger en <em>pedidos</em> corre después de cada insert o update y llama a una función que, si el pedido es nuevo o su estado cambió, inserta una fila en <em>historial</em> con el estado y la hora.</p>
+            <p>La tabla <em>historial</em> tiene RLS con la regla de siempre: la ves si puedes ver el pedido. La página la trae junto con los pedidos en una sola consulta, y como <em>EnVivo</em> de la clase 3 ya vuelve a renderizar con cada cambio, el cliente la ve en vivo sin código nuevo.</p>
+          </aside>
+        </section>
+
+        <!-- 9. Sección 3 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 3: Broadcast" data-min="14">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c3">/03</span>
+            <div><h2 class="t1">Broadcast</h2><p>Mensajes al momento, sin pasar por la base.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Tercera parte: la diferencia entre los cambios de la base y Broadcast, y cómo viaja la posición de la moto.</p></aside>
+        </section>
+
+        <!-- 10. Postgres Changes o Broadcast -->
+        <section class="lamina" data-titulo="Postgres Changes o Broadcast" data-min="14 a 17">
+          <p class="ceja">Dos formas de Realtime</p>
+          <h2 class="t2">Postgres Changes o Broadcast</h2>
+          <div class="col2 preguntas">
+            <div class="caja entra" style="--i:2">
+              <p class="etiqueta">Postgres Changes · clase 3</p>
+              <h3 class="t3">Cambios de la base</h3>
+              <p class="texto">Primero se guarda la fila y luego se avisa. Sirve para lo que tiene que quedar registrado: el estado de un pedido.</p>
+            </div>
+            <div class="caja caja-si" data-paso="1" data-en="1500">
+              <p class="etiqueta">Broadcast · hoy</p>
+              <h3 class="t3">Mensajes entre clientes</h3>
+              <p class="texto">Van por un canal y no se guardan. Sirve para lo que solo importa en el momento: la ubicación de cada segundo.</p>
+            </div>
+          </div>
+          <p class="dicho" data-paso="2" data-en="2600">Guardar 60 posiciones por minuto por cada moto llenaría la base de filas que nadie vuelve a leer.</p>
+          <aside class="notas">
+            <p>Realtime tiene dos caras. Postgres Changes, de la clase 3: la fila se guarda y luego se avisa. Broadcast: un cliente manda un mensaje por un canal y los demás suscritos lo reciben al momento, sin tocar la base.</p>
+            <p>La ubicación de la moto cambia cada segundo y solo importa en ese momento: si la guardáramos, serían 60 filas por minuto por moto que nadie vuelve a leer. Si no estás conectado cuando pasa el mensaje, te lo pierdes, y está bien.</p>
+          </aside>
+        </section>
+
+        <!-- 11. Cómo viaja la moto -->
+        <section class="lamina" data-titulo="Cómo viaja la posición de la moto" data-min="17 a 21">
+          <p class="ceja">Un canal por pedido</p>
+          <h2 class="t2">Cómo viaja la posición de la moto</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 230" role="img" aria-label="La tienda simula al repartidor y cada segundo manda la posición por el canal pedido-3 con send, evento posicion. Realtime la reparte a los suscritos del canal. El cliente escucha el evento posicion en el mismo canal y mueve la moto en el mapa.">
+              <defs>
+                <marker id="punta-moto" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="0" width="400" height="200" rx="14"/>
+                <text x="24" y="42" font-size="24" class="t-fuerte">La tienda · <tspan class="mono">Simulador</tspan></text>
+                <text x="24" y="74" font-size="18" class="t-suave">recorre la ruta grabada,</text>
+                <text x="24" y="100" font-size="18" class="t-suave">un punto por segundo</text>
+                <rect x="24" y="124" width="352" height="52" rx="8" class="f-codigo"/>
+                <text x="40" y="157" font-size="14" class="mono t-codigo">send({ event: "posicion", … })</text>
+              </g>
+              <g data-anima="pop" style="--d:450ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="476" y="30" width="400" height="140" rx="14"/>
+                <text x="500" y="72" font-size="24" class="t-fuerte">Canal <tspan class="mono">pedido-3</tspan></text>
+                <text x="500" y="106" font-size="18" class="t-suave">Realtime lo reparte a</text>
+                <text x="500" y="132" font-size="18" class="t-suave">los suscritos; no guarda nada</text>
+              </g>
+              <g data-anima="pop" style="--d:750ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="952" y="0" width="400" height="200" rx="14"/>
+                <text x="976" y="42" font-size="24" class="t-fuerte">El cliente · <tspan class="mono">SeguirMoto</tspan></text>
+                <text x="976" y="74" font-size="18" class="t-suave">escucha el evento y</text>
+                <text x="976" y="100" font-size="18" class="t-suave">mueve la moto en el mapa</text>
+                <rect x="976" y="124" width="352" height="52" rx="8" class="f-codigo"/>
+                <text x="992" y="157" font-size="14" class="mono t-codigo">on("broadcast", { event: "posicion" })</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1000ms; stroke-width:2.4" d="M408 100 H468" marker-end="url(#punta-moto)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1200ms; stroke-width:2.4" d="M884 100 H944" marker-end="url(#punta-moto)"/>
+            </svg>
+          </figure>
+          <div class="funcion aviso-seguridad" data-paso="1" data-en="2000">
+            <code>canal público</code>
+            <p>En el curso cualquiera que sepa el nombre del canal puede escucharlo. En producción, la ubicación va en <b>canales privados</b>, con políticas (Realtime Authorization).</p>
+          </div>
+          <aside class="notas">
+            <p>Un canal por pedido: <em>pedido-3</em>. La tienda, que hace de repartidor con el simulador, manda cada segundo la posición con <em>send</em>, con el evento <em>posicion</em>. El cliente se suscribe al mismo canal y escucha ese evento para mover la moto.</p>
+            <p>Dilo tal cual: en el curso el canal es público, así que cualquiera que sepa su nombre y tenga la llave publishable puede escuchar la ubicación. Para datos sensibles, Supabase tiene canales privados con políticas (Realtime Authorization). Queda como mejora.</p>
+          </aside>
+        </section>
+
+        <!-- 12. Sección 4 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 4: binario y escala" data-min="21">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c4">/04</span>
+            <div><h2 class="t1">Binario y escala</h2><p>Menos bytes por mensaje y menos mensajes.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Cuarta parte, la última de teoría: mandar la posición en binario, qué pasa con 200 repartidores, el error del día y qué no va en tiempo real. Al terminarla empieza la práctica.</p></aside>
+        </section>
+
+        <!-- 13. Texto o binario -->
+        <section class="lamina" data-titulo="La misma posición en texto o en binario" data-min="21 a 24">
+          <p class="ceja">Payloads binarios</p>
+          <h2 class="t2">La misma posición, en texto o en binario</h2>
+          <div class="pesos">
+            <div class="peso entra" style="--i:2">
+              <p class="etiqueta">Texto · JSON</p>
+              <code>{"lat":19.4185,"lng":-99.1592}</code>
+              <div class="peso-barra"><i style="--ancho: 100%"></i></div>
+              <b>unos 30 a 32 bytes</b>
+            </div>
+            <div class="peso" data-paso="1">
+              <p class="etiqueta">Binario · <code>Float32Array</code></p>
+              <code>2 números × 4 bytes</code>
+              <div class="peso-barra"><i style="--ancho: 25%"></i></div>
+              <b>8 bytes</b>
+            </div>
+          </div>
+          <p class="dicho" data-paso="2">Cada número ocupa siempre 4 bytes, sin nombres de campos ni comillas. Y se manda el <code>.buffer</code>, no el arreglo.</p>
+          <aside class="notas">
+            <p>En texto, cada aviso lleva los nombres de los campos, comillas y cada dígito como un carácter: unos 30 a 32 bytes. En binario, dos números de 4 bytes: 8 bytes. La precisión de un Float32 alcanza para una posición en el mapa.</p>
+            <p>Un detalle: se manda el <em>.buffer</em> del <em>Float32Array</em>. Si mandas el arreglo tal cual, la librería lo convierte en texto y llega como objeto, con decimales raros.</p>
+          </aside>
+        </section>
+
+        <!-- 14. 200 repartidores -->
+        <section class="lamina" data-titulo="¿Y si fueran 200 repartidores?" data-min="24 a 27">
+          <p class="ceja">La cuenta en la pizarra</p>
+          <h2 class="t2">¿Y si fueran 200 repartidores?</h2>
+          <div class="cuenta">
+            <div class="cuenta-fila entra" style="--i:2"><span>200 motos × 1 aviso por segundo</span><b>200 mensajes/s</b></div>
+            <div class="cuenta-fila cuenta-limite" data-paso="1"><span>Límite del plan gratis de Supabase Realtime</span><b>100 mensajes/s</b></div>
+            <div class="cuenta-fila cuenta-bien" data-paso="2"><span>Juntar: un solo mensaje por segundo con las 200 posiciones</span><b>1 mensaje/s</b></div>
+            <div class="cuenta-fila cuenta-bien" data-paso="3"><span>Empacar en binario: 200 × 8 bytes</span><b>1,600 bytes</b></div>
+          </div>
+          <p class="dicho" data-paso="4">Para escalar: juntar los avisos en menos mensajes y empacarlos en binario. <code>empacar()</code> ya recibe varias posiciones.</p>
+          <aside class="notas">
+            <p>La cuenta: 200 motos avisando cada segundo son 200 mensajes por segundo. El plan gratis de Realtime aguanta 100 (página de límites de Supabase, revisada el 29 sep 2026). Ya no caben.</p>
+            <p>Dos arreglos que se combinan: juntar, un solo mensaje por segundo con todas las posiciones, y empacar en binario: 200 posiciones son 1,600 bytes en un solo mensaje, muy lejos del límite de 256 KB por mensaje.</p>
+          </aside>
+        </section>
+
+        <!-- 15. El error del día -->
+        <section class="lamina" data-titulo="El error del día: el binario no llega o llega como texto" data-min="27 a 28">
+          <p class="ceja">El error del día</p>
+          <h2 class="t2">El binario no llega, o llega como texto</h2>
+          <div class="col2 preguntas">
+            <div class="caja caja-no entra" style="--i:2">
+              <p class="etiqueta">Librería vieja</p>
+              <h3 class="t3">No llega, sin error</h3>
+              <p class="texto">Con <code>@supabase/supabase-js</code> 2.90.0 el texto llega y el binario se descarta en silencio. El proyecto usa una versión nueva.</p>
+            </div>
+            <div class="caja caja-no" data-paso="1" data-en="1500">
+              <p class="etiqueta">Sin <code>.buffer</code></p>
+              <h3 class="t3">Llega como texto</h3>
+              <p class="texto">Si mandas el <code>Float32Array</code>, llega convertido: <code>{"0":19.4115…,"1":-99.1686}</code>.</p>
+            </div>
+          </div>
+          <p class="dicho" data-paso="2" data-en="2600">Si el binario no se comporta, revisa la versión de la librería y que mandes un <code>ArrayBuffer</code>.</p>
+          <aside class="notas">
+            <p>Dos errores con el binario, los dos sin mensaje de error. Con una versión vieja de la librería del navegador, el binario nunca llega aunque el texto sí: se probó con la 2.90.0. El proyecto trae la 2.117, que sí lo maneja.</p>
+            <p>El otro: mandar el <em>Float32Array</em> en lugar de su <em>.buffer</em>. No falla: llega convertido en un objeto con índices y decimales raros. Por eso <em>empacar()</em> regresa el <em>.buffer</em>.</p>
+          </aside>
+        </section>
+
+        <!-- 16. Qué no va en tiempo real -->
+        <section class="lamina" data-titulo="Más allá de la moto: qué sí y qué no va en tiempo real" data-min="28 a 30">
+          <p class="ceja">Más allá de la moto</p>
+          <h2 class="t2">Qué sí y qué no va en tiempo real</h2>
+          <div class="col2 preguntas">
+            <div class="caja caja-si entra" style="--i:2">
+              <p class="etiqueta">Sí: lo que importa en el momento</p>
+              <h3 class="t3">Broadcast y Presence</h3>
+              <p class="texto">Cursores en vivo, el "escribiendo...", votaciones en vivo, juegos por turnos, ubicaciones.</p>
+            </div>
+            <div class="caja caja-no" data-paso="1" data-en="1500">
+              <p class="etiqueta">No: lo que no se puede perder</p>
+              <h3 class="t3">A la base de datos</h3>
+              <p class="texto">Pagos, pedidos y cualquier cosa que tenga que quedar registrada: se guarda primero y luego se avisa.</p>
+            </div>
+          </div>
+          <p class="dicho" data-paso="2" data-en="2600">Un mensaje de Broadcast que nadie escuchó se perdió. Si no se puede perder, va a la base.</p>
+          <aside class="notas">
+            <p>Cinco minutos para abrir la cabeza: Broadcast y Presence sirven para mucho más que un chat. Cursores en vivo como en Figma, el "escribiendo...", votaciones en vivo, juegos por turnos.</p>
+            <p>Y el cierre técnico del curso: lo que no se puede perder, como un pago o un pedido, no va por Broadcast. Se guarda en la base y, si hace falta, se avisa con Postgres Changes.</p>
+            <p>Aquí terminan las láminas de teoría: empieza la práctica. Al final de la clase regresa a la parte 5.</p>
+          </aside>
+        </section>
+
+        <!-- 17. Sección 5 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 5: para cerrar el curso" data-min="110">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c5">/05</span>
+            <div><h2 class="t1">Para cerrar el curso</h2><p>Lo que te llevas, la tarea y lo que sigue.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Esta parte va al final de la clase, cuando ya construiste todo en vivo: las tres ideas, la tarea, el proyecto final, los recursos y el cierre del curso.</p></aside>
+        </section>
+
+        <!-- 18. Resumen -->
+        <section class="lamina" data-titulo="Resumen: las tres ideas de hoy" data-min="110 a 112">
+          <p class="ceja">Lo que te llevas hoy</p>
+          <h2 class="t2">Tres ideas</h2>
+          <div class="col3 ideas">
+            <article class="idea entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Un evento, varias reacciones</h3><p class="texto">Trigger, Realtime y webhook reaccionan sin que el origen los conozca.</p></article>
+            <article class="idea entra" style="--i:3"><span class="paso-num">2</span><h3 class="t3">Broadcast no guarda nada</h3><p class="texto">Mensajes al momento para lo que solo importa en el momento.</p></article>
+            <article class="idea entra" style="--i:4"><span class="paso-num">3</span><h3 class="t3">Binario: el mismo dato con menos bytes</h3><p class="texto">Para escalar, juntar los avisos y empacarlos.</p></article>
+          </div>
+          <aside class="notas">
+            <p>Ya con todo funcionando: tres frases, una por idea. Pregunta si alguien la puede decir con sus palabras antes de enseñarla.</p>
+          </aside>
+        </section>
+
+        <!-- 19. Tarea -->
+        <section class="lamina" data-titulo="Tarea: construye tú solo lo que viste hoy" data-min="112 a 114">
+          <p class="ceja">Tarea</p>
+          <h2 class="t2">Construye tú solo lo que viste hoy</h2>
+          <div class="tarea">
+            <div>
+              <p class="etiqueta">Cómo sé que ya quedó</p>
+              <ul class="checklist">
+                <li data-paso="1">Cada cambio de estado aparece en el historial, con su hora.</li>
+                <li data-paso="1">El cliente ve el historial actualizarse sin recargar.</li>
+                <li data-paso="1">La moto se mueve en el mapa del cliente.</li>
+                <li data-paso="1">Con "Mandar en binario", cada aviso pesa 8 bytes.</li>
+              </ul>
+            </div>
+            <div class="caja caja-si atorado" data-paso="2" data-en="2000">
+              <p class="etiqueta">¿No te salió?</p>
+              <h3 class="t3">No pasa nada</h3>
+              <p class="texto">Compara con <code>clase-6-final</code>: es el proyecto terminado.</p>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>La tarea es simple: construir por su cuenta lo que vieron hoy. Como es la última clase, si no les sale comparan con <em>clase-6-final</em>, el proyecto terminado.</p>
+          </aside>
+        </section>
+
+        <!-- 20. Proyecto final -->
+        <section class="lamina" data-titulo="Proyecto final sugerido" data-min="114 a 115">
+          <p class="ceja">Proyecto final sugerido</p>
+          <h2 class="t2">Adapta Rastro a un negocio real</h2>
+          <div class="col4 negocios">
+            <p class="negocio entra" style="--i:2">Florería</p>
+            <p class="negocio entra" style="--i:3">Farmacia</p>
+            <p class="negocio entra" style="--i:4">Lavandería</p>
+            <p class="negocio entra" style="--i:5">Papelería</p>
+          </div>
+          <p class="dicho" data-paso="1" data-en="1800">Mismas piezas: tablas con RLS, sesión, Realtime, una función, Storage y eventos. Otro negocio, otras reglas.</p>
+          <aside class="notas">
+            <p>La sugerencia para seguir practicando: tomar un negocio real que conozcan y adaptar Rastro. Las piezas son las mismas; lo que cambia son las tablas y las reglas de quién ve qué.</p>
+          </aside>
+        </section>
+
+        <!-- 21. Para profundizar -->
+        <section class="lamina" data-titulo="Recursos para profundizar" data-min="115">
+          <h2 class="t2">Recursos para profundizar</h2>
+          <ul class="recursos">
+            <li class="entra" style="--i:1">Broadcast: <a href="https://supabase.com/docs/guides/realtime/broadcast">supabase.com/docs/guides/realtime/broadcast</a></li>
+            <li class="entra" style="--i:2">Canales privados (Realtime Authorization): <a href="https://supabase.com/docs/guides/realtime/authorization">supabase.com/docs/guides/realtime/authorization</a></li>
+            <li class="entra" style="--i:3">Triggers en Postgres: <a href="https://supabase.com/docs/guides/database/postgres/triggers">supabase.com/docs/guides/database/postgres/triggers</a></li>
+            <li class="entra" style="--i:4">Límites de Realtime: <a href="https://supabase.com/docs/guides/realtime/limits">supabase.com/docs/guides/realtime/limits</a></li>
+          </ul>
+          <img class="deco mascota laptop" src="../marca/mascota-laptop.png" alt="" />
+          <aside class="notas">
+            <p>La documentación oficial, por si quieren ir más lejos. No es tarea.</p>
+          </aside>
+        </section>
+
+        <!-- 22. Cierre del curso -->
+        <section class="lamina llevas" data-titulo="Cierre del curso: una app completa en seis clases" data-min="115 a 120">
+          <p class="ceja">Cierre del curso</p>
+          <h2 class="t2">Seis clases, una app completa</h2>
+          <div class="llevas-curso cierre-curso">
+            <div class="ruta-curso">
+              <div class="ruta-fila">
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:150ms"></i></div>
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:300ms"></i></div>
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:450ms"></i></div>
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:600ms"></i></div>
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:750ms"></i></div>
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:900ms"></i></div>
+              </div>
+              <div class="ruta-fila ruta-partes">
+                <p class="actual"><b>Clase 1</b>Base de datos</p>
+                <p class="actual"><b>Clase 2</b>Auth y RLS</p>
+                <p class="actual"><b>Clase 3</b>Realtime</p>
+                <p class="actual"><b>Clase 4</b>Edge Functions</p>
+                <p class="actual"><b>Clase 5</b>Storage</p>
+                <p class="actual"><b>Clase 6</b>Eventos y Broadcast</p>
+              </div>
+            </div>
+          </div>
+          <p class="final" data-paso="1" data-en="1600">Gracias. <strong>Nos vemos en el proyecto final.</strong></p>
+          <p class="contacto" data-paso="2" data-en="2400">rodrigomendez.dev · github.com/rodrigo2392</p>
+          <aside class="notas">
+            <p>El recorrido completo: una base de datos, cuentas con reglas, pantallas en vivo, una función con secretos, archivos privados y eventos. Una sola app, construida pieza por pieza.</p>
+            <p>Gracias, y dónde encontrarte.</p>
+          </aside>
+        </section>
+
+        <div class="cajetin" aria-hidden="true">
+          <span>Rastro · Supabase + Next.js</span><span>Clase 6</span><span>Lámina <b>01 de 22</b></span>
+        </div>
+        <div class="avance" aria-hidden="true"></div>
+      </div>
+      <p class="solo-lector" aria-live="polite"></p>
+    </div>
+
+    <nav class="controles" aria-label="Controles de la presentación">
+      <button type="button" data-accion="anterior" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="contador" aria-live="off">1 / 1</span>
+      <button type="button" data-accion="siguiente" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <span class="separa" aria-hidden="true"></span>
+      <button type="button" data-accion="pantalla" aria-label="Pantalla completa" title="Pantalla completa (F)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+      <button type="button" data-accion="tema" aria-label="Cambiar entre claro y oscuro" title="Claro u oscuro (T)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/></svg>
+      </button>
+      <button type="button" data-accion="otra" title="Pasar a la otra presentación (O)" hidden>
+        <span class="otra-texto"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </button>
+      <button type="button" data-accion="presentador" title="Abrir las notas en otra ventana (P)">Notas</button>
+      <button type="button" data-accion="ayuda" aria-label="Ver los atajos del teclado" title="Atajos (?)">?</button>
+    </nav>
+
+    <div class="aviso-teclas fuera" role="status"></div>
+
+    <div class="ayuda" hidden>
+      <div class="ayuda-caja" role="dialog" aria-modal="true" aria-label="Atajos del teclado">
+        <h2>Atajos del teclado</h2>
+        <dl>
+          <dt><kbd>→</kbd> <kbd>Espacio</kbd> <kbd>Av Pág</kbd></dt><dd>Pasar a la siguiente lámina: lo de cada lámina aparece solo, con su animación</dd>
+          <dt><kbd>←</kbd> <kbd>Re Pág</kbd></dt><dd>Regresar</dd>
+          <dt><kbd>Inicio</kbd> <kbd>Fin</kbd></dt><dd>Ir a la primera o a la última</dd>
+          <dt><kbd>F</kbd></dt><dd>Pantalla completa</dd>
+          <dt><kbd>P</kbd></dt><dd>Notas y cronómetro en otra ventana. Desde ahí se prende el modo limpio: sin botones, y solo las notas mueven las láminas</dd>
+          <dt><kbd>Esc</kbd></dt><dd>Cerrar esta ayuda</dd>
+        </dl>
+      </div>
+    </div>
+
+    <script src="../motor/motor.js"></script>
+  </body>
+</html>

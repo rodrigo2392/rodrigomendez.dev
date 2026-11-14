@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clase 1 · Base de datos con Supabase</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@500;700&display=swap"
+    />
+    <link rel="stylesheet" href="../motor/motor.css" />
+    <link rel="stylesheet" href="../motor/comun.css" />
+    <link rel="stylesheet" href="../motor/codigofacilito.css" />
+    <link rel="stylesheet" href="../motor/piezas.css" />
+    <link rel="stylesheet" href="clase-1.css" />
+  </head>
+  <body>
+    <!--
+      Clase 1 del bootcamp: base de datos con Supabase (mié 14 oct 2026).
+      El guion y los tiempos viven en el vault, en 10-proyectos/bootcamp-codigofacilito-programa.
+      El código de la clase: branches clase-1-inicio, clase-1-rescate y clase-1-final del repo.
+    -->
+    <div class="escenario" data-nombre="clase-1" role="region" aria-roledescription="presentación" aria-label="Clase 1: base de datos con Supabase">
+      <div class="lienzo">
+        <div class="registro" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+        <!-- 1. Portada, con el formato de Código Facilito -->
+        <section class="lamina portada fondo-portada" data-titulo="Portada: base de datos con Supabase" data-min="0">
+          <p class="portada-bootcamp">Bootcamp · Módulo 4: Integración App + DB</p>
+          <h1 class="t1">Base de datos con Supabase</h1>
+          <p class="portada-clase">Clase 1 de 6 · Supabase + Next.js</p>
+          <p class="portada-autor">Rodrigo Méndez<small>rodrigomendez.dev</small></p>
+          <div class="deco fichas-tec" aria-hidden="true" data-anima="aparece" style="--d:300ms">
+            <span class="ficha-tec next">Next.js</span>
+            <span class="ficha-tec supa">Supabase</span>
+            <span class="ficha-tec ts">TS</span>
+          </div>
+          <img class="deco destellos" src="../marca/destellos.png" alt="" data-anima="pop" style="--d:800ms" />
+          <img class="deco mascota-portada" src="../marca/mascota-portada.png" alt="" />
+          <aside class="notas">
+            <p>Bienvenida. Durante seis clases vamos a construir una sola app: <em>Rastro</em>, para que los clientes de la Fonda La Esquina sigan su pedido como en las apps de comida.</p>
+            <p>Hoy, la primera pieza: guardar los pedidos en una base de datos de Supabase y leerlos y escribirlos desde Next.js.</p>
+          </aside>
+        </section>
+
+        <!-- 2. Hola: quién te va a enseñar -->
+        <section class="lamina hola fondo-seccion" data-titulo="¡Hola! Quién te va a enseñar" data-min="0 a 2">
+          <span class="deco circulo amarillo" style="width: 176px; height: 176px; left: 958px; top: 30px"></span>
+          <span class="deco circulo cian" style="width: 132px; height: 132px; left: 1456px; top: 420px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1104px; top: 780px"></span>
+          <div class="hola-tarjeta">
+            <div>
+              <h2 class="hola-titulo">¡Hola! <img src="../marca/saludo.png" alt="" /></h2>
+              <p class="hola-quien"><b>Rodrigo Méndez</b>, ingeniero de software full stack: React, React Native, Next.js y Node.js.</p>
+              <div class="hola-anios"><span class="numero" data-anima="cuenta" data-valor="12" data-dur="1200" style="--d:300ms">12</span><span>años construyendo software para empresas grandes.</span></div>
+              <ul class="hola-logros">
+                <li class="entra" style="--i:3">Construí desde cero la app que usan los repartidores de una cadena nacional de tiendas para el hogar.</li>
+                <li class="entra" style="--i:4">La app de una cadena de tiendas departamentales, con más de un millón de descargas.</li>
+                <li class="entra" style="--i:5">Fundé Piclink, una plataforma para fotógrafos que construí y opero solo.</li>
+              </ul>
+            </div>
+            <figure class="hola-foto entra" style="--i:1">
+              <img src="../marca/rodrigo.jpg" alt="Rodrigo Méndez" width="340" height="340" />
+              <p>rodrigomendez.dev<br />github.com/rodrigo2392</p>
+            </figure>
+          </div>
+          <aside class="notas">
+            <p>Doce años haciendo software. La app de repartidores de una cadena nacional de tiendas para el hogar, que construí desde cero; la app de una cadena de tiendas departamentales, con más de un millón de descargas; y Piclink, mi propia plataforma.</p>
+            <p><strong>Sin nombres de clientes</strong>, ni en la lámina ni en voz alta. Si alguien pregunta cuáles son, se dice que no se dan nombres de clientes y se sigue. Si preguntan por tu relación con ellos: contratista integrado en sus equipos, no empleado directo.</p>
+          </aside>
+        </section>
+
+        <!-- 3. Tabla de contenido -->
+        <section class="lamina" data-titulo="Tabla de contenido" data-min="2 a 3">
+          <h2 class="temario-titulo"><img src="../marca/tabla.png" alt="" />Tabla de contenido</h2>
+          <ol class="temario">
+            <li class="entra" style="--i:1"><span class="chip-seccion">/01</span>El problema y el proyecto</li>
+            <li class="entra" style="--i:2"><span class="chip-seccion c2">/02</span>Supabase y la arquitectura</li>
+            <li class="entra" style="--i:3"><span class="chip-seccion c3">/03</span>Tablas, conexión y lectura</li>
+            <li class="entra" style="--i:4"><span class="chip-seccion c4">/04</span>Escribir datos</li>
+            <li class="entra" style="--i:5"><span class="chip-seccion c5">/05</span>Para cerrar la clase</li>
+          </ol>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>El mapa de hoy: cuatro partes de teoría y, en cuanto terminen, construyo la app en vivo mientras ustedes miran. La parte 5 va al final de la clase, después de la práctica.</p></aside>
+        </section>
+
+        <!-- 4. Sección 1 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 1: el problema y el proyecto" data-min="3">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion">/01</span>
+            <div><h2 class="t1">El problema y el proyecto</h2><p>Qué vamos a construir, y por qué.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Primera parte: el problema que resuelve una base de datos y lo que vamos a construir hoy.</p></aside>
+        </section>
+
+        <!-- 5. El problema -->
+        <section class="lamina" data-titulo="El problema: ¿cómo ven todos los mismos pedidos?" data-min="3 a 5">
+          <p class="ceja">El problema</p>
+          <h2 class="t2 pregunta">La cocina, la caja y el repartidor trabajan en dispositivos distintos. ¿Cómo ven los mismos pedidos, al mismo tiempo?</h2>
+          <figure class="problema">
+            <svg viewBox="0 0 1384 360" role="img" aria-label="Hoy cada dispositivo guarda su propia copia de los pedidos y cada copia dice algo distinto. La solución: una base de datos compartida que consultan la cocina, la caja y el repartidor.">
+              <defs>
+                <marker id="punta-problema" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-senal"/>
+                </marker>
+              </defs>
+              <text x="0" y="22" font-size="17" class="t-suave t-fuerte" letter-spacing="2">HOY: CADA DISPOSITIVO CON SU COPIA</text>
+
+              <g data-anima="pop" style="--d:300ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="44" width="180" height="200" rx="10"/>
+                <path class="svg-linea s-linea" d="M22 104 H158 M22 148 H158 M22 192 H158"/>
+                <text x="22" y="92" font-size="21" class="t-fuerte">Pedido 1</text>
+                <text x="22" y="136" font-size="21" class="t-fuerte">Pedido 2</text>
+                <text x="22" y="180" font-size="21" class="t-fuerte">Pedido 3</text>
+              </g>
+              <text x="90" y="284" font-size="25" class="t-fuerte" text-anchor="middle">Cocina</text>
+
+              <g data-anima="pop" style="--d:450ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="220" y="44" width="180" height="200" rx="10"/>
+                <path class="svg-linea s-linea" d="M242 104 H378 M242 148 H378 M242 192 H378"/>
+                <text x="242" y="92" font-size="21" class="t-fuerte">Pedido 1</text>
+                <text x="242" y="136" font-size="21" class="t-fuerte">Pedido 2</text>
+              </g>
+              <text x="310" y="284" font-size="25" class="t-fuerte" text-anchor="middle">Caja</text>
+
+              <g data-anima="pop" style="--d:600ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="440" y="44" width="180" height="200" rx="10"/>
+                <path class="svg-linea s-linea" d="M462 104 H598 M462 148 H598 M462 192 H598"/>
+                <text x="462" y="92" font-size="21" class="t-fuerte">Pedido 1</text>
+              </g>
+              <text x="530" y="284" font-size="25" class="t-fuerte" text-anchor="middle">Repartidor</text>
+
+              <text x="0" y="340" font-size="23" class="t-rojo t-fuerte" data-anima="aparece" style="--d:900ms">Cada copia dice algo distinto</text>
+
+              <g data-paso="1" data-en="2200">
+                <path class="svg-linea s-senal" style="stroke-width:3" d="M656 144 H724" marker-end="url(#punta-problema)"/>
+                <text x="770" y="22" font-size="17" class="t-senal t-fuerte" letter-spacing="2">LA SOLUCIÓN: UNA BASE DE DATOS COMPARTIDA</text>
+                <rect class="f-senal-fondo s-senal" style="stroke-width:2" x="770" y="44" width="250" height="200" rx="12"/>
+                <path class="svg-linea s-senal" style="stroke-opacity:0.35" d="M792 104 H998 M792 148 H998 M792 192 H998"/>
+                <text x="792" y="92" font-size="21" class="t-fuerte">Pedido 1</text>
+                <text x="792" y="136" font-size="21" class="t-fuerte">Pedido 2</text>
+                <text x="792" y="180" font-size="21" class="t-fuerte">Pedido 3</text>
+                <text x="895" y="284" font-size="25" class="t-fuerte" text-anchor="middle">Base de datos</text>
+
+                <path class="svg-linea s-plano" data-anima="traza" style="--d:150ms" d="M1020 144 C1075 144 1075 70 1130 70"/>
+                <path class="svg-linea s-plano" data-anima="traza" style="--d:250ms" d="M1020 144 H1130"/>
+                <path class="svg-linea s-plano" data-anima="traza" style="--d:350ms" d="M1020 144 C1075 144 1075 218 1130 218"/>
+                <g data-anima="pop" style="--d:900ms">
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="1134" y="44" width="250" height="52" rx="8"/>
+                  <text x="1156" y="78" font-size="22" class="t-fuerte">Cocina</text>
+                  <text x="1356" y="80" font-size="26" class="t-verde t-fuerte" text-anchor="end">✓</text>
+                </g>
+                <g data-anima="pop" style="--d:1050ms">
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="1134" y="118" width="250" height="52" rx="8"/>
+                  <text x="1156" y="152" font-size="22" class="t-fuerte">Caja</text>
+                  <text x="1356" y="154" font-size="26" class="t-verde t-fuerte" text-anchor="end">✓</text>
+                </g>
+                <g data-anima="pop" style="--d:1200ms">
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="1134" y="192" width="250" height="52" rx="8"/>
+                  <text x="1156" y="226" font-size="22" class="t-fuerte">Repartidor</text>
+                  <text x="1356" y="228" font-size="26" class="t-verde t-fuerte" text-anchor="end">✓</text>
+                </g>
+                <text x="770" y="340" font-size="23" class="t-verde t-fuerte">Una sola fuente de verdad</text>
+              </g>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>Plantea el problema mientras aparece el dibujo: si cada dispositivo guarda su propia copia, las copias se desfasan y alguien trabaja con datos viejos. Pasa igual con un Excel que se manda por correo.</p>
+            <p>A los dos segundos aparece la solución: una base de datos compartida, una sola fuente de verdad que todos consultan y actualizan.</p>
+          </aside>
+        </section>
+
+        <!-- 6. La meta de hoy, dentro del proyecto del curso -->
+        <section class="lamina llevas" data-titulo="La meta de hoy: tu app con los pedidos en Supabase, la primera pieza de Rastro" data-min="5 a 8">
+          <p class="ceja">La meta de hoy</p>
+          <h2 class="t2">Tu app, con los pedidos en Supabase</h2>
+          <div class="demo">
+            <div class="navegador app-demo entra" style="--i:2">
+              <div class="navegador-barra"><i></i><i></i><i></i><span>localhost:3000</span></div>
+              <div class="app-demo-cuerpo">
+                <p class="app-demo-marca">Fonda La Esquina</p>
+                <p class="app-demo-titulo">Pedidos</p>
+                <div class="app-demo-form marca-2">
+                  <b>Nuevo pedido</b>
+                  <span class="campo">¿Qué pidió? Ej. 3 tacos al pastor y una horchata</span>
+                  <span class="campo">Dirección</span>
+                  <span class="campo">Teléfono</span>
+                  <span class="boton">Agregar pedido</span>
+                </div>
+                <div class="app-demo-lista marca-1">
+                  <div class="app-demo-pedido">
+                    <p><span>Pedido 3 · 01:20 p.m.</span><em class="edo edo-camino">En camino</em></p>
+                    <b>Pozole grande para llevar</b>
+                    <small>Calle Allende 12, Col. Roma · 55 2468 1357</small>
+                    <span class="boton-oscuro marca-3">Marcar “Entregado”</span>
+                  </div>
+                  <div class="app-demo-pedido">
+                    <p><span>Pedido 2 · 01:10 p.m.</span><em class="edo edo-preparando">Preparando</em></p>
+                    <b>Orden de quesadillas y un refresco</b>
+                    <small>Av. Hidalgo 210, Col. Juárez · 55 8765 4321</small>
+                    <span class="boton-oscuro marca-3">Marcar “En camino”</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ol class="llamadas">
+              <li class="llamada" data-paso="1"><span class="parte-num">1</span><div><b>La lista viene de la base</b><p>La página consulta los pedidos en Supabase antes de renderizarse.</p></div></li>
+              <li class="llamada" data-paso="2"><span class="parte-num">2</span><div><b>El formulario guarda</b><p>Lo que escribes llega a la tabla, y lo ve cualquiera que abra la app.</p></div></li>
+              <li class="llamada" data-paso="3"><span class="parte-num">3</span><div><b>Los botones cambian el estado</b><p>Recibido, preparando, en camino y entregado.</p></div></li>
+            </ol>
+          </div>
+          <div class="llevas-curso" data-paso="4">
+            <p class="etiqueta">Rastro, sigue tu pedido · una sola app que crece clase a clase</p>
+            <div class="ruta-curso">
+              <div class="ruta-fila">
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:150ms"></i><span class="aqui" data-anima="aparece" style="--d:1200ms">Hoy</span></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:300ms"></i></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:450ms"></i></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:600ms"></i></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:750ms"></i></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:900ms"></i></div>
+              </div>
+              <div class="ruta-fila ruta-partes">
+                <p class="actual"><b>Clase 1</b>Base de datos</p>
+                <p><b>Clase 2</b>Auth y RLS</p>
+                <p><b>Clase 3</b>Realtime</p>
+                <p><b>Clase 4</b>Edge Functions</p>
+                <p><b>Clase 5</b>Storage</p>
+                <p><b>Clase 6</b>Eventos y Broadcast</p>
+              </div>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>Esta es la meta de hoy: una app que guarda los pedidos en Supabase. Todavía no hay nada hecho. La construyo en vivo en cuanto terminen las láminas: ustedes miran y entienden, y de tarea la construyen por su cuenta.</p>
+            <p>Se marcan solos, uno tras otro: la lista que viene de la base, el formulario que guarda y los botones que cambian el estado.</p>
+            <p>Abajo aparece el camino del curso: seis clases, una sola app, y nadie empieza de cero dos veces. Cada clase le agrega una pieza a lo que ya funciona.</p>
+          </aside>
+        </section>
+
+        <!-- 7. Sección 2 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 2: Supabase y la arquitectura" data-min="8">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c2">/02</span>
+            <div><h2 class="t1">Supabase y la arquitectura</h2><p>Qué es Supabase y dónde corre cada parte de la app.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Segunda parte: qué es Supabase, la arquitectura de la app y las dos piezas de Next.js que usamos hoy.</p></aside>
+        </section>
+
+        <!-- 8. Qué es Supabase -->
+        <section class="lamina" data-titulo="Qué es Supabase" data-min="8 a 10">
+          <p class="ceja">Qué es Supabase</p>
+          <h2 class="t2">Postgres administrado, con Auth, Storage y Realtime</h2>
+          <div class="col5 piezas">
+            <article class="pieza hoy entra" style="--i:2">
+              <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v13c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-13"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/></svg>
+              <h3 class="t3">Base de datos</h3>
+              <p class="texto">Postgres, con una API lista para usarse.</p>
+              <span class="etiqueta-senal">Hoy</span>
+            </article>
+            <article class="pieza entra" style="--i:3">
+              <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+              <h3 class="t3">Auth</h3>
+              <p class="texto">Usuarios, sesiones y permisos.</p>
+              <span class="etiqueta-gris">Clase 2</span>
+            </article>
+            <article class="pieza entra" style="--i:4">
+              <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>
+              <h3 class="t3">Realtime</h3>
+              <p class="texto">Los cambios llegan al navegador al instante.</p>
+              <span class="etiqueta-gris">Clase 3</span>
+            </article>
+            <article class="pieza entra" style="--i:5">
+              <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg>
+              <h3 class="t3">Edge Functions</h3>
+              <p class="texto">Tu código, corriendo en Supabase.</p>
+              <span class="etiqueta-gris">Clase 4</span>
+            </article>
+            <article class="pieza entra" style="--i:6">
+              <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>
+              <h3 class="t3">Storage</h3>
+              <p class="texto">Archivos con permisos.</p>
+              <span class="etiqueta-gris">Clase 5</span>
+            </article>
+          </div>
+          <p class="dicho empuja entra" style="--i:7">Es Postgres: SQL estándar. Todo se administra desde el panel, sin instalar nada.</p>
+          <aside class="notas">
+            <p>En una frase: Postgres administrado, con autenticación, archivos y tiempo real incluidos. Cada servicio llega en su clase.</p>
+            <p>Hoy solo usamos la base de datos. Es Postgres, una de las bases de datos más usadas: lo que aprendan aquí les sirve fuera de Supabase. Todo se hace desde el panel, sin instalar nada.</p>
+          </aside>
+        </section>
+
+        <!-- 9. La arquitectura -->
+        <section class="lamina" data-titulo="La arquitectura: navegador, servidor y Supabase" data-min="10 a 12">
+          <p class="ceja">La arquitectura del curso</p>
+          <h2 class="t2">Navegador, servidor y Supabase</h2>
+          <figure class="fonda">
+            <svg viewBox="0 0 1384 440" role="img" aria-label="Tres capas: el navegador, el servidor de Next.js y Supabase, con seis servicios. Hoy usamos la base de datos.">
+              <defs>
+                <marker id="punta-fonda" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+
+              <g data-anima="pop" style="--d:200ms">
+                <rect class="zona" x="0" y="20" width="300" height="400" rx="14"/>
+                <text x="28" y="72" class="zona-titulo">Navegador</text>
+                <text x="28" y="104" class="zona-sub">el cliente</text>
+                <text x="28" y="152" class="zona-texto">Lo que ve y usa el usuario.</text>
+                <text x="28" y="178" class="zona-texto">Aquí nada es secreto.</text>
+                <rect class="svg-linea s-linea" style="stroke-width:1.5" x="40" y="236" width="220" height="150" rx="8"/>
+                <path class="svg-linea s-linea" style="stroke-width:1.5" d="M40 266 H260"/>
+                <circle cx="58" cy="251" r="4" class="f-neutro"/><circle cx="74" cy="251" r="4" class="f-neutro"/>
+                <path class="svg-linea s-linea" style="stroke-width:1.5" d="M62 300 H200 M62 326 H238 M62 352 H180"/>
+              </g>
+
+              <g data-anima="pop" style="--d:450ms">
+                <rect class="zona" x="400" y="20" width="300" height="400" rx="14"/>
+                <text x="428" y="72" class="zona-titulo">Servidor</text>
+                <text x="428" y="104" class="zona-sub">Next.js</text>
+                <text x="428" y="152" class="zona-texto">Consultas, lógica y llaves.</text>
+                <text x="428" y="178" class="zona-texto">El usuario no tiene acceso.</text>
+                <rect class="svg-linea s-linea" style="stroke-width:1.5" x="440" y="236" width="220" height="44" rx="6"/>
+                <rect class="svg-linea s-linea" style="stroke-width:1.5" x="440" y="290" width="220" height="44" rx="6"/>
+                <rect class="svg-linea s-linea" style="stroke-width:1.5" x="440" y="344" width="220" height="44" rx="6"/>
+                <circle cx="462" cy="258" r="5" class="f-plano"/><circle cx="462" cy="312" r="5" class="f-plano"/><circle cx="462" cy="366" r="5" class="f-plano"/>
+              </g>
+
+              <g data-anima="pop" style="--d:700ms">
+                <rect class="zona" x="800" y="20" width="584" height="400" rx="14"/>
+                <text x="828" y="72" class="zona-titulo">Supabase</text>
+                <text x="828" y="104" class="zona-sub">la base de datos y sus servicios</text>
+              </g>
+
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:950ms; stroke-width:2.4" d="M312 220 H388" marker-start="url(#punta-fonda)" marker-end="url(#punta-fonda)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1150ms; stroke-width:2.4" d="M712 220 H788" marker-start="url(#punta-fonda)" marker-end="url(#punta-fonda)"/>
+
+              <g class="prendido" data-anima="pop" style="--d:1500ms">
+                <rect class="cuarto" x="828" y="150" width="164" height="100" rx="8"/>
+                <text x="846" y="192" class="cuarto-nombre">Base de datos</text>
+                <text x="846" y="222" class="cuarto-sub">Postgres · clase 1</text>
+              </g>
+              <g data-anima="aparece" style="--d:1300ms">
+                <rect class="cuarto" x="1012" y="150" width="164" height="100" rx="8"/>
+                <text x="1030" y="192" class="cuarto-nombre">Auth</text>
+                <text x="1030" y="222" class="cuarto-sub">clase 2</text>
+                <rect class="cuarto" x="1196" y="150" width="164" height="100" rx="8"/>
+                <text x="1214" y="192" class="cuarto-nombre">Realtime</text>
+                <text x="1214" y="222" class="cuarto-sub">clase 3</text>
+                <rect class="cuarto" x="828" y="270" width="164" height="100" rx="8"/>
+                <text x="846" y="312" class="cuarto-nombre" style="font-size:17px">Edge Functions</text>
+                <text x="846" y="342" class="cuarto-sub">clase 4</text>
+                <rect class="cuarto" x="1012" y="270" width="164" height="100" rx="8"/>
+                <text x="1030" y="312" class="cuarto-nombre">Storage</text>
+                <text x="1030" y="342" class="cuarto-sub">clase 5</text>
+                <rect class="cuarto" x="1196" y="270" width="164" height="100" rx="8"/>
+                <text x="1214" y="312" class="cuarto-nombre">Webhooks</text>
+                <text x="1214" y="342" class="cuarto-sub">clase 6</text>
+              </g>
+            </svg>
+          </figure>
+          <p class="dicho empuja entra" style="--i:6">Cada clase suma un servicio de Supabase. Hoy: la base de datos.</p>
+          <aside class="notas">
+            <p>Este dibujo se repite todo el curso. El navegador es lo que ve y usa el usuario: todo lo que llega ahí se puede inspeccionar, así que ahí nada es secreto. El servidor de Next.js consulta los datos, corre la lógica y guarda las llaves; el usuario no tiene acceso a él. Supabase es la base de datos y sus servicios.</p>
+            <p>Cada clase suma un servicio. Hoy, la base de datos.</p>
+          </aside>
+        </section>
+
+        <!-- 10. Idea 1: leer y escribir desde el servidor -->
+        <section class="lamina" data-titulo="Idea 1: se lee y se escribe desde el servidor" data-min="12 a 15">
+          <p class="ceja">Idea 1 de 3 · Lo único de Next.js que usamos hoy</p>
+          <h2 class="t2">Se lee y se escribe desde el servidor</h2>
+          <figure class="flujo">
+            <svg viewBox="0 0 1384 330" role="img" aria-label="Leer: el navegador pide la página, el servidor consulta los pedidos en Supabase y regresa el HTML ya renderizado. Escribir: el formulario manda los datos al servidor, el servidor los guarda en Supabase y la página se vuelve a renderizar.">
+              <defs>
+                <marker id="punta-flujo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+                <marker id="punta-flujo-senal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-senal"/>
+                </marker>
+              </defs>
+
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="0" width="250" height="330" rx="12"/>
+                <text x="24" y="44" font-size="28" class="t-fuerte">Navegador</text>
+                <text x="24" y="72" font-size="18" class="t-suave">el cliente</text>
+              </g>
+              <g data-anima="pop" style="--d:300ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="567" y="0" width="250" height="330" rx="12"/>
+                <text x="591" y="44" font-size="28" class="t-fuerte">Servidor</text>
+                <text x="591" y="72" font-size="18" class="t-suave">Next.js</text>
+              </g>
+              <g data-anima="pop" style="--d:450ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="1134" y="0" width="250" height="330" rx="12"/>
+                <text x="1158" y="44" font-size="28" class="t-fuerte">Supabase</text>
+                <text x="1158" y="72" font-size="18" class="t-suave">Postgres</text>
+              </g>
+
+              <text x="24" y="146" font-size="21" class="t-fuerte">Ver los pedidos</text>
+              <text x="591" y="146" font-size="21" class="t-fuerte">La página</text>
+              <text x="591" y="172" font-size="17" class="t-suave">se renderiza aquí</text>
+              <text x="1158" y="146" font-size="21" class="t-fuerte">select</text>
+              <text x="1158" y="172" font-size="17" class="t-suave">leer la tabla</text>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:700ms; stroke-width:2.4" d="M262 128 H551" marker-end="url(#punta-flujo)"/>
+              <text x="406" y="114" font-size="18" class="t-suave" text-anchor="middle">pide la página</text>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1000ms; stroke-width:2.4" d="M829 128 H1118" marker-end="url(#punta-flujo)"/>
+              <text x="975" y="114" font-size="18" class="t-suave" text-anchor="middle">consulta los pedidos</text>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1300ms; stroke-width:2.4" d="M551 166 H262" marker-end="url(#punta-flujo)"/>
+              <text x="406" y="194" font-size="18" class="t-suave" text-anchor="middle">HTML ya renderizado</text>
+
+              <g data-paso="1" data-en="2800">
+                <path class="svg-linea s-linea" style="stroke-dasharray:6 8" d="M16 222 H1368"/>
+                <text x="24" y="270" font-size="21" class="t-fuerte">Hacer un pedido</text>
+                <text x="591" y="270" font-size="21" class="t-fuerte">Server Action</text>
+                <text x="591" y="296" font-size="17" class="t-suave">guarda el pedido</text>
+                <text x="1158" y="270" font-size="21" class="t-fuerte">insert</text>
+                <text x="1158" y="296" font-size="17" class="t-suave">escribir en la tabla</text>
+                <path class="svg-linea s-senal" data-anima="traza" style="--d:150ms; stroke-width:2.4" d="M262 252 H551" marker-end="url(#punta-flujo-senal)"/>
+                <text x="406" y="238" font-size="18" class="t-suave" text-anchor="middle">manda el formulario</text>
+                <path class="svg-linea s-senal" data-anima="traza" style="--d:450ms; stroke-width:2.4" d="M829 252 H1118" marker-end="url(#punta-flujo-senal)"/>
+                <text x="975" y="238" font-size="18" class="t-suave" text-anchor="middle">lo guarda</text>
+                <path class="svg-linea s-senal" data-anima="traza" style="--d:750ms; stroke-width:2.4" d="M551 288 H262" marker-end="url(#punta-flujo-senal)"/>
+                <text x="406" y="316" font-size="18" class="t-suave" text-anchor="middle">se vuelve a renderizar</text>
+              </g>
+            </svg>
+          </figure>
+          <div class="chips-codigo">
+            <p class="chip-codigo entra" style="--i:4"><code>async function Inicio()</code><span>La página consulta los datos antes de renderizarse: <b>Server Component</b>.</span></p>
+            <p class="chip-codigo" data-paso="1"><code>"use server"</code><span>El formulario llama a una función que corre en el servidor: <b>Server Action</b>.</span></p>
+          </div>
+          <aside class="notas">
+            <p>Solo dos piezas de Next.js. La página es un Server Component: corre en el servidor, consulta los pedidos en Supabase y manda al navegador el HTML ya renderizado. Hoy el navegador nunca habla directo con la base.</p>
+            <p>Abajo aparece el otro camino: el formulario tampoco habla con la base. Llama a una Server Action, una función que corre en el servidor, que guarda el pedido y vuelve a renderizar la página.</p>
+          </aside>
+        </section>
+
+        <!-- 11. Sección 3 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 3: tablas, conexión y lectura" data-min="15">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c3">/03</span>
+            <div><h2 class="t1">Tablas, conexión y lectura</h2><p>Qué es una tabla, cómo se conecta tu app y cómo se lee.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Tercera parte: la tabla, la conexión y cómo se lee.</p></aside>
+        </section>
+
+        <!-- 12. Idea 2: la tabla -->
+        <section class="lamina" data-titulo="Idea 2: una tabla valida lo que guarda" data-min="15 a 18">
+          <p class="ceja">Idea 2 de 3</p>
+          <h2 class="t2">Una tabla <span data-anima="subraya" style="--d:600ms">valida</span> lo que guarda</h2>
+          <div class="hoja entra" style="--i:2">
+            <p class="hoja-nombre">pedidos</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>id<small>bigint · identity</small></th>
+                  <th>created_at<small>timestamptz · now()</small></th>
+                  <th>descripcion<small>text · not null</small></th>
+                  <th>direccion<small>text · not null</small></th>
+                  <th>telefono<small>text · not null</small></th>
+                  <th>estado<small>text · default 'recibido'</small></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-anima="aparece" style="--d:700ms"><td>1</td><td>14 oct 13:05</td><td>3 tacos al pastor y una horchata</td><td>Calle Morelos 45</td><td>55 1234 5678</td><td>recibido</td></tr>
+                <tr data-anima="aparece" style="--d:900ms"><td>2</td><td>14 oct 13:10</td><td>Orden de quesadillas</td><td>Av. Hidalgo 210</td><td>55 8765 4321</td><td>preparando</td></tr>
+                <tr data-anima="aparece" style="--d:1100ms"><td>3</td><td>14 oct 13:20</td><td>Pozole grande para llevar</td><td>Calle Allende 12</td><td>55 2468 1357</td><td>en_camino</td></tr>
+                <tr class="rechazo" data-paso="1" data-en="2000"><td>4</td><td>14 oct 13:30</td><td class="vacio">vacío</td><td>Calle Juárez 8</td><td>55 1111 2222</td><td>recibido</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="rechazo-texto" data-paso="1"><span aria-hidden="true">✕</span> Rechazado: descripcion es not null. La base valida cada fila antes de guardarla.</p>
+          <ul class="hoja-claves">
+            <li data-paso="2" data-en="3000"><b>Fila</b>un pedido</li>
+            <li data-paso="2"><b>Columna</b>un campo, con tipo y restricciones</li>
+            <li data-paso="2"><b>id</b>la llave primaria: identifica cada pedido</li>
+          </ul>
+          <aside class="notas">
+            <p>Una tabla tiene un esquema: cada fila es un pedido y cada columna tiene un tipo (bigint, text, timestamptz) y restricciones (not null, default). La base rechaza lo que no las cumple, venga de donde venga: de la app, del panel o de la API.</p>
+            <p>El id es la llave primaria: único, lo genera la base (identity) y con él se identifica cada pedido. <em>created_at</em> lo llena la base con <em>now()</em>.</p>
+            <p>Al final aparece un pedido sin descripción: la base lo rechaza. En la práctica creo la tabla en vivo, desde el panel.</p>
+          </aside>
+        </section>
+
+        <!-- 13. Idea 3: la llave publishable -->
+        <section class="lamina" data-titulo="Idea 3: la llave publishable es pública" data-min="18 a 21">
+          <p class="ceja">Conectar Next.js con Supabase · Idea 3 de 3</p>
+          <h2 class="t2">La llave publishable es pública</h2>
+          <figure class="conexion">
+            <svg viewBox="0 0 1352 222" role="img" aria-label="Tu app se conecta a tu proyecto de Supabase con dos datos: la URL del proyecto y la llave publishable. Los dos viven en .env.local, fuera del código y fuera del repo.">
+              <defs>
+                <marker id="punta-conexion" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="10" width="300" height="180" rx="14"/>
+                <text x="28" y="58" font-size="30" class="t-fuerte">Tu app</text>
+                <text x="28" y="90" font-size="19" class="t-suave">servidor de Next.js</text>
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="28" y="128" width="180" height="44" rx="8"/>
+                <text x="46" y="157" font-size="20" class="t-fuerte mono">.env.local</text>
+              </g>
+
+              <g data-anima="pop" style="--d:300ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="1052" y="10" width="300" height="180" rx="14"/>
+                <text x="1080" y="58" font-size="30" class="t-fuerte">Tu proyecto</text>
+                <text x="1080" y="90" font-size="19" class="t-suave">la API de Supabase</text>
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="1080" y="128" width="150" height="44" rx="8"/>
+                <text x="1098" y="157" font-size="20" class="t-fuerte mono">pedidos</text>
+              </g>
+
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:500ms; stroke-width:2.4" d="M220 150 H1040" marker-end="url(#punta-conexion)"/>
+
+              <g data-anima="pop" style="--d:900ms">
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="336" y="14" width="330" height="118" rx="12"/>
+                <circle cx="368" cy="48" r="17" class="f-senal"/>
+                <text x="368" y="55" font-size="18" class="t-fuerte num" text-anchor="middle">1</text>
+                <text x="398" y="57" font-size="25" class="t-fuerte">La URL</text>
+                <text x="360" y="92" font-size="19" class="t-suave">A dónde van las peticiones.</text>
+                <text x="360" y="119" font-size="17" class="t-senal mono">tu-proyecto.supabase.co</text>
+              </g>
+              <g data-anima="pop" style="--d:1150ms">
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="696" y="14" width="330" height="118" rx="12"/>
+                <circle cx="728" cy="48" r="17" class="f-senal"/>
+                <text x="728" y="55" font-size="18" class="t-fuerte num" text-anchor="middle">2</text>
+                <text x="758" y="57" font-size="25" class="t-fuerte">Llave publishable</text>
+                <text x="720" y="92" font-size="19" class="t-suave">Identifica a tu app.</text>
+                <text x="720" y="119" font-size="17" class="t-senal mono">sb_publishable_…</text>
+              </g>
+
+              <text x="0" y="216" font-size="20" class="t-suave" data-anima="aparece" style="--d:1500ms">Los dos van en .env.local: variables de entorno, fuera del código y del repo.</text>
+            </svg>
+          </figure>
+          <div class="col2 llaves">
+            <div class="caja caja-si" data-paso="1" data-en="2300">
+              <p class="etiqueta">Llave publishable · <code>sb_publishable_</code></p>
+              <h3 class="t3">Pública por diseño</h3>
+              <p class="texto">Hecha para ir en el navegador: cualquiera la puede ver. Solo puede lo que la base le permita.</p>
+            </div>
+            <div class="caja caja-no" data-paso="2" data-en="3200">
+              <p class="etiqueta">Llave secreta · <code>sb_secret_</code></p>
+              <h3 class="t3">Acceso total</h3>
+              <p class="texto">Se salta RLS. Solo en el servidor; nunca en el navegador ni en el repo. Clase 4.</p>
+            </div>
+          </div>
+          <p class="dicho" data-paso="3" data-en="4100">Lo que protege los datos son las políticas RLS de la base, no esconder la llave. Eso es la clase 2.</p>
+          <aside class="notas">
+            <p>Para conectarse, la app necesita dos datos: la URL del proyecto y la llave publishable. Van en <em>.env.local</em>: variables de entorno, configuración que no se escribe en el código ni se sube al repo (el <em>.gitignore</em> ya lo excluye).</p>
+            <p>Las variables que empiezan con <em>NEXT_PUBLIC_</em> se incluyen en el código que llega al navegador. Por eso ahí solo va lo que puede ver cualquiera.</p>
+            <p>Pregúntales: ¿esta llave es secreta? No: es pública por diseño y cualquiera la saca del navegador. Solo tiene los permisos que la base le dé al rol anónimo. La secreta es otra: se salta RLS y solo vive en el servidor. Lo que protege los datos son las políticas RLS, y eso es el viernes. Guarda la pregunta para el cierre.</p>
+          </aside>
+        </section>
+
+        <!-- 14. Leer: una consulta -->
+        <section class="lamina" data-titulo="Leer: una consulta con select" data-min="21 a 24">
+          <p class="ceja">Leer desde el servidor</p>
+          <h2 class="t2">Leer: una consulta con select</h2>
+          <div class="consulta">
+            <div class="consulta-partes">
+              <div class="consulta-fila entra" style="--i:2"><span class="consulta-q">¿De qué tabla?</span><b>pedidos</b><code>.from("pedidos")</code></div>
+              <div class="consulta-fila" data-paso="1"><span class="consulta-q">¿Qué columnas?</span><b>todas</b><code>.select("*")</code></div>
+              <div class="consulta-fila" data-paso="2"><span class="consulta-q">¿En qué orden?</span><b>más nuevos primero</b><code>.order("created_at", { ascending: false })</code></div>
+            </div>
+            <div class="consulta-respuesta" data-paso="3">
+              <p class="etiqueta">El resultado: un arreglo</p>
+              <ol>
+                <li><span>3</span>Pozole grande para llevar<em class="mini-estado e-camino">en camino</em></li>
+                <li><span>2</span>Orden de quesadillas<em class="mini-estado e-preparando">preparando</em></li>
+                <li><span>1</span>3 tacos al pastor y una horchata<em class="mini-estado e-recibido">recibido</em></li>
+              </ol>
+            </div>
+          </div>
+          <p class="dicho" data-paso="4">La consulta corre en el servidor, dentro de la página.<br />En SQL: <code>select * from pedidos order by created_at desc</code></p>
+          <aside class="notas">
+            <p>Una consulta dice de qué tabla, qué columnas y en qué orden. Con supabase-js se escribe encadenada: <em>from</em>, <em>select</em> y <em>order</em> (del más nuevo al más viejo con <em>ascending: false</em>). Por debajo es una petición HTTP a la API de Supabase, que la convierte en SQL.</p>
+            <p>El resultado es un arreglo de pedidos, y la página lo renderiza con <em>map</em>, como cualquier arreglo en React.</p>
+            <p>La consulta va en la página, que es un Server Component: corre en el servidor y el navegador recibe el HTML ya renderizado. Es la idea 1.</p>
+          </aside>
+        </section>
+
+        <!-- 15. Sección 4 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 4: escribir datos" data-min="24">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c4">/04</span>
+            <div><h2 class="t1">Escribir datos</h2><p>insert y update desde una Server Action.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Cuarta parte, la última de teoría: cómo se guarda y cómo se cambia un pedido, y el error que casi todos se encuentran. Al terminarla empieza la práctica.</p></aside>
+        </section>
+
+        <!-- 16. Leer, guardar, cambiar y borrar -->
+        <section class="lamina" data-titulo="Leer, guardar, cambiar y borrar: lo que una app le pide a una tabla" data-min="24 a 26">
+          <p class="ceja">CRUD: las cuatro operaciones</p>
+          <h2 class="t2">Leer, guardar, cambiar y borrar</h2>
+          <div class="col4 operaciones">
+            <article class="operacion hoy entra" style="--i:2"><p class="op-verbo">Leer</p><code>select</code><p class="texto">Traer filas: la lista.</p><span class="etiqueta-senal">Hoy</span></article>
+            <article class="operacion hoy entra" style="--i:3"><p class="op-verbo">Guardar</p><code>insert</code><p class="texto">Agregar una fila: el formulario.</p><span class="etiqueta-senal">Hoy</span></article>
+            <article class="operacion hoy entra" style="--i:4"><p class="op-verbo">Cambiar</p><code>update</code><p class="texto">Cambiar datos de una fila: los botones.</p><span class="etiqueta-senal">Hoy</span></article>
+            <article class="operacion entra" style="--i:5"><p class="op-verbo">Borrar</p><code>delete</code><p class="texto">Quitar filas.</p><span class="etiqueta-gris">Más adelante</span></article>
+          </div>
+          <p class="dicho" data-paso="1" data-en="1800">Guardar y cambiar corren en el servidor, en una Server Action. Después, <code>revalidatePath</code> le indica a Next.js que vuelva a renderizar la página.</p>
+          <aside class="notas">
+            <p>Las cuatro operaciones sobre una tabla, lo que se conoce como CRUD: crear, leer, actualizar y borrar. Hoy usamos tres: <em>select</em> para la lista, <em>insert</em> para el formulario y <em>update</em> para los botones.</p>
+            <p>Igual que en la idea 1: el formulario no habla con la base; llama a una Server Action, que corre en el servidor y hace el insert.</p>
+            <p>Después de una Server Action, Next.js no vuelve a renderizar la página por su cuenta. <em>revalidatePath</em> le indica que esa ruta tiene datos nuevos. Si se olvida, el pedido sí se guarda, pero no aparece hasta recargar.</p>
+          </aside>
+        </section>
+
+        <!-- 17. El error del día -->
+        <section class="lamina" data-titulo="El error del día: guardas un pedido y no aparece" data-min="26 a 28">
+          <p class="ceja">El error del día</p>
+          <h2 class="t2">Guardas un pedido y no aparece</h2>
+          <div class="pasos de4 error-pasos">
+            <article class="paso entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Guardas</h3><p class="texto">La Server Action hace el <code>insert</code> y no marca error.</p></article>
+            <article class="paso" data-paso="1"><span class="paso-num">2</span><h3 class="t3">No aparece</h3><p class="texto">La página sigue igual: Next.js no la volvió a renderizar.</p></article>
+            <article class="paso" data-paso="2"><span class="paso-num">3</span><h3 class="t3">Sí se guardó</h3><p class="texto">En el panel ya está, y al recargar aparece.</p></article>
+            <article class="paso ancla" data-paso="3"><span class="paso-num">4</span><h3 class="t3">revalidatePath</h3><p class="texto">Le indica a Next.js que vuelva a renderizar la ruta.</p></article>
+          </div>
+          <p class="dicho" data-paso="4">Después de escribir en la base desde una Server Action, llama a <code>revalidatePath</code> con la ruta que muestra el dato.</p>
+          <aside class="notas">
+            <p>Adelántales el error que casi todos se encuentran hoy: la Server Action guarda bien, pero la página no muestra el pedido nuevo hasta que recargan. No es un error de Supabase: Next.js no volvió a renderizar la página.</p>
+            <p>En la práctica lo provocas a propósito: escribe <em>crearPedido</em> sin <em>revalidatePath</em> y haz un pedido; no aparece. Enséñalo en el panel: sí se guardó. Recarga y aparece. Agrega <em>revalidatePath("/")</em> y el siguiente aparece al momento.</p>
+            <p>Si preguntan por <em>.env.local</em>: con <em>npm run dev</em>, Next.js lo vuelve a leer cada vez que lo guardan (en la terminal sale <em>Reload env</em>); no hace falta reiniciar.</p>
+          </aside>
+        </section>
+
+        <!-- 18. Cambiar un solo pedido: el filtro -->
+        <section class="lamina" data-titulo="Cada botón cambia un solo pedido: update y el filtro por id" data-min="28 a 30">
+          <p class="ceja">Cambiar el estado</p>
+          <h2 class="t2">Cada botón cambia un solo pedido</h2>
+          <div class="estados" role="img" aria-label="Los estados del pedido en orden: recibido, preparando, en camino y entregado.">
+            <span class="estado e-recibido" data-anima="pop" style="--d:200ms">Recibido</span>
+            <svg class="flecha" viewBox="0 0 80 24" aria-hidden="true"><path class="svg-linea s-linea" data-anima="traza" style="--d:450ms; stroke-width:2.4" d="M4 12 H70 M60 4 L72 12 L60 20"/></svg>
+            <span class="estado e-preparando" data-anima="pop" style="--d:600ms">Preparando</span>
+            <svg class="flecha" viewBox="0 0 80 24" aria-hidden="true"><path class="svg-linea s-linea" data-anima="traza" style="--d:850ms; stroke-width:2.4" d="M4 12 H70 M60 4 L72 12 L60 20"/></svg>
+            <span class="estado e-camino" data-anima="pop" style="--d:1000ms">En camino</span>
+            <svg class="flecha" viewBox="0 0 80 24" aria-hidden="true"><path class="svg-linea s-linea" data-anima="traza" style="--d:1250ms; stroke-width:2.4" d="M4 12 H70 M60 4 L72 12 L60 20"/></svg>
+            <span class="estado e-entregado" data-anima="pop" style="--d:1400ms">Entregado</span>
+          </div>
+          <div class="filtro">
+            <div class="hoja filtro-hoja entra" style="--i:3">
+              <p class="hoja-nombre">pedidos</p>
+              <table>
+                <thead><tr><th>id</th><th>descripcion</th><th>estado</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td>3 tacos al pastor y una horchata</td><td>recibido</td></tr>
+                  <tr class="elegido"><td>2</td><td>Orden de quesadillas</td><td><span class="antes">preparando</span> <span class="despues">en_camino</span></td></tr>
+                  <tr><td>3</td><td>Pozole grande para llevar</td><td>en_camino</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <ol class="llamadas">
+              <li class="llamada" data-paso="1" data-en="1900"><span class="parte-num">1</span><div><b>Qué cambia</b><p><code>.update({ estado: "en_camino" })</code></p></div></li>
+              <li class="llamada" data-paso="2" data-en="2800"><span class="parte-num">2</span><div><b>En cuál: el filtro</b><p><code>.eq("id", 2)</code> solo toca el pedido 2.</p></div></li>
+            </ol>
+          </div>
+          <p class="rechazo-texto" data-paso="3" data-en="4400"><span aria-hidden="true">✕</span> En SQL, un update sin filtro cambia todas las filas de la tabla.</p>
+          <aside class="notas">
+            <p>Un pedido avanza siempre en el mismo orden: recibido, preparando, en camino y entregado. Cada botón lo mueve al estado que sigue.</p>
+            <p>Para cambiar hacen falta dos cosas: qué cambia (el estado nuevo) y en qué fila. Lo segundo es el filtro: el pedido con ese id, la llave primaria de la idea 2. Cada botón manda en campos ocultos el id del pedido y el estado que sigue.</p>
+            <p>En SQL, un update sin <em>where</em> cambia todas las filas: es de los errores más caros. Con supabase-js, <em>update</em> siempre va con su filtro, y un filtro equivocado cambia las filas equivocadas.</p>
+            <p>Aquí terminan las láminas de teoría: empieza la práctica. Al final de la clase regresa a la parte 5.</p>
+          </aside>
+        </section>
+
+        <!-- 19. Sección 5 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 5: para cerrar la clase" data-min="112">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c5">/05</span>
+            <div><h2 class="t1">Para cerrar la clase</h2><p>Lo que te llevas, la tarea y lo que sigue.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Esta parte va al final de la clase, cuando ya construiste la app en vivo: las tres ideas, la tarea, los recursos y el gancho para el viernes.</p></aside>
+        </section>
+
+        <!-- 20. Resumen -->
+        <section class="lamina" data-titulo="Resumen: las tres ideas de hoy" data-min="112 a 114">
+          <p class="ceja">Lo que te llevas hoy</p>
+          <h2 class="t2">Tres ideas</h2>
+          <div class="col3 ideas">
+            <article class="idea entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Se lee y se escribe desde el servidor</h3><p class="texto">La página consulta en el servidor y el formulario guarda con una Server Action.</p></article>
+            <article class="idea entra" style="--i:3"><span class="paso-num">2</span><h3 class="t3">Una tabla valida lo que guarda</h3><p class="texto">Cada columna tiene tipo y restricciones; la base rechaza lo que no cumple.</p></article>
+            <article class="idea entra" style="--i:4"><span class="paso-num">3</span><h3 class="t3">La llave publishable es pública</h3><p class="texto">Cualquiera la puede ver. Lo que protege los datos son las políticas RLS.</p></article>
+          </div>
+          <aside class="notas">
+            <p>Ya con la app funcionando: tres frases, una por idea. Pregunta si alguien la puede decir con sus palabras antes de enseñarla.</p>
+          </aside>
+        </section>
+
+        <!-- 21. Tarea -->
+        <section class="lamina" data-titulo="Tarea para el viernes: construye tú solo lo que viste hoy" data-min="114 a 116">
+          <p class="ceja">Tarea · para el viernes</p>
+          <h2 class="t2">Construye tú solo lo que viste hoy</h2>
+          <div class="tarea">
+            <div>
+              <p class="etiqueta">Cómo sé que ya quedó</p>
+              <ul class="checklist">
+                <li data-paso="1">Tu proyecto de Supabase tiene su tabla de pedidos.</li>
+                <li data-paso="1">La página lee los pedidos de esa tabla.</li>
+                <li data-paso="1">El formulario guarda un pedido nuevo y aparece en la lista.</li>
+                <li data-paso="1">Cada botón mueve su pedido al estado que sigue.</li>
+              </ul>
+            </div>
+            <div class="caja caja-si atorado" data-paso="2" data-en="2000">
+              <p class="etiqueta">¿No te salió?</p>
+              <h3 class="t3">No pasa nada</h3>
+              <p class="texto">Toma la base de la clase 2: ya trae todo esto hecho. Compárala con lo tuyo y encuentra qué te faltó.</p>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>La tarea es simple: construir por su cuenta lo que vieron hoy, con lo que entendieron y sin copiar.</p>
+            <p>Si no les sale, no pasa nada: toman la base de la clase 2 (<em>clase-2-inicio</em>), que ya trae todo esto hecho, y la comparan con lo suyo. Así en cada clase.</p>
+          </aside>
+        </section>
+
+        <!-- 22. Para profundizar -->
+        <section class="lamina" data-titulo="Recursos para profundizar" data-min="116">
+          <h2 class="t2">Recursos para profundizar</h2>
+          <ul class="recursos">
+            <li class="entra" style="--i:1">Supabase con Next.js, paso a paso: <a href="https://supabase.com/docs/guides/getting-started/quickstarts/nextjs">supabase.com/docs/guides/getting-started/quickstarts/nextjs</a></li>
+            <li class="entra" style="--i:2">Tablas en Supabase: <a href="https://supabase.com/docs/guides/database/tables">supabase.com/docs/guides/database/tables</a></li>
+            <li class="entra" style="--i:3">Leer datos en Next.js: <a href="https://nextjs.org/docs/app/getting-started/fetching-data">nextjs.org/docs/app/getting-started/fetching-data</a></li>
+            <li class="entra" style="--i:4">Guardar datos con Server Actions: <a href="https://nextjs.org/docs/app/getting-started/mutating-data">nextjs.org/docs/app/getting-started/mutating-data</a></li>
+          </ul>
+          <img class="deco mascota laptop" src="../marca/mascota-laptop.png" alt="" />
+          <aside class="notas">
+            <p>La documentación oficial, por si quieren ir más lejos. No es tarea.</p>
+          </aside>
+        </section>
+
+        <!-- 23. Cierre: el problema de seguridad -->
+        <section class="lamina" data-titulo="Cierre: hoy la tabla está expuesta" data-min="116 a 120">
+          <p class="ceja">Problema de seguridad</p>
+          <h2 class="t2">Hoy tu tabla está expuesta</h2>
+          <figure class="abierta">
+            <svg viewBox="0 0 1352 250" role="img" aria-label="La URL del proyecto y la llave publishable son públicas por diseño. Con ellas, cualquier persona le puede pedir a la API de Supabase la tabla completa, porque no tiene RLS: todos los pedidos, con direcciones y teléfonos.">
+              <defs>
+                <marker id="punta-abierta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+                <marker id="punta-abierta-roja" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-rojo"/>
+                </marker>
+              </defs>
+
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="20" width="330" height="210" rx="14"/>
+                <text x="28" y="66" font-size="28" class="t-fuerte">Cualquier persona</text>
+                <text x="28" y="98" font-size="19" class="t-suave">navegador, curl o un script</text>
+                <rect x="28" y="152" width="274" height="54" rx="8" class="f-codigo"/>
+                <text x="46" y="186" font-size="18" class="mono t-codigo">› 3 líneas de código</text>
+              </g>
+
+              <g data-anima="pop" style="--d:300ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="1022" y="20" width="330" height="210" rx="14"/>
+                <text x="1050" y="66" font-size="28" class="t-fuerte">Tabla pedidos</text>
+                <text x="1050" y="98" font-size="19" class="t-suave">sin RLS</text>
+                <text x="1050" y="126" font-size="19" class="t-suave">permisos para el rol anon</text>
+              </g>
+
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:500ms; stroke-width:2.4" d="M342 80 H1010" marker-end="url(#punta-abierta)"/>
+              <g data-anima="aparece" style="--d:800ms">
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="466" y="60" width="200" height="40" rx="20"/>
+                <text x="566" y="87" font-size="19" class="t-fuerte" text-anchor="middle">URL del proyecto</text>
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="686" y="60" width="200" height="40" rx="20"/>
+                <text x="786" y="87" font-size="19" class="t-fuerte" text-anchor="middle">llave publishable</text>
+              </g>
+
+              <path class="svg-linea s-rojo" data-anima="traza" style="--d:1300ms; stroke-width:2.4" d="M1010 180 H342" marker-end="url(#punta-abierta-roja)"/>
+              <text x="676" y="166" font-size="23" class="t-rojo t-fuerte" text-anchor="middle" data-anima="aparece" style="--d:1800ms">Todas las filas: direcciones y teléfonos</text>
+            </svg>
+          </figure>
+          <ul class="riesgos">
+            <li data-paso="1" data-en="2400">Leer todos los pedidos, con direcciones y teléfonos</li>
+            <li data-paso="1">Crear pedidos falsos</li>
+            <li data-paso="1">Cambiar el estado de cualquier pedido</li>
+          </ul>
+          <p class="final" data-paso="2" data-en="3400">Nunca así en producción. <strong>En la clase 2 lo cerramos con autenticación y políticas RLS.</strong></p>
+          <aside class="notas">
+            <p>Haz la demo en vivo antes de esta lámina. En la consola del navegador (F12) pega tres líneas con la URL y la llave publishable:</p>
+            <p><em>const url = "https://tu-proyecto.supabase.co/rest/v1/pedidos?select=*";</em><br /><em>const llave = "PEGA_AQUI_TU_LLAVE_PUBLISHABLE";</em><br /><em>fetch(url, { headers: { apikey: llave } }).then((r) => r.json()).then(console.table);</em></p>
+            <p>Salen todos los pedidos, con direcciones y teléfonos, sin pasar por la app. Explícalo tal cual: la tabla no tiene RLS y el rol anónimo tiene permiso de leer, crear y actualizar. La API queda abierta a cualquiera que tenga la URL y la llave publishable, y las dos son públicas por diseño: van en cualquier app que use Supabase desde el navegador.</p>
+            <p>Lo dejamos así a propósito, para ver el problema. En producción, nunca. La clase 2 lo cierra con autenticación y políticas RLS.</p>
+          </aside>
+        </section>
+
+        <div class="cajetin" aria-hidden="true">
+          <span>Rastro · Supabase + Next.js</span><span>Clase 1</span><span>Lámina <b>01 de 23</b></span>
+        </div>
+        <div class="avance" aria-hidden="true"></div>
+      </div>
+      <p class="solo-lector" aria-live="polite"></p>
+    </div>
+
+    <nav class="controles" aria-label="Controles de la presentación">
+      <button type="button" data-accion="anterior" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="contador" aria-live="off">1 / 1</span>
+      <button type="button" data-accion="siguiente" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <span class="separa" aria-hidden="true"></span>
+      <button type="button" data-accion="pantalla" aria-label="Pantalla completa" title="Pantalla completa (F)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+      <button type="button" data-accion="tema" aria-label="Cambiar entre claro y oscuro" title="Claro u oscuro (T)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/></svg>
+      </button>
+      <button type="button" data-accion="otra" title="Pasar a la otra presentación (O)" hidden>
+        <span class="otra-texto"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </button>
+      <button type="button" data-accion="presentador" title="Abrir las notas en otra ventana (P)">Notas</button>
+      <button type="button" data-accion="ayuda" aria-label="Ver los atajos del teclado" title="Atajos (?)">?</button>
+    </nav>
+
+    <div class="aviso-teclas fuera" role="status"></div>
+
+    <div class="ayuda" hidden>
+      <div class="ayuda-caja" role="dialog" aria-modal="true" aria-label="Atajos del teclado">
+        <h2>Atajos del teclado</h2>
+        <dl>
+          <dt><kbd>→</kbd> <kbd>Espacio</kbd> <kbd>Av Pág</kbd></dt><dd>Pasar a la siguiente lámina: lo de cada lámina aparece solo, con su animación</dd>
+          <dt><kbd>←</kbd> <kbd>Re Pág</kbd></dt><dd>Regresar</dd>
+          <dt><kbd>Inicio</kbd> <kbd>Fin</kbd></dt><dd>Ir a la primera o a la última</dd>
+          <dt><kbd>F</kbd></dt><dd>Pantalla completa</dd>
+          <dt><kbd>P</kbd></dt><dd>Notas y cronómetro en otra ventana. Desde ahí se prende el modo limpio: sin botones, y solo las notas mueven las láminas</dd>
+          <dt><kbd>Esc</kbd></dt><dd>Cerrar esta ayuda</dd>
+        </dl>
+      </div>
+    </div>
+
+    <script src="../motor/motor.js"></script>
+  </body>
+</html>

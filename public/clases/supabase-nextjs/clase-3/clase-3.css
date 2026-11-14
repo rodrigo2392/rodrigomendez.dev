@@ -1,0 +1,21 @@
+/* Lo propio de las láminas de la clase 3: Realtime.
+   Las piezas compartidas viven en motor/piezas.css. */
+
+/* la meta: la vista del cliente con la barra y el aviso de la tienda */
+.cuerpo-vivo { grid-template-columns: 1fr 220px; }
+.en-linea { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; font: 500 12px/1 var(--display); color: var(--tinta-suave); }
+.en-linea i { width: 9px; height: 9px; border-radius: 50%; background: #10B981; }
+.barra-demo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+.barra-demo i { height: 7px; border-radius: 99px; background: #E4E4E7; }
+.barra-demo i.lleno { background: #F97316; }
+.barra-demo-nombres { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font: 500 11px/1.2 var(--display); color: #A1A1AA; text-align: center; }
+.barra-demo-nombres .actual { color: var(--tinta); font-weight: 700; }
+.aviso-tienda { display: grid; gap: 6px; align-content: start; padding: 14px; border: 1px dashed var(--linea-fuerte); border-radius: 12px; transition: box-shadow 0.4s ease; }
+.aviso-tienda b { font: 700 14px/1.2 var(--display); color: var(--tinta); }
+.aviso-tienda span { font: 600 13px/1.3 var(--display); color: #EA580C; }
+.aviso-tienda small { font: 500 12px/1.3 var(--display); color: var(--tinta-suave); }
+
+/* el ciclo de vida de la suscripción */
+.ciclo-pasos { margin-top: 70px; }
+.ciclo-pasos .texto code { font-size: 0.8em; }
+.ciclo-pasos + .dicho { margin-top: 48px; }

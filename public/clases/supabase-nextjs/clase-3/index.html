@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clase 3 · Realtime con Supabase</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@500;700&display=swap"
+    />
+    <link rel="stylesheet" href="../motor/motor.css" />
+    <link rel="stylesheet" href="../motor/comun.css" />
+    <link rel="stylesheet" href="../motor/codigofacilito.css" />
+    <link rel="stylesheet" href="../motor/piezas.css" />
+    <link rel="stylesheet" href="clase-3.css" />
+  </head>
+  <body>
+    <!--
+      Clase 3 del bootcamp: realtime con Supabase (mié 28 oct 2026).
+      La teoría y sus tiempos están en las notas de cada lámina; la práctica, en el vault: 10-proyectos/bootcamp-clase-3-guion.
+      El código de la clase: branches clase-3-inicio, clase-3-rescate y clase-3-final del repo.
+    -->
+    <div class="escenario" data-nombre="clase-3" role="region" aria-roledescription="presentación" aria-label="Clase 3: realtime con Supabase">
+      <div class="lienzo">
+        <div class="registro" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+        <!-- 1. Portada -->
+        <section class="lamina portada fondo-portada" data-titulo="Portada: Realtime con Supabase" data-min="0">
+          <p class="portada-bootcamp">Bootcamp · Módulo 4: Integración App + DB</p>
+          <h1 class="t1">Realtime<br />con Supabase</h1>
+          <p class="portada-clase">Clase 3 de 6 · Supabase + Next.js</p>
+          <p class="portada-autor">Rodrigo Méndez<small>rodrigomendez.dev</small></p>
+          <div class="deco fichas-tec" aria-hidden="true" data-anima="aparece" style="--d:300ms">
+            <span class="ficha-tec next">Next.js</span>
+            <span class="ficha-tec supa">Supabase</span>
+            <span class="ficha-tec ts">TS</span>
+          </div>
+          <img class="deco destellos" src="../marca/destellos.png" alt="" data-anima="pop" style="--d:800ms" />
+          <img class="deco mascota-portada" src="../marca/mascota-portada.png" alt="" />
+          <aside class="notas">
+            <p>Bienvenida. Ya hay cuentas y cada quien ve lo suyo, pero la pantalla solo cambia si recargas.</p>
+            <p>Hoy la base avisa cuando algo cambia y la pantalla se actualiza sola.</p>
+          </aside>
+        </section>
+
+        <!-- 2. Tabla de contenido -->
+        <section class="lamina" data-titulo="Tabla de contenido" data-min="0 a 1">
+          <h2 class="temario-titulo"><img src="../marca/tabla.png" alt="" />Tabla de contenido</h2>
+          <ol class="temario">
+            <li class="entra" style="--i:1"><span class="chip-seccion">/01</span>El problema y la meta</li>
+            <li class="entra" style="--i:2"><span class="chip-seccion c2">/02</span>Suscribirse a los cambios</li>
+            <li class="entra" style="--i:3"><span class="chip-seccion c3">/03</span>Realtime en el navegador</li>
+            <li class="entra" style="--i:4"><span class="chip-seccion c4">/04</span>Realtime, RLS y Presence</li>
+            <li class="entra" style="--i:5"><span class="chip-seccion c5">/05</span>Para cerrar la clase</li>
+          </ol>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>El mapa de hoy: cuatro partes de teoría y, en cuanto terminen, construyo en vivo mientras ustedes miran. La parte 5 va al final, después de la práctica.</p></aside>
+        </section>
+
+        <!-- 3. Sección 1 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 1: el problema y la meta" data-min="1">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion">/01</span>
+            <div><h2 class="t1">El problema y la meta</h2><p>Qué vamos a construir hoy, y por qué.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Primera parte: por qué la pantalla se queda vieja y lo que vamos a construir hoy.</p></aside>
+        </section>
+
+        <!-- 4. El problema -->
+        <section class="lamina" data-titulo="El problema: la pantalla se queda vieja" data-min="1 a 4">
+          <p class="ceja">El problema</p>
+          <h2 class="t2 pregunta">La tienda marca un pedido "En camino". ¿Cómo se entera la pantalla del cliente sin que recargue?</h2>
+          <figure class="problema">
+            <svg viewBox="0 0 1384 330" role="img" aria-label="Hoy la base ya dice En camino, pero la pantalla del cliente sigue diciendo Preparando hasta que recarga. La solución: la base avisa del cambio y la pantalla se actualiza sola.">
+              <defs>
+                <marker id="punta-problema-3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-senal"/>
+                </marker>
+              </defs>
+              <text x="0" y="22" font-size="17" class="t-suave t-fuerte" letter-spacing="2">HOY: LA PANTALLA SE QUEDA VIEJA</text>
+              <g data-anima="pop" style="--d:300ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="44" width="250" height="200" rx="12"/>
+                <text x="24" y="84" font-size="22" class="t-fuerte">La base</text>
+                <text x="24" y="116" font-size="17" class="t-suave">pedido 3</text>
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="24" y="140" width="170" height="44" rx="22"/>
+                <text x="109" y="169" font-size="19" class="t-fuerte" text-anchor="middle">En camino</text>
+              </g>
+              <g data-anima="pop" style="--d:450ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="290" y="44" width="250" height="200" rx="12"/>
+                <text x="314" y="84" font-size="22" class="t-fuerte">La pantalla</text>
+                <text x="314" y="116" font-size="17" class="t-suave">del cliente</text>
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="314" y="140" width="170" height="44" rx="22"/>
+                <text x="399" y="169" font-size="19" class="t-fuerte" text-anchor="middle">Preparando</text>
+              </g>
+              <text x="0" y="296" font-size="23" class="t-rojo t-fuerte" data-anima="aparece" style="--d:900ms">Solo cambia si el cliente recarga</text>
+
+              <g data-paso="1" data-en="2200">
+                <path class="svg-linea s-senal" style="stroke-width:3" d="M576 144 H648" marker-end="url(#punta-problema-3)"/>
+                <text x="690" y="22" font-size="17" class="t-senal t-fuerte" letter-spacing="2">LA SOLUCIÓN: LA BASE AVISA</text>
+                <g data-anima="pop" style="--d:150ms">
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="690" y="44" width="250" height="200" rx="12"/>
+                  <text x="714" y="84" font-size="22" class="t-fuerte">La base</text>
+                  <text x="714" y="116" font-size="17" class="t-suave">cambió el pedido 3</text>
+                  <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="714" y="140" width="170" height="44" rx="22"/>
+                  <text x="799" y="169" font-size="19" class="t-fuerte" text-anchor="middle">En camino</text>
+                </g>
+                <path class="svg-linea s-senal" data-anima="traza" style="--d:400ms; stroke-width:2.6" d="M952 144 H1122" marker-end="url(#punta-problema-3)"/>
+                <text x="1037" y="128" font-size="17" class="t-senal t-fuerte" text-anchor="middle" data-anima="aparece" style="--d:600ms">aviso al momento</text>
+                <g data-anima="pop" style="--d:900ms">
+                  <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="1134" y="44" width="250" height="200" rx="12"/>
+                  <text x="1158" y="84" font-size="22" class="t-fuerte">La pantalla</text>
+                  <text x="1158" y="116" font-size="17" class="t-suave">se actualiza sola</text>
+                  <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="1158" y="140" width="170" height="44" rx="22"/>
+                  <text x="1243" y="169" font-size="19" class="t-fuerte" text-anchor="middle">En camino</text>
+                </g>
+                <text x="690" y="296" font-size="23" class="t-verde t-fuerte">Sin recargar y sin preguntar a cada rato</text>
+              </g>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>Pregunta de arranque: en tu app de comida, cuando el pedido sale, la pantalla cambia sola. ¿Cómo sabe? Hoy en Rastro la base ya tiene el estado nuevo, pero la pantalla del cliente solo lo muestra si recarga.</p>
+            <p>A los dos segundos aparece la solución: que la base avise del cambio y la pantalla se actualice sola, sin recargar y sin preguntar a cada rato.</p>
+          </aside>
+        </section>
+
+        <!-- 5. La meta de hoy -->
+        <section class="lamina llevas" data-titulo="La meta de hoy: la pantalla se actualiza sola" data-min="4 a 7">
+          <p class="ceja">La meta de hoy</p>
+          <h2 class="t2">La pantalla se actualiza sola</h2>
+          <div class="demo">
+            <div class="navegador app-demo entra" style="--i:2">
+              <div class="navegador-barra"><i></i><i></i><i></i><span>localhost:3000</span></div>
+              <div class="app-demo-cuerpo cuerpo-cliente cuerpo-vivo">
+                <div class="app-demo-cabeza marca-3">
+                  <div>
+                    <p class="app-demo-marca">Fonda La Esquina</p>
+                    <p class="app-demo-titulo">Mis pedidos</p>
+                    <p class="app-demo-quien">Ana · Cliente</p>
+                    <p class="en-linea"><i></i>La tienda está en línea</p>
+                  </div>
+                  <span class="boton-claro">Salir</span>
+                </div>
+                <div class="app-demo-lista marca-1">
+                  <div class="app-demo-pedido">
+                    <p><span>Pedido 3 · 01:20 p.m.</span><em class="edo edo-camino">En camino</em></p>
+                    <b>Pozole grande para llevar</b>
+                    <div class="barra-demo"><i class="lleno"></i><i class="lleno"></i><i class="lleno"></i><i></i></div>
+                    <div class="barra-demo-nombres"><span>Recibido</span><span>Preparando</span><span class="actual">En camino</span><span>Entregado</span></div>
+                  </div>
+                </div>
+                <div class="aviso-tienda marca-2">
+                  <b>En la tienda</b>
+                  <span>Pedido 4 · nuevo</span>
+                  <small>suena un aviso</small>
+                </div>
+              </div>
+            </div>
+            <ol class="llamadas">
+              <li class="llamada" data-paso="1"><span class="parte-num">1</span><div><b>La barra avanza sola</b><p>Cuando la tienda cambia el estado, sin recargar.</p></div></li>
+              <li class="llamada" data-paso="2"><span class="parte-num">2</span><div><b>Los pedidos nuevos llegan solos</b><p>A la tienda, con un sonido.</p></div></li>
+              <li class="llamada" data-paso="3"><span class="parte-num">3</span><div><b>Sabes si la tienda está conectada</b><p>Un indicador de "en línea".</p></div></li>
+            </ol>
+          </div>
+          <div class="llevas-curso" data-paso="4">
+            <p class="etiqueta">Rastro, sigue tu pedido · una sola app que crece clase a clase</p>
+            <div class="ruta-curso">
+              <div class="ruta-fila">
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:150ms"></i></div>
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:300ms"></i></div>
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:450ms"></i><span class="aqui" data-anima="aparece" style="--d:1200ms">Hoy</span></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:600ms"></i></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:750ms"></i></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:900ms"></i></div>
+              </div>
+              <div class="ruta-fila ruta-partes">
+                <p><b>Clase 1</b>Base de datos</p>
+                <p><b>Clase 2</b>Auth y RLS</p>
+                <p class="actual"><b>Clase 3</b>Realtime</p>
+                <p><b>Clase 4</b>Edge Functions</p>
+                <p><b>Clase 5</b>Storage</p>
+                <p><b>Clase 6</b>Eventos y Broadcast</p>
+              </div>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>La meta de hoy: dos ventanas lado a lado, la tienda cambia el estado y la pantalla del cliente avanza sola; los pedidos nuevos le llegan a la tienda con un sonido; y un indicador de si la tienda está conectada. Lo construyo en vivo en cuanto terminen las láminas.</p>
+            <p>Abajo, el camino del curso: hoy la tercera pieza.</p>
+          </aside>
+        </section>
+
+        <!-- 6. Sección 2 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 2: suscribirse a los cambios" data-min="7">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c2">/02</span>
+            <div><h2 class="t1">Suscribirse a los cambios</h2><p>Qué es Realtime y cómo llega un cambio.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Segunda parte: preguntar a cada rato contra suscribirse, cómo llega un cambio de la base al navegador y el error del día.</p></aside>
+        </section>
+
+        <!-- 7. Preguntar o suscribirse -->
+        <section class="lamina" data-titulo="Preguntar a cada rato o suscribirse" data-min="7 a 10">
+          <p class="ceja">Dos formas de enterarse</p>
+          <h2 class="t2">Preguntar a cada rato o suscribirse</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 290" role="img" aria-label="Preguntar cada cinco segundos: la mayoría de las respuestas dicen que no hubo cambios. Suscribirse: una conexión abierta y el servidor manda el cambio en cuanto ocurre.">
+              <text x="0" y="40" font-size="24" class="t-fuerte">Preguntar cada 5 s</text>
+              <text x="0" y="70" font-size="17" class="t-suave">polling</text>
+              <path class="svg-linea s-linea" style="stroke-width:2" d="M300 52 H1352"/>
+              <g data-anima="aparece" style="--d:200ms"><rect class="f-papel s-linea" x="330" y="30" width="140" height="44" rx="22" style="stroke-width:1.5"/><text x="400" y="59" font-size="17" class="t-suave" text-anchor="middle">¿cambió? no</text></g>
+              <g data-anima="aparece" style="--d:400ms"><rect class="f-papel s-linea" x="530" y="30" width="140" height="44" rx="22" style="stroke-width:1.5"/><text x="600" y="59" font-size="17" class="t-suave" text-anchor="middle">¿cambió? no</text></g>
+              <g data-anima="aparece" style="--d:600ms"><rect class="f-papel s-linea" x="730" y="30" width="140" height="44" rx="22" style="stroke-width:1.5"/><text x="800" y="59" font-size="17" class="t-suave" text-anchor="middle">¿cambió? no</text></g>
+              <g data-anima="aparece" style="--d:800ms"><rect class="f-papel s-linea" x="930" y="30" width="140" height="44" rx="22" style="stroke-width:1.5"/><text x="1000" y="59" font-size="17" class="t-suave" text-anchor="middle">¿cambió? no</text></g>
+              <g data-anima="aparece" style="--d:1000ms"><rect class="f-senal-fondo s-senal" x="1130" y="30" width="140" height="44" rx="22" style="stroke-width:1.5"/><text x="1200" y="59" font-size="17" class="t-fuerte" text-anchor="middle">¿cambió? sí</text></g>
+              <text x="300" y="112" font-size="19" class="t-rojo" data-anima="aparece" style="--d:1200ms">Muchas peticiones para nada, y el cambio llega tarde.</text>
+
+              <g data-paso="1" data-en="2200">
+                <text x="0" y="200" font-size="24" class="t-fuerte">Suscribirse</text>
+                <text x="0" y="230" font-size="17" class="t-suave">Realtime, por WebSocket</text>
+                <path class="svg-linea s-plano" data-anima="traza" style="--d:150ms; stroke-width:6" d="M300 212 H1352"/>
+                <text x="330" y="190" font-size="17" class="t-suave" data-anima="aparece" style="--d:500ms">una conexión abierta</text>
+                <g data-anima="pop" style="--d:900ms"><rect class="f-senal-fondo s-senal" x="1000" y="190" width="270" height="44" rx="22" style="stroke-width:1.5"/><text x="1135" y="219" font-size="17" class="t-fuerte" text-anchor="middle">cambió: En camino</text></g>
+                <text x="300" y="276" font-size="19" class="t-verde" data-anima="aparece" style="--d:1200ms">El servidor manda el cambio en cuanto ocurre.</text>
+              </g>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>La forma ingenua de enterarse: preguntar cada cierto tiempo (polling). Casi todas las respuestas son "no hubo cambios": muchas peticiones para nada, y aun así el cambio llega con retraso.</p>
+            <p>Abajo aparece la otra: suscribirse. El navegador abre una conexión que se queda abierta (un WebSocket) y el servidor manda el cambio en cuanto ocurre. Eso es Supabase Realtime.</p>
+          </aside>
+        </section>
+
+        <!-- 8. Cómo llega un cambio -->
+        <section class="lamina" data-titulo="Cómo llega un cambio de la base al navegador" data-min="10 a 14">
+          <p class="ceja">Postgres Changes</p>
+          <h2 class="t2">Cómo llega un cambio al navegador</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 240" role="img" aria-label="La tienda actualiza un pedido. Postgres registra el cambio; si la tabla está en la publicación supabase_realtime, Supabase Realtime lo recibe, revisa qué suscriptores pueden ver esa fila y les manda el evento por WebSocket. El navegador recibe el evento y vuelve a renderizar la página.">
+              <defs>
+                <marker id="punta-cambio" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="0" width="290" height="200" rx="14"/>
+                <text x="24" y="42" font-size="25" class="t-fuerte">La tienda</text>
+                <text x="24" y="74" font-size="18" class="t-suave">marca "En camino"</text>
+                <rect x="24" y="116" width="242" height="48" rx="8" class="f-codigo"/>
+                <text x="42" y="147" font-size="17" class="mono t-codigo">update pedidos</text>
+              </g>
+              <g data-anima="pop" style="--d:400ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="354" y="0" width="290" height="200" rx="14"/>
+                <text x="378" y="42" font-size="25" class="t-fuerte">Postgres</text>
+                <text x="378" y="74" font-size="18" class="t-suave">registra el cambio</text>
+                <text x="378" y="126" font-size="17" class="t-suave">la tabla tiene que estar</text>
+                <text x="378" y="152" font-size="17" class="t-suave">en la publicación</text>
+                <text x="378" y="178" font-size="16" class="t-senal mono">supabase_realtime</text>
+              </g>
+              <g data-anima="pop" style="--d:650ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="708" y="0" width="290" height="200" rx="14"/>
+                <text x="732" y="42" font-size="25" class="t-fuerte">Realtime</text>
+                <text x="732" y="74" font-size="18" class="t-suave">servicio de Supabase</text>
+                <text x="732" y="126" font-size="17" class="t-suave">revisa quién puede ver</text>
+                <text x="732" y="152" font-size="17" class="t-suave">la fila y se lo manda</text>
+                <text x="732" y="178" font-size="17" class="t-suave">por WebSocket</text>
+              </g>
+              <g data-anima="pop" style="--d:900ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="1062" y="0" width="290" height="200" rx="14"/>
+                <text x="1086" y="42" font-size="25" class="t-fuerte">El navegador</text>
+                <text x="1086" y="74" font-size="18" class="t-suave">recibe el evento</text>
+                <text x="1086" y="126" font-size="17" class="t-fuerte mono">UPDATE</text>
+                <text x="1086" y="152" font-size="17" class="t-suave">con la fila nueva</text>
+                <text x="1086" y="178" font-size="17" class="t-suave mono">router.refresh()</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1100ms; stroke-width:2.4" d="M298 100 H346" marker-end="url(#punta-cambio)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1300ms; stroke-width:2.4" d="M652 100 H700" marker-end="url(#punta-cambio)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1500ms; stroke-width:2.4" d="M1006 100 H1054" marker-end="url(#punta-cambio)"/>
+              <text x="0" y="236" font-size="21" class="t-suave" data-anima="aparece" style="--d:1800ms">Eventos: INSERT, UPDATE y DELETE. Te suscribes a los que te interesan, por tabla.</text>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>El recorrido de un cambio. La tienda hace un update. Postgres registra el cambio, y si la tabla está en la publicación <em>supabase_realtime</em>, el servicio Realtime de Supabase lo recibe.</p>
+            <p>Realtime revisa qué suscriptores pueden ver esa fila y les manda el evento por el WebSocket: el tipo (INSERT, UPDATE o DELETE) y la fila. En el navegador, con el evento, le pedimos a Next.js que vuelva a renderizar la página: <em>router.refresh()</em>.</p>
+            <p>Agregar la tabla a la publicación es una línea de SQL: <em>clase-3.sql</em>.</p>
+          </aside>
+        </section>
+
+        <!-- 9. El error del día -->
+        <section class="lamina" data-titulo="El error del día: no llega nada y no hay error" data-min="14 a 16">
+          <p class="ceja">El error del día</p>
+          <h2 class="t2">No llega nada y no hay error</h2>
+          <div class="pasos de4 error-pasos">
+            <article class="paso entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Te suscribes</h3><p class="texto">El código es correcto y la conexión se abre.</p></article>
+            <article class="paso" data-paso="1"><span class="paso-num">2</span><h3 class="t3">No llega nada</h3><p class="texto">La tabla no está en la publicación de Realtime.</p></article>
+            <article class="paso" data-paso="2"><span class="paso-num">3</span><h3 class="t3">Sin error</h3><p class="texto">El servidor lo avisa en un mensaje de sistema.</p></article>
+            <article class="paso ancla" data-paso="3"><span class="paso-num">4</span><h3 class="t3">Escucha "system"</h3><p class="texto">Imprímelo en la consola: ahí dice qué falta.</p></article>
+          </div>
+          <p class="dicho" data-paso="4">Si no llegan cambios, revisa que la tabla esté en <code>supabase_realtime</code> y escucha los mensajes de sistema del canal.</p>
+          <aside class="notas">
+            <p>Adelántales el error del día: te suscribes, cambias un pedido y no llega nada, sin ningún error en la página. La causa: la tabla no está en la publicación de Realtime.</p>
+            <p>El servidor sí lo dice, pero en un mensaje de sistema del canal que nadie escucha. Por eso el componente escucha también los mensajes <em>system</em> y los imprime en la consola. En la práctica lo provocas: escribes el componente antes de correr <em>clase-3.sql</em>.</p>
+          </aside>
+        </section>
+
+        <!-- 10. Sección 3 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 3: Realtime en el navegador" data-min="16">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c3">/03</span>
+            <div><h2 class="t1">Realtime en el navegador</h2><p>Un Client Component que se suscribe y se limpia.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Tercera parte: dónde vive la suscripción en Next.js y cómo se abre y se cierra.</p></aside>
+        </section>
+
+        <!-- 11. Un Client Component -->
+        <section class="lamina" data-titulo="La suscripción vive en un Client Component" data-min="16 a 19">
+          <p class="ceja"><code>"use client"</code></p>
+          <h2 class="t2">La suscripción vive en el navegador</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 280" role="img" aria-label="La página es un Server Component: corre en el servidor, consulta los pedidos y manda el HTML. Dentro va un Client Component, EnVivo, que corre en el navegador, se suscribe a los cambios y, con cada uno, llama a router.refresh para que el servidor vuelva a renderizar la página con datos nuevos.">
+              <defs>
+                <marker id="punta-cliente" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-senal"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="0" width="1352" height="236" rx="16"/>
+                <text x="28" y="44" font-size="26" class="t-fuerte">La página · Server Component</text>
+                <text x="28" y="76" font-size="18" class="t-suave">corre en el servidor: valida la sesión, consulta los pedidos y manda el HTML</text>
+              </g>
+              <g data-anima="pop" style="--d:500ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="28" y="104" width="620" height="108" rx="12"/>
+                <text x="52" y="142" font-size="22" class="t-fuerte mono">&lt;EnVivo /&gt; · Client Component</text>
+                <text x="52" y="174" font-size="18" class="t-suave">corre en el navegador: se suscribe y no pinta nada</text>
+                <text x="52" y="200" font-size="18" class="t-suave">(regresa null)</text>
+              </g>
+              <path class="svg-linea s-senal" data-anima="traza" style="--d:900ms; stroke-width:2.4" d="M660 158 H760" marker-end="url(#punta-cliente)"/>
+              <g data-anima="pop" style="--d:1100ms">
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="772" y="104" width="552" height="108" rx="12"/>
+                <text x="796" y="142" font-size="22" class="t-fuerte mono">router.refresh()</text>
+                <text x="796" y="174" font-size="18" class="t-suave">el servidor vuelve a renderizar la página</text>
+                <text x="796" y="200" font-size="18" class="t-suave">con los datos nuevos</text>
+              </g>
+              <text x="0" y="274" font-size="21" class="t-suave" data-anima="aparece" style="--d:1500ms">Usa el cliente de Supabase del navegador: con la URL y la llave publishable, que son públicas.</text>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>Un Server Component corre en el servidor y termina en cuanto manda el HTML: no puede quedarse escuchando. La suscripción necesita una conexión abierta en el navegador, así que vive en un Client Component, marcado con <em>"use client"</em>.</p>
+            <p><em>EnVivo</em> no pinta nada: solo escucha. Cuando llega un cambio llama a <em>router.refresh()</em>, y el servidor vuelve a renderizar la página con los datos nuevos. La lógica y las consultas se quedan en el servidor.</p>
+            <p>En el navegador se usa otro cliente de Supabase (<em>lib/supabase/client.ts</em>), con la URL y la llave publishable: por eso esa llave es pública por diseño.</p>
+          </aside>
+        </section>
+
+        <!-- 12. useEffect -->
+        <section class="lamina" data-titulo="useEffect: abrir y cerrar la suscripción" data-min="19 a 22">
+          <p class="ceja"><code>useEffect</code></p>
+          <h2 class="t2">Abrir y cerrar la suscripción</h2>
+          <div class="pasos de4 ciclo-pasos">
+            <article class="paso entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Monta</h3><p class="texto">El componente aparece en la página.</p></article>
+            <article class="paso" data-paso="1"><span class="paso-num">2</span><h3 class="t3">Se suscribe</h3><p class="texto">El efecto abre el canal y escucha los cambios.</p></article>
+            <article class="paso" data-paso="2"><span class="paso-num">3</span><h3 class="t3">Recibe avisos</h3><p class="texto">Con cada evento, <code>router.refresh()</code>.</p></article>
+            <article class="paso ancla" data-paso="3"><span class="paso-num">4</span><h3 class="t3">Se limpia</h3><p class="texto">Al salir, <code>removeChannel</code> cierra el canal.</p></article>
+          </div>
+          <p class="dicho" data-paso="4">Cada suscripción abierta es una conexión: si no la cierras en la limpieza del efecto, se acumulan.</p>
+          <aside class="notas">
+            <p><em>useEffect</em> corre después de que el componente aparece en pantalla: ahí se abre el canal. La función que regresa el efecto es la limpieza: corre cuando el componente se va, y ahí se cierra el canal con <em>removeChannel</em>.</p>
+            <p>Sin limpieza, cada vez que el componente se monta se abre otra suscripción, y los avisos se duplican. En desarrollo, React monta dos veces a propósito, así que el error se nota rápido.</p>
+          </aside>
+        </section>
+
+        <!-- 13. Sección 4 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 4: Realtime, RLS y Presence" data-min="22">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c4">/04</span>
+            <div><h2 class="t1">Realtime, RLS y Presence</h2><p>Quién recibe cada cambio y quién está conectado.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Cuarta parte, la última de teoría: RLS también aplica a lo que llega en vivo, y Presence para saber quién está conectado. Al terminarla empieza la práctica.</p></aside>
+        </section>
+
+        <!-- 14. RLS en vivo -->
+        <section class="lamina" data-titulo="RLS también filtra lo que llega en vivo" data-min="22 a 26">
+          <p class="ceja">Realtime y RLS</p>
+          <h2 class="t2">RLS también filtra lo que llega en vivo</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 250" role="img" aria-label="Cambia un pedido de Ana. Realtime revisa la política de lectura para cada suscriptor: Ana recibe el aviso, la tienda también, Beto no. Para que Realtime sepa quién es cada suscriptor, el navegador manda el token de la sesión con setAuth antes de suscribirse; sin él entra como anon y no recibe nada.">
+              <defs>
+                <marker id="punta-vivo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="50" width="320" height="120" rx="14"/>
+                <text x="24" y="94" font-size="24" class="t-fuerte">Cambia el pedido 3</text>
+                <text x="24" y="128" font-size="18" class="t-suave">es de Ana</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:400ms; stroke-width:2.4" d="M328 110 H412" marker-end="url(#punta-vivo)"/>
+              <g data-anima="pop" style="--d:600ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="420" y="30" width="420" height="160" rx="14"/>
+                <text x="444" y="72" font-size="24" class="t-fuerte">Realtime aplica la política</text>
+                <text x="444" y="104" font-size="18" class="t-suave">de lectura a cada suscriptor:</text>
+                <rect x="444" y="124" width="372" height="46" rx="8" class="f-codigo"/>
+                <text x="460" y="154" font-size="16" class="mono t-codigo">cliente_id = auth.uid() or es_tienda()</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:900ms; stroke-width:2.2" d="M848 110 C900 110 900 40 952 40" marker-end="url(#punta-vivo)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1000ms; stroke-width:2.2" d="M848 110 H952" marker-end="url(#punta-vivo)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1100ms; stroke-width:2.2" d="M848 110 C900 110 900 180 952 180" marker-end="url(#punta-vivo)"/>
+              <g data-anima="pop" style="--d:1300ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="960" y="14" width="392" height="52" rx="10"/>
+                <text x="984" y="48" font-size="21" class="t-fuerte">Ana</text><text x="1328" y="48" font-size="19" class="t-verde t-fuerte" text-anchor="end">recibe el aviso</text>
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="960" y="84" width="392" height="52" rx="10"/>
+                <text x="984" y="118" font-size="21" class="t-fuerte">La tienda</text><text x="1328" y="118" font-size="19" class="t-verde t-fuerte" text-anchor="end">recibe el aviso</text>
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="960" y="154" width="392" height="52" rx="10"/>
+                <text x="984" y="188" font-size="21" class="t-fuerte">Beto</text><text x="1328" y="188" font-size="19" class="t-rojo t-fuerte" text-anchor="end">no recibe nada</text>
+              </g>
+              <text x="0" y="244" font-size="21" class="t-suave" data-anima="aparece" style="--d:1700ms">Para saber quién es cada suscriptor, el navegador manda el token de la sesión antes de suscribirse.</text>
+            </svg>
+          </figure>
+          <div class="funcion" data-paso="1" data-en="2400">
+            <code>await supabase.realtime.setAuth()</code>
+            <p>Sin esta línea la suscripción entra como <b>anon</b>: ninguna política le deja ver filas y no llega nada, sin error.</p>
+          </div>
+          <aside class="notas">
+            <p>Las políticas de la clase 2 también aplican en vivo: Realtime revisa la política de lectura para cada suscriptor antes de mandarle un cambio. Ana recibe los cambios de sus pedidos, la tienda los de todos y Beto no recibe los de Ana.</p>
+            <p>Para eso Realtime necesita saber quién es cada suscriptor: el navegador le manda el token de la sesión con <em>setAuth()</em> antes de suscribirse. Si se suscribe antes, entra como <em>anon</em> y otra vez: silencio, sin error.</p>
+          </aside>
+        </section>
+
+        <!-- 15. Presence -->
+        <section class="lamina" data-titulo="Presence: quién está conectado" data-min="26 a 30">
+          <p class="ceja">Presence</p>
+          <h2 class="t2">Quién está conectado ahora</h2>
+          <div class="col2 preguntas">
+            <div class="caja caja-si entra" style="--i:2">
+              <p class="etiqueta">La tienda</p>
+              <h3 class="t3">Se anota en el canal</h3>
+              <p class="texto">Al conectarse, <code>track()</code> la agrega a la lista de presentes del canal. Al cerrar la ventana, sale sola.</p>
+            </div>
+            <div class="caja" data-paso="1" data-en="1500">
+              <p class="etiqueta">Los clientes</p>
+              <h3 class="t3">Escuchan la lista</h3>
+              <p class="texto">Con cada evento <code>sync</code> revisan quién está: si hay alguien anotado, la tienda está en línea.</p>
+            </div>
+          </div>
+          <p class="dicho" data-paso="2" data-en="2600">Presence no toca la base: es un estado compartido que dura lo que dura la conexión.</p>
+          <aside class="notas">
+            <p>Presence es la otra cara de Realtime: no son cambios de la base, sino quién está conectado a un canal ahora mismo, como el "en línea" de un chat. La tienda se anota con <em>track()</em> y los clientes escuchan el evento <em>sync</em>.</p>
+            <p>No se guarda nada en la base: cuando la tienda cierra la ventana, sale de la lista sola.</p>
+            <p>Un detalle práctico del aviso con sonido: el navegador no deja sonar nada hasta que la persona interactúa con la página.</p>
+            <p>Aquí terminan las láminas de teoría: empieza la práctica. Al final de la clase regresa a la parte 5.</p>
+          </aside>
+        </section>
+
+        <!-- 16. Sección 5 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 5: para cerrar la clase" data-min="112">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c5">/05</span>
+            <div><h2 class="t1">Para cerrar la clase</h2><p>Lo que te llevas, la tarea y lo que sigue.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Esta parte va al final de la clase, cuando ya construiste todo en vivo: las tres ideas, la tarea, los recursos y el cierre.</p></aside>
+        </section>
+
+        <!-- 17. Resumen -->
+        <section class="lamina" data-titulo="Resumen: las tres ideas de hoy" data-min="112 a 114">
+          <p class="ceja">Lo que te llevas hoy</p>
+          <h2 class="t2">Tres ideas</h2>
+          <div class="col3 ideas">
+            <article class="idea entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Suscribirse en lugar de preguntar</h3><p class="texto">Una conexión abierta y el servidor manda cada cambio al momento.</p></article>
+            <article class="idea entra" style="--i:3"><span class="paso-num">2</span><h3 class="t3">La suscripción vive en un Client Component</h3><p class="texto">Se abre en <code>useEffect</code> y se cierra en su limpieza.</p></article>
+            <article class="idea entra" style="--i:4"><span class="paso-num">3</span><h3 class="t3">RLS también filtra lo que llega en vivo</h3><p class="texto">Por eso el navegador manda su sesión con <code>setAuth()</code>.</p></article>
+          </div>
+          <aside class="notas">
+            <p>Ya con la app funcionando: tres frases, una por idea. Pregunta si alguien la puede decir con sus palabras antes de enseñarla.</p>
+          </aside>
+        </section>
+
+        <!-- 18. Tarea -->
+        <section class="lamina" data-titulo="Tarea: construye tú solo lo que viste hoy" data-min="114 a 116">
+          <p class="ceja">Tarea · para la clase 4</p>
+          <h2 class="t2">Construye tú solo lo que viste hoy</h2>
+          <div class="tarea">
+            <div>
+              <p class="etiqueta">Cómo sé que ya quedó</p>
+              <ul class="checklist">
+                <li data-paso="1">La tabla de pedidos está en la publicación de Realtime.</li>
+                <li data-paso="1">La barra del cliente avanza sola cuando la tienda cambia el estado.</li>
+                <li data-paso="1">A la tienda le suena un aviso con cada pedido nuevo.</li>
+                <li data-paso="1">Un cliente no recibe los cambios de los pedidos de otro.</li>
+              </ul>
+            </div>
+            <div class="caja caja-si atorado" data-paso="2" data-en="2000">
+              <p class="etiqueta">¿No te salió?</p>
+              <h3 class="t3">No pasa nada</h3>
+              <p class="texto">Toma la base de la clase 4: ya trae todo esto hecho. Compárala con lo tuyo y encuentra qué te faltó.</p>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>La tarea es simple: construir por su cuenta lo que vieron hoy. Si no les sale, toman la base de la clase 4 (<em>clase-4-inicio</em>), que ya trae todo esto hecho, y la comparan con lo suyo.</p>
+            <p>Para la tarea de la clase 4 van a necesitar una cuenta gratis de Resend con su llave: que la creen desde ya, toma cinco minutos.</p>
+          </aside>
+        </section>
+
+        <!-- 19. Para profundizar -->
+        <section class="lamina" data-titulo="Recursos para profundizar" data-min="116">
+          <h2 class="t2">Recursos para profundizar</h2>
+          <ul class="recursos">
+            <li class="entra" style="--i:1">Cambios de la base en vivo (Postgres Changes): <a href="https://supabase.com/docs/guides/realtime/postgres-changes">supabase.com/docs/guides/realtime/postgres-changes</a></li>
+            <li class="entra" style="--i:2">Presence: <a href="https://supabase.com/docs/guides/realtime/presence">supabase.com/docs/guides/realtime/presence</a></li>
+            <li class="entra" style="--i:3"><code>"use client"</code> en Next.js: <a href="https://nextjs.org/docs/app/api-reference/directives/use-client">nextjs.org/docs/app/api-reference/directives/use-client</a></li>
+            <li class="entra" style="--i:4"><code>useEffect</code> y su limpieza: <a href="https://react.dev/reference/react/useEffect">react.dev/reference/react/useEffect</a></li>
+          </ul>
+          <img class="deco mascota laptop" src="../marca/mascota-laptop.png" alt="" />
+          <aside class="notas">
+            <p>La documentación oficial, por si quieren ir más lejos. No es tarea.</p>
+          </aside>
+        </section>
+
+        <!-- 20. Cierre -->
+        <section class="lamina" data-titulo="Cierre: quién manda el correo" data-min="116 a 120">
+          <p class="ceja">Lo que sigue</p>
+          <h2 class="t2">¿Quién le avisa al cliente por correo?</h2>
+          <div class="col2 preguntas">
+            <div class="caja entra" style="--i:2">
+              <p class="etiqueta">En el navegador</p>
+              <h3 class="t3">No se puede</h3>
+              <p class="texto">Mandar un correo necesita una llave secreta. En el navegador, cualquiera la copia y manda correos a tu nombre.</p>
+            </div>
+            <div class="caja caja-si" data-paso="1" data-en="1500">
+              <p class="etiqueta">En Supabase</p>
+              <h3 class="t3">Una Edge Function</h3>
+              <p class="texto">Código que corre junto a la base, con la llave guardada como secreto.</p>
+            </div>
+          </div>
+          <p class="final" data-paso="2" data-en="2600">Hoy la pantalla se actualiza sola. <strong>En la clase 4 el aviso sale por correo, sin que nadie apriete nada.</strong></p>
+          <aside class="notas">
+            <p>El gancho para la clase 4: cuando el pedido sale, al cliente le debería llegar un correo. Para mandarlo hace falta una llave secreta, y esa no puede ir en el navegador ni en el código que llega a él.</p>
+            <p>La respuesta es una Edge Function: código que corre en Supabase, con la llave guardada como secreto. Para la tarea de la clase 4 van a necesitar su cuenta de Resend.</p>
+          </aside>
+        </section>
+
+        <div class="cajetin" aria-hidden="true">
+          <span>Rastro · Supabase + Next.js</span><span>Clase 3</span><span>Lámina <b>01 de 20</b></span>
+        </div>
+        <div class="avance" aria-hidden="true"></div>
+      </div>
+      <p class="solo-lector" aria-live="polite"></p>
+    </div>
+
+    <nav class="controles" aria-label="Controles de la presentación">
+      <button type="button" data-accion="anterior" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="contador" aria-live="off">1 / 1</span>
+      <button type="button" data-accion="siguiente" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <span class="separa" aria-hidden="true"></span>
+      <button type="button" data-accion="pantalla" aria-label="Pantalla completa" title="Pantalla completa (F)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+      <button type="button" data-accion="tema" aria-label="Cambiar entre claro y oscuro" title="Claro u oscuro (T)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/></svg>
+      </button>
+      <button type="button" data-accion="otra" title="Pasar a la otra presentación (O)" hidden>
+        <span class="otra-texto"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </button>
+      <button type="button" data-accion="presentador" title="Abrir las notas en otra ventana (P)">Notas</button>
+      <button type="button" data-accion="ayuda" aria-label="Ver los atajos del teclado" title="Atajos (?)">?</button>
+    </nav>
+
+    <div class="aviso-teclas fuera" role="status"></div>
+
+    <div class="ayuda" hidden>
+      <div class="ayuda-caja" role="dialog" aria-modal="true" aria-label="Atajos del teclado">
+        <h2>Atajos del teclado</h2>
+        <dl>
+          <dt><kbd>→</kbd> <kbd>Espacio</kbd> <kbd>Av Pág</kbd></dt><dd>Pasar a la siguiente lámina: lo de cada lámina aparece solo, con su animación</dd>
+          <dt><kbd>←</kbd> <kbd>Re Pág</kbd></dt><dd>Regresar</dd>
+          <dt><kbd>Inicio</kbd> <kbd>Fin</kbd></dt><dd>Ir a la primera o a la última</dd>
+          <dt><kbd>F</kbd></dt><dd>Pantalla completa</dd>
+          <dt><kbd>P</kbd></dt><dd>Notas y cronómetro en otra ventana. Desde ahí se prende el modo limpio: sin botones, y solo las notas mueven las láminas</dd>
+          <dt><kbd>Esc</kbd></dt><dd>Cerrar esta ayuda</dd>
+        </dl>
+      </div>
+    </div>
+
+    <script src="../motor/motor.js"></script>
+  </body>
+</html>

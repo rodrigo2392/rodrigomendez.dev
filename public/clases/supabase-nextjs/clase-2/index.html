@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clase 2 · Autenticación y RLS</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@500;700&display=swap"
+    />
+    <link rel="stylesheet" href="../motor/motor.css" />
+    <link rel="stylesheet" href="../motor/comun.css" />
+    <link rel="stylesheet" href="../motor/codigofacilito.css" />
+    <link rel="stylesheet" href="../motor/piezas.css" />
+    <link rel="stylesheet" href="clase-2.css" />
+  </head>
+  <body>
+    <!--
+      Clase 2 del bootcamp: autenticación y RLS (vie 16 oct 2026).
+      La teoría y sus tiempos están en las notas de cada lámina; la práctica, en el vault: 10-proyectos/bootcamp-clase-2-guion.
+      El código de la clase: branches clase-2-inicio, clase-2-rescate y clase-2-final del repo.
+    -->
+    <div class="escenario" data-nombre="clase-2" role="region" aria-roledescription="presentación" aria-label="Clase 2: autenticación y RLS">
+      <div class="lienzo">
+        <div class="registro" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+        <!-- 1. Portada -->
+        <section class="lamina portada fondo-portada" data-titulo="Portada: autenticación y RLS" data-min="0">
+          <p class="portada-bootcamp">Bootcamp · Módulo 4: Integración App + DB</p>
+          <h1 class="t1">Autenticación<br />y RLS</h1>
+          <p class="portada-clase">Clase 2 de 6 · Supabase + Next.js</p>
+          <p class="portada-autor">Rodrigo Méndez<small>rodrigomendez.dev</small></p>
+          <div class="deco fichas-tec" aria-hidden="true" data-anima="aparece" style="--d:300ms">
+            <span class="ficha-tec next">Next.js</span>
+            <span class="ficha-tec supa">Supabase</span>
+            <span class="ficha-tec ts">TS</span>
+          </div>
+          <img class="deco destellos" src="../marca/destellos.png" alt="" data-anima="pop" style="--d:800ms" />
+          <img class="deco mascota-portada" src="../marca/mascota-portada.png" alt="" />
+          <aside class="notas">
+            <p>Bienvenida. La clase pasada la tabla de pedidos quedó expuesta: cualquiera con la URL y la llave publishable la leía completa.</p>
+            <p>Hoy se cierra: cada usuario entra con su cuenta y la base decide qué filas ve cada quien.</p>
+          </aside>
+        </section>
+
+        <!-- 2. Tabla de contenido -->
+        <section class="lamina" data-titulo="Tabla de contenido" data-min="0 a 1">
+          <h2 class="temario-titulo"><img src="../marca/tabla.png" alt="" />Tabla de contenido</h2>
+          <ol class="temario">
+            <li class="entra" style="--i:1"><span class="chip-seccion">/01</span>El problema y la meta</li>
+            <li class="entra" style="--i:2"><span class="chip-seccion c2">/02</span>Autenticación</li>
+            <li class="entra" style="--i:3"><span class="chip-seccion c3">/03</span>Autorización con RLS</li>
+            <li class="entra" style="--i:4"><span class="chip-seccion c4">/04</span>Roles en la app</li>
+            <li class="entra" style="--i:5"><span class="chip-seccion c5">/05</span>Para cerrar la clase</li>
+          </ol>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>El mapa de hoy: cuatro partes de teoría y, en cuanto terminen, construyo en vivo mientras ustedes miran. La parte 5 va al final, después de la práctica.</p></aside>
+        </section>
+
+        <!-- 3. Sección 1 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 1: el problema y la meta" data-min="1">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion">/01</span>
+            <div><h2 class="t1">El problema y la meta</h2><p>Qué vamos a construir hoy, y por qué.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Primera parte: el problema que dejó abierto la clase 1 y lo que vamos a construir hoy.</p></aside>
+        </section>
+
+        <!-- 4. El problema -->
+        <section class="lamina" data-titulo="El problema: todos los pedidos en la misma tabla" data-min="1 a 4">
+          <p class="ceja">El problema</p>
+          <h2 class="t2 pregunta">Todos los pedidos viven en la misma tabla. ¿Cómo hace la base para que cada cliente vea solo los suyos?</h2>
+          <figure class="problema">
+            <svg viewBox="0 0 1384 340" role="img" aria-label="Hoy cualquiera ve todas las filas de la tabla de pedidos. La solución: la base filtra cada consulta según el usuario; Ana ve sus pedidos, Beto los suyos, la tienda todos y sin sesión no se ve nada.">
+              <defs>
+                <marker id="punta-problema-2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-senal"/>
+                </marker>
+              </defs>
+              <text x="0" y="22" font-size="17" class="t-suave t-fuerte" letter-spacing="2">HOY: CUALQUIERA VE TODO</text>
+              <g data-anima="pop" style="--d:300ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="44" width="440" height="226" rx="12"/>
+                <text x="24" y="80" font-size="20" class="t-fuerte mono">pedidos</text>
+                <path class="svg-linea s-linea" d="M0 98 H440"/>
+                <text x="24" y="134" font-size="21" class="t-fuerte">Pedido 1</text><text x="416" y="134" font-size="20" class="t-suave" text-anchor="end">de Ana</text>
+                <text x="24" y="176" font-size="21" class="t-fuerte">Pedido 2</text><text x="416" y="176" font-size="20" class="t-suave" text-anchor="end">de Beto</text>
+                <text x="24" y="218" font-size="21" class="t-fuerte">Pedido 3</text><text x="416" y="218" font-size="20" class="t-suave" text-anchor="end">de Ana</text>
+                <text x="24" y="258" font-size="21" class="t-fuerte">Pedido 4</text><text x="416" y="258" font-size="20" class="t-suave" text-anchor="end">de Beto</text>
+              </g>
+              <text x="0" y="316" font-size="23" class="t-rojo t-fuerte" data-anima="aparece" style="--d:900ms">Beto puede leer los pedidos de Ana</text>
+
+              <g data-paso="1" data-en="2200">
+                <path class="svg-linea s-senal" style="stroke-width:3" d="M476 157 H548" marker-end="url(#punta-problema-2)"/>
+                <text x="590" y="22" font-size="17" class="t-senal t-fuerte" letter-spacing="2">LA SOLUCIÓN: LA BASE FILTRA CADA CONSULTA</text>
+                <g data-anima="pop" style="--d:150ms">
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="590" y="44" width="794" height="50" rx="8"/>
+                  <text x="614" y="77" font-size="21" class="t-fuerte">Ana</text><text x="1360" y="77" font-size="20" class="t-suave" text-anchor="end">Pedido 1 · Pedido 3</text>
+                </g>
+                <g data-anima="pop" style="--d:300ms">
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="590" y="106" width="794" height="50" rx="8"/>
+                  <text x="614" y="139" font-size="21" class="t-fuerte">Beto</text><text x="1360" y="139" font-size="20" class="t-suave" text-anchor="end">Pedido 2 · Pedido 4</text>
+                </g>
+                <g data-anima="pop" style="--d:450ms">
+                  <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="590" y="168" width="794" height="50" rx="8"/>
+                  <text x="614" y="201" font-size="21" class="t-fuerte">La tienda</text><text x="1360" y="201" font-size="20" class="t-suave" text-anchor="end">todos</text>
+                </g>
+                <g data-anima="pop" style="--d:600ms">
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="590" y="230" width="794" height="50" rx="8"/>
+                  <text x="614" y="263" font-size="21" class="t-fuerte">Sin sesión</text><text x="1360" y="263" font-size="20" class="t-suave" text-anchor="end">ninguno</text>
+                </g>
+                <text x="590" y="316" font-size="23" class="t-verde t-fuerte">Una sola tabla: cada quien ve solo lo suyo</text>
+              </g>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>Recuerda el cierre de la clase 1: con la URL y la llave publishable, cualquiera leía la tabla completa. Hoy, además, cada cliente va a tener su cuenta, y sin reglas cada uno vería los pedidos de los demás.</p>
+            <p>A los dos segundos aparece la solución: la base filtra cada consulta según el usuario que la hace. Pasa igual en tu banco: todas las cuentas viven en la misma base y con tu usuario solo ves la tuya.</p>
+          </aside>
+        </section>
+
+        <!-- 5. La meta de hoy -->
+        <section class="lamina llevas" data-titulo="La meta de hoy: cuentas, sesión y cada quien ve lo suyo" data-min="4 a 7">
+          <p class="ceja">La meta de hoy</p>
+          <h2 class="t2">Cada quien entra con su cuenta y ve lo suyo</h2>
+          <div class="demo">
+            <div class="navegador app-demo entra" style="--i:2">
+              <div class="navegador-barra"><i></i><i></i><i></i><span>localhost:3000</span></div>
+              <div class="app-demo-cuerpo cuerpo-cliente">
+                <div class="app-demo-cabeza marca-1">
+                  <div>
+                    <p class="app-demo-marca">Fonda La Esquina</p>
+                    <p class="app-demo-titulo">Mis pedidos</p>
+                    <p class="app-demo-quien">Ana · Cliente</p>
+                  </div>
+                  <span class="boton-claro">Salir</span>
+                </div>
+                <div class="app-demo-form marca-2">
+                  <b>Haz tu pedido</b>
+                  <span class="campo">¿Qué vas a pedir? Ej. 3 tacos al pastor y una horchata</span>
+                  <small>Te lo llevamos a la dirección de tu cuenta.</small>
+                  <span class="boton">Hacer pedido</span>
+                </div>
+                <div class="app-demo-lista marca-3">
+                  <div class="app-demo-pedido">
+                    <p><span>Pedido 3 · 01:20 p.m.</span><em class="edo edo-preparando">Preparando</em></p>
+                    <b>Pozole grande para llevar</b>
+                  </div>
+                  <div class="app-demo-pedido">
+                    <p><span>Pedido 1 · 01:05 p.m.</span><em class="edo edo-camino">En camino</em></p>
+                    <b>3 tacos al pastor y una horchata</b>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ol class="llamadas">
+              <li class="llamada" data-paso="1"><span class="parte-num">1</span><div><b>Entras con tu cuenta</b><p>Registro e inicio de sesión con correo y contraseña.</p></div></li>
+              <li class="llamada" data-paso="2"><span class="parte-num">2</span><div><b>Pides sin repetir tus datos</b><p>La dirección y el teléfono salen de tu perfil.</p></div></li>
+              <li class="llamada" data-paso="3"><span class="parte-num">3</span><div><b>Solo ves tus pedidos</b><p>La tienda entra con su cuenta y ve todos.</p></div></li>
+            </ol>
+          </div>
+          <div class="llevas-curso" data-paso="4">
+            <p class="etiqueta">Rastro, sigue tu pedido · una sola app que crece clase a clase</p>
+            <div class="ruta-curso">
+              <div class="ruta-fila">
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:150ms"></i></div>
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:300ms"></i><span class="aqui" data-anima="aparece" style="--d:1200ms">Hoy</span></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:450ms"></i></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:600ms"></i></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:750ms"></i></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:900ms"></i></div>
+              </div>
+              <div class="ruta-fila ruta-partes">
+                <p><b>Clase 1</b>Base de datos</p>
+                <p class="actual"><b>Clase 2</b>Auth y RLS</p>
+                <p><b>Clase 3</b>Realtime</p>
+                <p><b>Clase 4</b>Edge Functions</p>
+                <p><b>Clase 5</b>Storage</p>
+                <p><b>Clase 6</b>Eventos y Broadcast</p>
+              </div>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>La meta de hoy: registro e inicio de sesión, una página que solo abre con sesión, cada cliente viendo solo sus pedidos y la tienda viendo todos. Todavía no hay nada de esto; lo construyo en vivo en cuanto terminen las láminas.</p>
+            <p>Se marcan solos, uno tras otro: la cuenta, el pedido que toma los datos del perfil y la lista filtrada. Abajo, el camino del curso: hoy la segunda pieza.</p>
+          </aside>
+        </section>
+
+        <!-- 6. Sección 2 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 2: autenticación" data-min="7">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c2">/02</span>
+            <div><h2 class="t1">Autenticación</h2><p>Quién eres: la cuenta, la sesión y el perfil.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Segunda parte: autenticación contra autorización, cómo viaja la sesión y qué pasa al registrarse.</p></aside>
+        </section>
+
+        <!-- 7. Autenticación y autorización -->
+        <section class="lamina" data-titulo="Autenticación y autorización: dos preguntas distintas" data-min="7 a 9">
+          <p class="ceja">Dos preguntas distintas</p>
+          <h2 class="t2">Autenticación y autorización</h2>
+          <div class="col2 preguntas">
+            <div class="caja caja-si entra" style="--i:2">
+              <p class="etiqueta">Autenticación · Supabase Auth</p>
+              <h3 class="t3">¿Quién eres?</h3>
+              <p class="texto">Registro e inicio de sesión con correo y contraseña. El resultado es una sesión: un token que dice quién eres.</p>
+            </div>
+            <div class="caja caja-no" data-paso="1" data-en="1500">
+              <p class="etiqueta">Autorización · RLS</p>
+              <h3 class="t3">¿Qué puedes hacer?</h3>
+              <p class="texto">Políticas en la base de datos: qué filas puede leer y escribir cada usuario.</p>
+            </div>
+          </div>
+          <p class="dicho" data-paso="2" data-en="2600">Primero la base sabe quién eres; con eso decide qué te deja ver y cambiar. Hoy hacemos las dos.</p>
+          <aside class="notas">
+            <p>Dos preguntas que se confunden seguido. Autenticación: ¿quién eres? Se resuelve con registro e inicio de sesión, y el resultado es una sesión. Autorización: ¿qué puedes hacer? Se resuelve con reglas.</p>
+            <p>En Supabase, la primera la resuelve Auth y la segunda las políticas RLS de Postgres. Sin la primera, la base no sabe a quién aplicarle las reglas.</p>
+          </aside>
+        </section>
+
+        <!-- 8. La sesión viaja en cookies -->
+        <section class="lamina" data-titulo="La sesión viaja en cookies" data-min="9 a 13">
+          <p class="ceja">La sesión</p>
+          <h2 class="t2">La sesión viaja en cookies</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 300" role="img" aria-label="El navegador guarda la sesión en cookies. En cada petición, proxy.ts valida el token y lo renueva si está por caducar. La página o la Server Action lee las cookies, valida la sesión con getClaims y, si no hay, redirige a /login. Supabase recibe el token y auth.uid() es el id de ese usuario.">
+              <defs>
+                <marker id="punta-sesion" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="0" width="290" height="236" rx="14"/>
+                <text x="24" y="42" font-size="27" class="t-fuerte">Navegador</text>
+                <text x="24" y="72" font-size="18" class="t-suave">guarda la sesión</text>
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="24" y="98" width="242" height="112" rx="8"/>
+                <text x="42" y="130" font-size="17" class="t-fuerte">Cookies</text>
+                <text x="42" y="160" font-size="16" class="t-suave">access token (JWT)</text>
+                <text x="42" y="188" font-size="16" class="t-suave">refresh token</text>
+              </g>
+              <g data-anima="pop" style="--d:400ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="354" y="0" width="290" height="236" rx="14"/>
+                <text x="378" y="42" font-size="27" class="t-fuerte mono">proxy.ts</text>
+                <text x="378" y="72" font-size="18" class="t-suave">antes de cada petición</text>
+                <text x="378" y="122" font-size="18" class="t-fuerte">Valida el token</text>
+                <text x="378" y="152" font-size="18" class="t-fuerte">y lo renueva</text>
+                <text x="378" y="182" font-size="18" class="t-fuerte">si está por caducar.</text>
+              </g>
+              <g data-anima="pop" style="--d:650ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="708" y="0" width="290" height="236" rx="14"/>
+                <text x="732" y="42" font-size="27" class="t-fuerte">Tu página</text>
+                <text x="732" y="72" font-size="18" class="t-suave">o una Server Action</text>
+                <text x="732" y="122" font-size="18" class="t-fuerte mono">getClaims()</text>
+                <text x="732" y="152" font-size="18" class="t-suave">valida la sesión;</text>
+                <text x="732" y="182" font-size="18" class="t-suave">sin sesión, redirige</text>
+                <text x="732" y="210" font-size="18" class="t-suave">a /login.</text>
+              </g>
+              <g data-anima="pop" style="--d:900ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="1062" y="0" width="290" height="236" rx="14"/>
+                <text x="1086" y="42" font-size="27" class="t-fuerte">Supabase</text>
+                <text x="1086" y="72" font-size="18" class="t-suave">recibe el token</text>
+                <text x="1086" y="122" font-size="18" class="t-fuerte mono">auth.uid()</text>
+                <text x="1086" y="152" font-size="18" class="t-suave">es el id del usuario</text>
+                <text x="1086" y="182" font-size="18" class="t-suave">que viene en el JWT.</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1100ms; stroke-width:2.4" d="M298 118 H346" marker-end="url(#punta-sesion)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1300ms; stroke-width:2.4" d="M652 118 H700" marker-end="url(#punta-sesion)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1500ms; stroke-width:2.4" d="M1006 118 H1054" marker-end="url(#punta-sesion)"/>
+              <text x="0" y="286" font-size="21" class="t-suave" data-anima="aparece" style="--d:1800ms">Una página no puede escribir cookies: por eso la renovación vive en proxy.ts.</text>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>Al entrar, Supabase Auth crea una sesión: un access token, que es un JWT con el id del usuario y caduca, y un refresh token para pedir uno nuevo. Con <em>@supabase/ssr</em> los dos viajan en cookies, así que el servidor los recibe en cada petición.</p>
+            <p><em>proxy.ts</em> corre antes de cada petición: valida el token y, si ya caducó o está por caducar, lo renueva y guarda las cookies nuevas. Lo necesita porque una página no puede escribir cookies.</p>
+            <p>Cada página decide si deja pasar: <em>getClaims()</em> valida el JWT y, si no hay sesión, redirige a <em>/login</em>. En la base, <em>auth.uid()</em> regresa el id que viene en ese token: con eso trabajan las políticas.</p>
+          </aside>
+        </section>
+
+        <!-- 9. El registro crea el perfil -->
+        <section class="lamina" data-titulo="Al registrarte, la base crea tu perfil" data-min="13 a 16">
+          <p class="ceja">El registro</p>
+          <h2 class="t2">Al registrarte, la base crea tu perfil</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 250" role="img" aria-label="El formulario de registro manda nombre, teléfono, dirección, correo y contraseña. signUp crea la cuenta en auth.users con esos datos en raw_user_meta_data. Un trigger de la base, al insertarse la cuenta, crea su fila en perfiles con rol cliente.">
+              <defs>
+                <marker id="punta-registro" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="0" width="300" height="200" rx="14"/>
+                <text x="24" y="42" font-size="25" class="t-fuerte">Crear cuenta</text>
+                <text x="24" y="80" font-size="18" class="t-suave">nombre, teléfono,</text>
+                <text x="24" y="106" font-size="18" class="t-suave">dirección, correo</text>
+                <text x="24" y="132" font-size="18" class="t-suave">y contraseña</text>
+                <text x="24" y="176" font-size="17" class="t-senal mono">signUp()</text>
+              </g>
+              <g data-anima="pop" style="--d:450ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="352" y="0" width="300" height="200" rx="14"/>
+                <text x="376" y="42" font-size="25" class="t-fuerte mono">auth.users</text>
+                <text x="376" y="80" font-size="18" class="t-suave">la cuenta, con los</text>
+                <text x="376" y="106" font-size="18" class="t-suave">datos extra en</text>
+                <text x="376" y="132" font-size="17" class="t-senal mono">raw_user_meta_data</text>
+              </g>
+              <g data-anima="pop" style="--d:750ms">
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="704" y="40" width="244" height="120" rx="12"/>
+                <text x="728" y="82" font-size="23" class="t-fuerte">Trigger</text>
+                <text x="728" y="112" font-size="17" class="t-suave">after insert:</text>
+                <text x="728" y="138" font-size="17" class="t-suave">crea el perfil</text>
+              </g>
+              <g data-anima="pop" style="--d:1050ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="1000" y="0" width="352" height="200" rx="14"/>
+                <text x="1024" y="42" font-size="25" class="t-fuerte mono">perfiles</text>
+                <text x="1024" y="80" font-size="18" class="t-suave">id, nombre, teléfono,</text>
+                <text x="1024" y="106" font-size="18" class="t-suave">dirección y rol</text>
+                <text x="1024" y="148" font-size="18" class="t-fuerte">rol = 'cliente'</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1250ms; stroke-width:2.4" d="M308 100 H344" marker-end="url(#punta-registro)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1400ms; stroke-width:2.4" d="M660 100 H696" marker-end="url(#punta-registro)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1550ms; stroke-width:2.4" d="M956 100 H992" marker-end="url(#punta-registro)"/>
+              <text x="0" y="244" font-size="21" class="t-suave" data-anima="aparece" style="--d:1800ms">El perfil tiene RLS desde que nace: cada usuario solo puede leer el suyo.</text>
+            </svg>
+          </figure>
+          <p class="dicho" data-paso="1" data-en="2400">El pedido ya no pide dirección ni teléfono: los toma del perfil de quien tiene la sesión.</p>
+          <aside class="notas">
+            <p>Crear cuenta es solo para clientes. <em>signUp</em> crea la cuenta en <em>auth.users</em> y los datos extra (nombre, teléfono, dirección) viajan en <em>options.data</em>, que Supabase guarda en <em>raw_user_meta_data</em>.</p>
+            <p>Un trigger de la base, al insertarse la cuenta, crea su fila en <em>perfiles</em> con rol cliente. La tabla <em>perfiles</em> nace con RLS y una política: cada usuario lee solo su perfil.</p>
+            <p>Por eso, al hacer un pedido, la Server Action consulta <em>perfiles</em> sin filtrar por id: la base solo le regresa el perfil de la sesión.</p>
+          </aside>
+        </section>
+
+        <!-- 10. Sección 3 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 3: autorización con RLS" data-min="16">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c3">/03</span>
+            <div><h2 class="t1">Autorización con RLS</h2><p>Qué filas puede leer y escribir cada usuario.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Tercera parte: qué es RLS, las políticas de los pedidos y el error del día.</p></aside>
+        </section>
+
+        <!-- 11. RLS filtra cada consulta -->
+        <section class="lamina" data-titulo="RLS: la base filtra cada consulta" data-min="16 a 19">
+          <p class="ceja">Row Level Security</p>
+          <h2 class="t2">La base filtra cada consulta</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 270" role="img" aria-label="La misma consulta llega desde tu página, desde la consola del navegador o desde un script. Postgres aplica la política de la tabla a cada fila y solo regresa las filas que la política permite para ese usuario.">
+              <defs>
+                <marker id="punta-rls" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="10" width="300" height="66" rx="10"/>
+                <text x="24" y="52" font-size="21" class="t-fuerte">Tu página</text>
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="96" width="300" height="66" rx="10"/>
+                <text x="24" y="138" font-size="21" class="t-fuerte">La consola del navegador</text>
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="182" width="300" height="66" rx="10"/>
+                <text x="24" y="224" font-size="21" class="t-fuerte">Un script con curl</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:500ms; stroke-width:2.2" d="M308 43 C380 43 380 129 452 129" marker-end="url(#punta-rls)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:600ms; stroke-width:2.2" d="M308 129 H452" marker-end="url(#punta-rls)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:700ms; stroke-width:2.2" d="M308 215 C380 215 380 129 452 129" marker-end="url(#punta-rls)"/>
+              <g data-anima="pop" style="--d:900ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="460" y="40" width="440" height="178" rx="14"/>
+                <text x="486" y="82" font-size="25" class="t-fuerte">Postgres con RLS</text>
+                <text x="486" y="116" font-size="18" class="t-suave">aplica la política a cada fila:</text>
+                <rect x="486" y="138" width="388" height="52" rx="8" class="f-codigo"/>
+                <text x="504" y="171" font-size="19" class="mono t-codigo">cliente_id = auth.uid()</text>
+              </g>
+              <path class="svg-linea s-senal" data-anima="traza" style="--d:1200ms; stroke-width:2.4" d="M908 129 H1000" marker-end="url(#punta-rls)"/>
+              <g data-anima="pop" style="--d:1400ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="1008" y="40" width="344" height="178" rx="14"/>
+                <text x="1032" y="82" font-size="23" class="t-fuerte">Solo las filas</text>
+                <text x="1032" y="112" font-size="23" class="t-fuerte">que la política</text>
+                <text x="1032" y="142" font-size="23" class="t-fuerte">permite</text>
+                <text x="1032" y="184" font-size="18" class="t-suave">para ese usuario</text>
+              </g>
+            </svg>
+          </figure>
+          <ul class="claves">
+            <li data-paso="1" data-en="2000">Se activa por tabla</li>
+            <li data-paso="1">Sin políticas, nadie ve nada</li>
+            <li data-paso="1">Aplica venga de donde venga la consulta</li>
+            <li data-paso="1">La llave secreta se la salta</li>
+          </ul>
+          <aside class="notas">
+            <p>RLS, Row Level Security: políticas por fila que Postgres aplica a cada consulta. No importa si la consulta viene de tu página, de la consola del navegador o de un script: la base filtra igual.</p>
+            <p>Se activa tabla por tabla. Al activarla, sin políticas, nadie ve nada. Cada política abre un tipo de acceso para un rol (<em>anon</em>, sin sesión; <em>authenticated</em>, con sesión) y usa <em>auth.uid()</em>, el usuario del token.</p>
+            <p>La llave secreta usa un rol que se salta RLS: por eso nunca va en el navegador.</p>
+          </aside>
+        </section>
+
+        <!-- 12. Las políticas de pedidos -->
+        <section class="lamina" data-titulo="Las políticas de pedidos, primero en español" data-min="19 a 23">
+          <p class="ceja">Las políticas de pedidos</p>
+          <h2 class="t2">Primero en español, luego en SQL</h2>
+          <div class="hoja reglas-hoja entra" style="--i:2">
+            <p class="hoja-nombre">pedidos · RLS</p>
+            <table>
+              <thead><tr><th>La regla</th><th>Operación</th><th>La condición</th></tr></thead>
+              <tbody>
+                <tr data-paso="1"><td>El cliente ve sus pedidos y la tienda ve todos</td><td class="op">select · <b>using</b></td><td><code>cliente_id = auth.uid() or es_tienda()</code></td></tr>
+                <tr data-paso="2"><td>El cliente hace pedidos a su nombre</td><td class="op">insert · <b>with check</b></td><td><code>cliente_id = auth.uid()</code></td></tr>
+                <tr data-paso="3"><td>Solo la tienda cambia el estado</td><td class="op">update · <b>using</b></td><td><code>es_tienda()</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <ul class="claves">
+            <li data-paso="4"><b>using</b> filtra qué filas puedes leer o modificar</li>
+            <li data-paso="4"><b>with check</b> valida las filas que escribes</li>
+            <li data-paso="4"><code>cliente_id</code> se llena solo: <code>default auth.uid()</code></li>
+          </ul>
+          <aside class="notas">
+            <p>Las reglas se dicen primero en español y luego se escriben. Cada pedido gana una columna <em>cliente_id</em> que la base llena sola con <em>auth.uid()</em>: la app no la manda.</p>
+            <p>Leer: el cliente ve los suyos y la tienda todos. Crear: el cliente solo inserta a su nombre; <em>with check</em> revisa la fila que se escribe. Cambiar: solo la tienda; <em>using</em> filtra qué filas puede tocar el update.</p>
+            <p>Además de las políticas, la tabla necesita el permiso (<em>grant</em>) para el rol <em>authenticated</em>: el permiso dice qué operaciones se pueden intentar; las políticas, sobre qué filas.</p>
+          </aside>
+        </section>
+
+        <!-- 13. El error del día -->
+        <section class="lamina" data-titulo="El error del día: activas RLS y la lista sale vacía" data-min="23 a 25">
+          <p class="ceja">El error del día</p>
+          <h2 class="t2">Activas RLS y la lista sale vacía</h2>
+          <div class="pasos de4 error-pasos">
+            <article class="paso entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Activas RLS</h3><p class="texto">En la tabla de pedidos, todavía sin políticas.</p></article>
+            <article class="paso" data-paso="1"><span class="paso-num">2</span><h3 class="t3">Lista vacía</h3><p class="texto">Ni la tienda ve nada: sin políticas, RLS niega todo.</p></article>
+            <article class="paso" data-paso="2"><span class="paso-num">3</span><h3 class="t3">Sin error</h3><p class="texto">La consulta responde bien, con cero filas.</p></article>
+            <article class="paso ancla" data-paso="3"><span class="paso-num">4</span><h3 class="t3">Las políticas</h3><p class="texto">Cada una abre un tipo de acceso.</p></article>
+          </div>
+          <p class="dicho" data-paso="4">Si una lista sale vacía de repente y no hay error, revisa si la tabla tiene RLS y qué políticas tiene.</p>
+          <aside class="notas">
+            <p>Adelántales el error más confuso de Supabase: activas RLS y la lista sale vacía, hasta para la tienda, y no hay ningún mensaje de error. La consulta es válida: simplemente ninguna política le deja ver filas.</p>
+            <p>En la práctica lo provocas a propósito: activas RLS antes de escribir las políticas y recargas con las dos cuentas. Luego escribes las políticas y todo vuelve, ya filtrado.</p>
+          </aside>
+        </section>
+
+        <!-- 14. Sección 4 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 4: roles en la app" data-min="25">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c4">/04</span>
+            <div><h2 class="t1">Roles en la app</h2><p>La tienda y los clientes, en la misma app.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Cuarta parte, la última de teoría: cómo se crea la cuenta de la tienda y qué cambia en la página según quién entra. Al terminarla empieza la práctica.</p></aside>
+        </section>
+
+        <!-- 15. La cuenta de la tienda -->
+        <section class="lamina" data-titulo="La tienda no se registra en la app" data-min="25 a 27">
+          <p class="ceja">La cuenta de la tienda</p>
+          <h2 class="t2">La tienda no se registra en la app</h2>
+          <div class="col2 preguntas">
+            <div class="caja entra" style="--i:2">
+              <p class="etiqueta">Registro en la app</p>
+              <h3 class="t3">Solo clientes</h3>
+              <p class="texto">Cualquiera puede crear una cuenta, y todas nacen con rol cliente.</p>
+            </div>
+            <div class="caja caja-si" data-paso="1" data-en="1500">
+              <p class="etiqueta">La tienda</p>
+              <h3 class="t3">Una migración en SQL</h3>
+              <p class="texto">Crea su cuenta directo en la base y cambia su perfil a rol tienda.</p>
+            </div>
+          </div>
+          <div class="funcion" data-paso="2" data-en="2600">
+            <code>es_tienda()</code>
+            <p>Función de la base que responde si la sesión es de la tienda. Es <b>security definer</b>: puede leer todos los perfiles, pero solo contesta sí o no.</p>
+          </div>
+          <aside class="notas">
+            <p>Si la tienda se registrara en la app, cualquiera podría registrarse como tienda y ver todos los pedidos. Por eso el registro es solo para clientes y la cuenta con más permisos se crea desde la base, con una migración que ya viene hecha: solo se le cambian el correo y la contraseña.</p>
+            <p><em>es_tienda()</em> es la pieza que usan las políticas. Corre con los permisos de quien la creó (<em>security definer</em>) para poder leer el perfil aunque <em>perfiles</em> tenga RLS, y solo regresa verdadero o falso.</p>
+          </aside>
+        </section>
+
+        <!-- 16. La interfaz y la seguridad -->
+        <section class="lamina" data-titulo="Esconder un botón no es seguridad" data-min="27 a 30">
+          <p class="ceja">La página según quién entra</p>
+          <h2 class="t2">Esconder un botón no es seguridad</h2>
+          <div class="col2 preguntas">
+            <div class="caja entra" style="--i:2">
+              <p class="etiqueta">La página · interfaz</p>
+              <h3 class="t3">Enseña lo que te toca</h3>
+              <p class="texto">El cliente ve el formulario "Haz tu pedido"; la tienda, los botones de estado. Lo decide leyendo el rol del perfil.</p>
+            </div>
+            <div class="caja caja-si" data-paso="1" data-en="1500">
+              <p class="etiqueta">La base · seguridad</p>
+              <h3 class="t3">Decide lo que puedes hacer</h3>
+              <p class="texto">Si un cliente manda el update a mano, la política de update lo deja en cero filas y no cambia nada.</p>
+            </div>
+          </div>
+          <p class="dicho" data-paso="2" data-en="2600">La interfaz se adapta al rol; la regla vive en la base.</p>
+          <aside class="notas">
+            <p>La página lee el perfil de la sesión y decide qué enseñar: al cliente, el formulario; a la tienda, los botones. Eso es solo la interfaz.</p>
+            <p>Lo que de verdad impide que un cliente cambie un estado es la política de update: aunque arme la petición a mano, la base no lo deja. Si la regla solo estuviera en la página, bastaría con abrir la consola para saltársela.</p>
+            <p>Aquí terminan las láminas de teoría: empieza la práctica. Al final de la clase regresa a la parte 5.</p>
+          </aside>
+        </section>
+
+        <!-- 17. Sección 5 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 5: para cerrar la clase" data-min="112">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c5">/05</span>
+            <div><h2 class="t1">Para cerrar la clase</h2><p>Lo que te llevas, la tarea y lo que sigue.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Esta parte va al final de la clase, cuando ya construiste todo en vivo: las tres ideas, la tarea, los recursos y el cierre.</p></aside>
+        </section>
+
+        <!-- 18. Resumen -->
+        <section class="lamina" data-titulo="Resumen: las tres ideas de hoy" data-min="112 a 114">
+          <p class="ceja">Lo que te llevas hoy</p>
+          <h2 class="t2">Tres ideas</h2>
+          <div class="col3 ideas">
+            <article class="idea entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Autenticación no es autorización</h3><p class="texto">Supabase Auth dice quién eres; las políticas RLS, qué puedes hacer.</p></article>
+            <article class="idea entra" style="--i:3"><span class="paso-num">2</span><h3 class="t3">La sesión viaja en cookies</h3><p class="texto"><code>proxy.ts</code> la renueva y cada página decide si te deja pasar.</p></article>
+            <article class="idea entra" style="--i:4"><span class="paso-num">3</span><h3 class="t3">RLS filtra en la base</h3><p class="texto">Aplica venga de donde venga la consulta. Sin políticas, nadie ve nada.</p></article>
+          </div>
+          <aside class="notas">
+            <p>Ya con la app funcionando: tres frases, una por idea. Pregunta si alguien la puede decir con sus palabras antes de enseñarla.</p>
+          </aside>
+        </section>
+
+        <!-- 19. Tarea -->
+        <section class="lamina" data-titulo="Tarea: construye tú solo lo que viste hoy" data-min="114 a 116">
+          <p class="ceja">Tarea · para la clase 3</p>
+          <h2 class="t2">Construye tú solo lo que viste hoy</h2>
+          <div class="tarea">
+            <div>
+              <p class="etiqueta">Cómo sé que ya quedó</p>
+              <ul class="checklist">
+                <li data-paso="1">Te registras, entras y sales con correo y contraseña.</li>
+                <li data-paso="1">Sin sesión, la página de pedidos te manda a entrar.</li>
+                <li data-paso="1">Cada cliente ve solo sus pedidos; la tienda ve todos y solo ella cambia estados.</li>
+                <li data-paso="1">La consulta de la consola con la llave publishable regresa vacío.</li>
+              </ul>
+            </div>
+            <div class="caja caja-si atorado" data-paso="2" data-en="2000">
+              <p class="etiqueta">¿No te salió?</p>
+              <h3 class="t3">No pasa nada</h3>
+              <p class="texto">Toma la base de la clase 3: ya trae todo esto hecho. Compárala con lo tuyo y encuentra qué te faltó.</p>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>La tarea es simple: construir por su cuenta lo que vieron hoy. Antes, en su proyecto de Supabase, que apaguen "Confirm email" en Authentication.</p>
+            <p>Si no les sale, toman la base de la clase 3 (<em>clase-3-inicio</em>), que ya trae todo esto hecho, y la comparan con lo suyo.</p>
+          </aside>
+        </section>
+
+        <!-- 20. Para profundizar -->
+        <section class="lamina" data-titulo="Recursos para profundizar" data-min="116">
+          <h2 class="t2">Recursos para profundizar</h2>
+          <ul class="recursos">
+            <li class="entra" style="--i:1">Supabase Auth en Next.js, del lado del servidor: <a href="https://supabase.com/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&amp;framework=nextjs">supabase.com/docs/guides/auth/server-side/creating-a-client</a></li>
+            <li class="entra" style="--i:2">Row Level Security: <a href="https://supabase.com/docs/guides/database/postgres/row-level-security">supabase.com/docs/guides/database/postgres/row-level-security</a></li>
+            <li class="entra" style="--i:3">Datos de usuario y perfiles: <a href="https://supabase.com/docs/guides/auth/managing-user-data">supabase.com/docs/guides/auth/managing-user-data</a></li>
+            <li class="entra" style="--i:4"><code>proxy.ts</code> en Next.js: <a href="https://nextjs.org/docs/app/api-reference/file-conventions/proxy">nextjs.org/docs/app/api-reference/file-conventions/proxy</a></li>
+          </ul>
+          <img class="deco mascota laptop" src="../marca/mascota-laptop.png" alt="" />
+          <aside class="notas">
+            <p>La documentación oficial, por si quieren ir más lejos. No es tarea.</p>
+          </aside>
+        </section>
+
+        <!-- 21. Cierre -->
+        <section class="lamina" data-titulo="Cierre: la tabla ya no está expuesta" data-min="116 a 120">
+          <p class="ceja">Una última cosa</p>
+          <h2 class="t2">Tu tabla ya no está expuesta</h2>
+          <figure class="abierta">
+            <svg viewBox="0 0 1352 250" role="img" aria-label="La misma consulta de la clase 1, con la URL y la llave publishable y sin sesión, ahora regresa un arreglo vacío: la tabla tiene RLS y ninguna política le da acceso al rol anon.">
+              <defs>
+                <marker id="punta-cerrada" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+                <marker id="punta-cerrada-verde" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-senal"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="20" width="330" height="210" rx="14"/>
+                <text x="28" y="66" font-size="28" class="t-fuerte">Cualquier persona</text>
+                <text x="28" y="98" font-size="19" class="t-suave">sin sesión: rol anon</text>
+                <rect x="28" y="152" width="274" height="54" rx="8" class="f-codigo"/>
+                <text x="46" y="186" font-size="18" class="mono t-codigo">› consulta sin sesión</text>
+              </g>
+              <g data-anima="pop" style="--d:300ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="1022" y="20" width="330" height="210" rx="14"/>
+                <text x="1050" y="66" font-size="28" class="t-fuerte">Tabla pedidos</text>
+                <text x="1050" y="98" font-size="19" class="t-suave">con RLS</text>
+                <text x="1050" y="126" font-size="19" class="t-suave">sin políticas para anon</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:500ms; stroke-width:2.4" d="M342 80 H1010" marker-end="url(#punta-cerrada)"/>
+              <g data-anima="aparece" style="--d:800ms">
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="466" y="60" width="200" height="40" rx="20"/>
+                <text x="566" y="87" font-size="19" class="t-fuerte" text-anchor="middle">URL del proyecto</text>
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="686" y="60" width="200" height="40" rx="20"/>
+                <text x="786" y="87" font-size="19" class="t-fuerte" text-anchor="middle">llave publishable</text>
+              </g>
+              <path class="svg-linea s-senal" data-anima="traza" style="--d:1300ms; stroke-width:2.4" d="M1010 180 H342" marker-end="url(#punta-cerrada-verde)"/>
+              <text x="676" y="166" font-size="23" class="t-verde t-fuerte" text-anchor="middle" data-anima="aparece" style="--d:1800ms">[ ] · cero filas</text>
+            </svg>
+          </figure>
+          <p class="final" data-paso="1" data-en="2800">Hoy la tienda recarga para ver pedidos nuevos. <strong>En la clase 3 la pantalla se actualiza sola.</strong></p>
+          <aside class="notas">
+            <p>Haz la demo en vivo antes de esta lámina: las mismas tres líneas de la clase 1 en la consola del navegador. Ahora regresan un arreglo vacío: sin sesión la petición entra como <em>anon</em> y ninguna política le da acceso.</p>
+            <p>El permiso de <em>anon</em> sobre la tabla sigue ahí; lo que decide qué filas ve son las políticas. Y el gancho: hoy la tienda tiene que recargar para ver un pedido nuevo; en la clase 3 la pantalla se actualiza sola.</p>
+          </aside>
+        </section>
+
+        <div class="cajetin" aria-hidden="true">
+          <span>Rastro · Supabase + Next.js</span><span>Clase 2</span><span>Lámina <b>01 de 21</b></span>
+        </div>
+        <div class="avance" aria-hidden="true"></div>
+      </div>
+      <p class="solo-lector" aria-live="polite"></p>
+    </div>
+
+    <nav class="controles" aria-label="Controles de la presentación">
+      <button type="button" data-accion="anterior" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="contador" aria-live="off">1 / 1</span>
+      <button type="button" data-accion="siguiente" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <span class="separa" aria-hidden="true"></span>
+      <button type="button" data-accion="pantalla" aria-label="Pantalla completa" title="Pantalla completa (F)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+      <button type="button" data-accion="tema" aria-label="Cambiar entre claro y oscuro" title="Claro u oscuro (T)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/></svg>
+      </button>
+      <button type="button" data-accion="otra" title="Pasar a la otra presentación (O)" hidden>
+        <span class="otra-texto"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </button>
+      <button type="button" data-accion="presentador" title="Abrir las notas en otra ventana (P)">Notas</button>
+      <button type="button" data-accion="ayuda" aria-label="Ver los atajos del teclado" title="Atajos (?)">?</button>
+    </nav>
+
+    <div class="aviso-teclas fuera" role="status"></div>
+
+    <div class="ayuda" hidden>
+      <div class="ayuda-caja" role="dialog" aria-modal="true" aria-label="Atajos del teclado">
+        <h2>Atajos del teclado</h2>
+        <dl>
+          <dt><kbd>→</kbd> <kbd>Espacio</kbd> <kbd>Av Pág</kbd></dt><dd>Pasar a la siguiente lámina: lo de cada lámina aparece solo, con su animación</dd>
+          <dt><kbd>←</kbd> <kbd>Re Pág</kbd></dt><dd>Regresar</dd>
+          <dt><kbd>Inicio</kbd> <kbd>Fin</kbd></dt><dd>Ir a la primera o a la última</dd>
+          <dt><kbd>F</kbd></dt><dd>Pantalla completa</dd>
+          <dt><kbd>P</kbd></dt><dd>Notas y cronómetro en otra ventana. Desde ahí se prende el modo limpio: sin botones, y solo las notas mueven las láminas</dd>
+          <dt><kbd>Esc</kbd></dt><dd>Cerrar esta ayuda</dd>
+        </dl>
+      </div>
+    </div>
+
+    <script src="../motor/motor.js"></script>
+  </body>
+</html>

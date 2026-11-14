@@ -1,0 +1,251 @@
+/* Piezas de lámina que usan todas las clases: la pregunta, la app de muestra, las
+   llamadas numeradas, la hoja de una tabla, las consultas, los estados, los pasos del
+   error del día, las tres ideas, la tarea y el cierre. Salieron de la clase 1.
+   El motor vive en motor.css, lo compartido del curso en comun.css y el formato de
+   Código Facilito en codigofacilito.css. Va después de esos tres. */
+
+.lamina code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  background: var(--senal-fondo);
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+}
+.lamina pre code, .consola code { background: none; padding: 0; }
+.t2 code.en-titulo { font-size: 0.8em; padding: 0 0.25em; }
+
+/* la pregunta */
+.t2.pregunta { font-size: 52px; line-height: 1.12; max-width: 1384px; }
+.problema { margin: 40px 0 0; }
+.problema svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+/* lo que te llevas hoy */
+.demo { display: grid; grid-template-columns: 860px minmax(0, 1fr); gap: 56px; margin-top: 28px; align-items: start; }
+.app-demo-cuerpo { display: grid; grid-template-columns: 330px 1fr; gap: 18px 22px; padding: 20px 24px 24px; background: #FAFAFA; }
+:root[data-theme="dark"] .app-demo-cuerpo { background: var(--papel); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .app-demo-cuerpo { background: var(--papel); } }
+.app-demo-marca { grid-column: 1 / -1; margin: 0; font: 700 14px/1 var(--display); color: var(--senal); }
+.app-demo-titulo { grid-column: 1 / -1; margin: -8px 0 0; font: 800 30px/1 var(--display); letter-spacing: -0.02em; color: var(--tinta); }
+.app-demo-form, .app-demo-pedido {
+  display: grid;
+  gap: 9px;
+  align-content: start;
+  padding: 16px;
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  transition: box-shadow 0.4s ease;
+}
+.app-demo-form b { font: 700 18px/1.2 var(--display); color: var(--tinta); }
+.campo { padding: 9px 12px; border: 1px solid var(--linea-fuerte); border-radius: 8px; font: 500 13px/1.3 var(--display); color: var(--tinta-suave); }
+.boton { padding: 10px 12px; border-radius: 8px; background: #EA580C; color: #FFFFFF; font: 700 14px/1 var(--display); text-align: center; }
+.app-demo-lista { display: grid; gap: 12px; align-content: start; border-radius: 12px; transition: box-shadow 0.4s ease; }
+.app-demo-pedido p { display: flex; justify-content: space-between; align-items: center; margin: 0; font: 500 13px/1 var(--display); color: var(--tinta-suave); }
+.app-demo-pedido > b { font: 600 18px/1.3 var(--display); color: var(--tinta); }
+.app-demo-pedido small { font: 500 13px/1.3 var(--display); color: var(--tinta-suave); }
+.edo { font-style: normal; font: 700 11px/1 var(--display); padding: 6px 9px; border-radius: 99px; }
+.edo-camino { background: #E0F2FE; color: #075985; }
+.edo-preparando { background: #FEF3C7; color: #92400E; }
+.boton-oscuro { justify-self: start; margin-top: 4px; padding: 9px 12px; border-radius: 8px; background: #18181B; color: #FFFFFF; font: 600 13px/1 var(--display); transition: box-shadow 0.4s ease; }
+.demo:has(.llamada[data-paso="1"].visto) .marca-1,
+.demo:has(.llamada[data-paso="2"].visto) .marca-2,
+.demo:has(.llamada[data-paso="3"].visto) .marca-3 { box-shadow: 0 0 0 3px var(--resalta, var(--senal)); }
+/* la app se ve un poco más chica para que abajo quepa el camino del curso */
+.llevas .demo { grid-template-columns: 655px minmax(0, 1fr); gap: 48px; margin-top: 22px; }
+.llevas .app-demo { zoom: 0.76; }
+.llevas .llamadas { gap: 22px; }
+.llevas-curso { margin-top: 26px; }
+.llevas-curso .etiqueta { margin-bottom: 12px; color: var(--verde); }
+.llevas .ruta-tramo { height: 40px; }
+.llevas .ruta-tramo .aqui { left: 14px; margin-top: -10px; font-size: 19px; }
+.llevas .ruta-partes { margin-top: 10px; }
+
+/* las llamadas numeradas de un lado */
+.llamadas { list-style: none; margin: 0; padding: 0; display: grid; gap: 30px; align-content: start; }
+.llamada { display: grid; grid-template-columns: 44px 1fr; gap: 18px; align-items: start; }
+.llamada b { display: block; font: 700 30px/1.2 var(--display); color: var(--tinta); }
+.llamada p { margin: 8px 0 0; font: 400 25px/1.4 var(--cuerpo); color: var(--tinta-suave); }
+.parte-num { width: 44px; height: 44px; border-radius: 50%; background: var(--senal); color: var(--sobre-senal); display: grid; place-items: center; font: 800 20px/1 var(--display); }
+
+/* qué es Supabase */
+.piezas { margin-top: 64px; }
+.pieza { display: grid; gap: 14px; align-content: start; padding-top: 26px; border-top: 1.5px solid var(--linea-fuerte); }
+.pieza.hoy { border-top: 3px solid var(--senal); padding-top: 24.5px; }
+.pieza .icono { width: 60px; height: 60px; }
+.pieza.hoy .icono { stroke: var(--senal); }
+.pieza .t3 { font-size: 32px; }
+.pieza .texto { font-size: 23px; }
+
+/* el mapa de la fonda */
+.fonda { margin: 30px 0 0; color: var(--tinta); }
+
+/* leer y escribir */
+.flujo { margin: 20px 0 0; }
+.flujo svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chips-codigo { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 16px; }
+.chip-codigo { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 0; }
+.chip-codigo code { font-size: 21px !important; padding: 5px 11px !important; }
+.chip-codigo span { font: 400 22px/1.4 var(--cuerpo); color: var(--tinta-suave); }
+
+/* la tabla como hoja de cálculo */
+.hoja { margin-top: 40px; }
+.hoja-nombre { display: inline-block; margin: 0; padding: 9px 18px; border: 1px solid var(--linea-fuerte); border-bottom: 0; border-radius: 8px 8px 0 0; background: var(--superficie); font: 700 19px/1 var(--mono); color: var(--tinta); }
+.hoja table { width: 100%; border-collapse: collapse; background: var(--superficie); box-shadow: var(--sombra); font: 500 20px/1.3 var(--display); color: var(--tinta); }
+.hoja th, .hoja td { border: 1px solid var(--linea-fuerte); padding: 12px 14px; text-align: left; vertical-align: top; }
+.hoja th { background: var(--papel); font: 700 19px/1.2 var(--mono); }
+.hoja th small { display: block; margin-top: 6px; font: 600 14px/1.2 var(--display); color: var(--senal); letter-spacing: 0.02em; }
+.hoja td:first-child, .hoja th:first-child { width: 140px; }
+.hoja tr.rechazo td { background: var(--rojo-fondo); color: var(--tinta-suave); text-decoration: line-through; text-decoration-color: var(--rojo); }
+.hoja tr.rechazo td.vacio { color: var(--rojo); font-style: italic; text-decoration: none; box-shadow: inset 0 0 0 2px var(--rojo); }
+.rechazo-texto { margin: 18px 0 0; font: 700 26px/1.3 var(--display); color: var(--rojo); }
+
+/* piezas de los dibujos */
+svg .mono { font-family: var(--mono); }
+svg .num { fill: var(--sobre-senal); }
+.f-rojo { fill: var(--rojo); }
+.s-rojo { stroke: var(--rojo); }
+.f-codigo { fill: #151718; stroke: rgba(255, 255, 255, 0.12); stroke-width: 1; }
+.t-codigo { fill: #98C379; }
+
+/* la tabla: renglón, columna y llave primaria */
+.hoja-claves { list-style: none; margin: 26px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 14px 44px; font: 400 23px/1.35 var(--cuerpo); color: var(--tinta-suave); }
+.hoja-claves b { margin-right: 10px; font: 700 23px/1.35 var(--display); color: var(--tinta); }
+
+/* cómo se conecta tu app */
+.conexion { margin: 30px 0 0; }
+.conexion svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+/* las dos llaves */
+.llaves { margin-top: 30px; gap: 40px; }
+.llaves .caja { display: grid; gap: 8px; align-content: start; padding: 20px 28px; }
+.llaves .t3 { font-size: 28px; margin: 0; }
+.llaves .texto { font-size: 21px; }
+.llaves .etiqueta code { font-size: 0.95em; letter-spacing: 0; text-transform: none; }
+.llaves + .dicho { margin-top: 28px; }
+
+/* leer: la consulta como una pregunta */
+.consulta { display: grid; grid-template-columns: minmax(0, 1fr) 470px; gap: 40px; margin-top: 40px; align-items: start; }
+.consulta-partes { display: grid; gap: 14px; }
+.consulta-fila { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 20px; padding: 16px 24px 18px; background: var(--superficie); border: 1px solid var(--linea); border-left: 4px solid var(--plano); border-radius: 12px; }
+.consulta-q { grid-column: 1 / -1; font: 700 15px/1.2 var(--display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-suave); }
+.consulta-fila b { font: 700 28px/1.2 var(--display); color: var(--tinta); }
+.consulta-fila code { font-size: 17px; padding: 5px 10px; white-space: nowrap; }
+.consulta-respuesta { padding: 22px 26px 26px; background: var(--superficie); border: 1px solid var(--linea); border-radius: 12px; }
+.consulta-respuesta .etiqueta { color: var(--verde); }
+.consulta-respuesta ol { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 10px; }
+.consulta-respuesta li { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 13px 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); font: 500 20px/1.3 var(--cuerpo); color: var(--tinta); }
+.consulta-respuesta li > span { font: 600 18px/1 var(--mono); color: var(--tinta-suave); }
+.mini-estado { font-style: normal; font: 700 13px/1 var(--display); padding: 6px 10px; border-radius: 99px; white-space: nowrap; }
+.consulta + .dicho { margin-top: 36px; }
+
+/* leer, guardar, cambiar y borrar */
+.operaciones { gap: 26px; margin-top: 56px; }
+.operacion { display: grid; gap: 14px; align-content: start; justify-items: start; padding: 26px 24px 24px; background: var(--superficie); border: 1px solid var(--linea); border-top: 4px solid var(--linea-fuerte); border-radius: 12px; }
+.operacion.hoy { border-top-color: var(--senal); }
+.op-verbo { margin: 0; font: 700 40px/1.1 var(--display); color: var(--tinta); }
+.operacion code { font-size: 22px; padding: 4px 10px; }
+.operacion .texto { font-size: 23px; }
+.operaciones + .dicho { margin-top: 44px; }
+
+/* los estados */
+.estados { display: flex; align-items: center; gap: 12px; margin-top: 30px; }
+.estado { display: inline-block; padding: 13px 22px; border-radius: 99px; font: 800 24px/1 var(--display); }
+.e-recibido { background: #F4F4F5; color: #3F3F46; }
+.e-preparando { background: #FEF3C7; color: #92400E; }
+.e-camino { background: #E0F2FE; color: #075985; }
+.e-entregado { background: #D1FAE5; color: #065F46; }
+.flecha { width: 64px; height: 20px; flex: none; overflow: visible; }
+
+/* cada botón cambia un solo pedido: el filtro */
+.filtro { display: grid; grid-template-columns: 720px minmax(0, 1fr); gap: 52px; margin-top: 36px; align-items: start; }
+.filtro-hoja { margin-top: 0; }
+.filtro-hoja td:first-child, .filtro-hoja th:first-child { width: 70px; }
+.filtro-hoja td { transition: background 0.5s ease; }
+.filtro:has(.llamada[data-paso="2"].visto) tr.elegido td { background: var(--senal-fondo); }
+.filtro .antes { transition: color 0.4s ease 0.7s; }
+.filtro .despues { opacity: 0; color: var(--senal); font-weight: 700; transition: opacity 0.5s ease 0.7s; }
+.filtro:has(.llamada[data-paso="2"].visto) .antes { color: var(--tinta-suave); text-decoration: line-through; text-decoration-color: var(--rojo); }
+.filtro:has(.llamada[data-paso="2"].visto) .despues { opacity: 1; }
+.filtro .llamadas { gap: 28px; }
+.filtro .llamada p code { font-size: 20px; }
+.filtro + .rechazo-texto { margin-top: 34px; }
+
+/* el error del día, en cuatro pasos */
+.error-pasos { margin-top: 70px; }
+.error-pasos .texto code { font-size: 0.8em; }
+.error-pasos + .dicho { margin-top: 48px; }
+
+/* resumen */
+.ideas { gap: 44px; margin-top: 70px; }
+.idea { display: grid; gap: 16px; align-content: start; padding-top: 26px; border-top: 3px solid var(--senal); }
+.idea .paso-num { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: var(--senal); color: var(--sobre-senal); font: 800 25px/1 var(--display); }
+.idea .t3 { font-size: 38px; text-wrap: pretty; }
+.idea .texto { font-size: 27px; }
+
+/* tarea: construir por su cuenta lo que vieron */
+.tarea { display: grid; grid-template-columns: minmax(0, 1fr) 500px; gap: 64px; margin-top: 50px; align-items: start; }
+.atorado { display: grid; gap: 10px; align-content: start; padding: 28px 32px; }
+.atorado .t3 { margin: 0; font-size: 34px; }
+.atorado .texto { font-size: 24px; }
+.checklist { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 20px; }
+.checklist li { position: relative; padding-left: 50px; font: 400 27px/1.35 var(--cuerpo); color: var(--tinta); }
+.checklist li::before { content: ""; position: absolute; left: 0; top: 4px; width: 28px; height: 28px; border: 2px solid var(--linea-fuerte); border-radius: 6px; }
+
+/* el cierre: el problema de seguridad */
+.abierta { margin: 34px 0 0; }
+.abierta svg { display: block; width: 100%; height: auto; overflow: visible; }
+.riesgos { list-style: none; margin: 26px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 40px; }
+.riesgos li { position: relative; padding-left: 32px; font: 600 23px/1.35 var(--display); color: var(--rojo); }
+.riesgos li::before { content: "✕"; position: absolute; left: 0; top: 0; font-weight: 700; }
+.final { margin: 30px 0 0; font: 800 44px/1.2 var(--display); letter-spacing: -0.02em; color: var(--tinta); text-wrap: balance; }
+.final strong { color: var(--senal); }
+
+/* ---------- piezas que se sumaron con la clase 2 ---------- */
+
+/* la app vista por un cliente, en la lámina de la meta */
+.cuerpo-cliente .app-demo-cabeza { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 6px 8px; margin: -6px -8px 0; border-radius: 12px; transition: box-shadow 0.4s ease; }
+.cuerpo-cliente .app-demo-titulo { margin: 4px 0 0; }
+.app-demo-quien { margin: 6px 0 0; font: 500 13px/1 var(--display); color: var(--tinta-suave); }
+.boton-claro { padding: 8px 12px; border: 1px solid var(--linea-fuerte); border-radius: 8px; font: 600 13px/1 var(--display); color: var(--tinta); }
+.app-demo-form small { font: 500 12px/1.3 var(--display); color: var(--tinta-suave); }
+
+/* dos cajas lado a lado, una idea en cada una */
+.preguntas { margin-top: 44px; gap: 44px; }
+.preguntas .caja { display: grid; gap: 12px; align-content: start; padding: 28px 32px; }
+.preguntas .t3 { font-size: 40px; margin: 0; }
+.preguntas .texto { font-size: 24px; }
+.preguntas + .dicho { margin-top: 38px; }
+
+/* un diagrama en SVG a lo ancho */
+.diagrama { margin: 34px 0 0; }
+.diagrama svg { display: block; width: 100%; height: auto; overflow: visible; }
+.diagrama + .dicho { margin-top: 30px; }
+
+/* puntos clave en una fila */
+.claves { list-style: none; margin: 30px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 40px; }
+.claves li { position: relative; padding-left: 26px; font: 500 22px/1.4 var(--cuerpo); color: var(--tinta); }
+.claves li::before { content: ""; position: absolute; left: 0; top: 11px; width: 10px; height: 10px; border-radius: 50%; background: var(--senal); }
+.claves b { font-family: var(--mono); font-weight: 600; }
+
+/* reglas en una tabla */
+.reglas-hoja { margin-top: 34px; }
+.reglas-hoja td { vertical-align: middle; }
+.reglas-hoja th:first-child, .reglas-hoja td:first-child { width: auto; }
+.reglas-hoja td.op { font: 500 18px/1.3 var(--mono); white-space: nowrap; color: var(--tinta-suave); }
+.reglas-hoja td.op b { color: var(--tinta); }
+.reglas-hoja td code { font-size: 18px; }
+
+/* una función o pieza con su explicación */
+.funcion { display: flex; gap: 24px; align-items: baseline; margin-top: 30px; padding: 22px 28px; border: 1px solid var(--linea); border-radius: 12px; background: var(--superficie); }
+.funcion code { font-size: 24px; white-space: nowrap; }
+.funcion p { margin: 0; font: 400 23px/1.45 var(--cuerpo); color: var(--tinta-suave); }
+.funcion b { color: var(--tinta); }
+
+/* código dentro de la ceja: sin mayúsculas ni espaciado */
+.ceja code { text-transform: none; letter-spacing: 0; }
+.reglas-hoja + .dicho { margin-top: 40px; }
+
+/* código dentro de una etiqueta: sin mayúsculas */
+.etiqueta code { text-transform: none; letter-spacing: 0; font-size: 0.95em; }
+.ideas + .dicho { margin-top: 48px; }
+.idea > .etiqueta { color: var(--senal); }

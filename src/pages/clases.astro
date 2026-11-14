@@ -1,0 +1,288 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Las láminas de cada clase son estáticas (public/clases/supabase-nextjs/clase-N/):
+// la presentación interactiva, su PDF y su PPTX. Esta página solo es el índice.
+const BASE = '/clases/supabase-nextjs';
+const REPO = 'https://github.com/rodrigo2392/rastreo-facilito';
+
+const CLASES = [
+  {
+    n: 1,
+    titulo: 'Base de datos con Supabase',
+    fecha: '14 oct 2026',
+    modulo: 'Módulo 4',
+    resumen: 'Tablas, la conexión desde Next.js y leer y guardar pedidos desde el servidor.',
+    laminas: 23,
+    pdf: '4.3 MB',
+    pptx: '6.0 MB',
+  },
+  {
+    n: 2,
+    titulo: 'Autenticación y RLS',
+    fecha: '16 oct 2026',
+    modulo: 'Módulo 4',
+    resumen: 'Cuentas, sesión y políticas RLS para que cada quien vea solo sus pedidos.',
+    laminas: 21,
+    pdf: '3.5 MB',
+    pptx: '5.0 MB',
+  },
+  {
+    n: 3,
+    titulo: 'Realtime con Supabase',
+    fecha: '28 oct 2026',
+    modulo: 'Módulo 4',
+    resumen: 'Los cambios de un pedido llegan solos al navegador, sin recargar la página.',
+    laminas: 20,
+    pdf: '3.5 MB',
+    pptx: '4.8 MB',
+  },
+  {
+    n: 4,
+    titulo: 'Edge Functions y webhooks',
+    fecha: '30 oct 2026',
+    modulo: 'Módulo 5',
+    resumen: 'Una función en Supabase que avisa por correo cuando el pedido sale.',
+    laminas: 20,
+    pdf: '3.4 MB',
+    pptx: '4.8 MB',
+  },
+  {
+    n: 5,
+    titulo: 'Storage con Supabase',
+    fecha: '4 nov 2026',
+    modulo: 'Módulo 5',
+    resumen: 'La foto de entrega en un bucket privado, con ligas firmadas que caducan.',
+    laminas: 20,
+    pdf: '3.4 MB',
+    pptx: '4.8 MB',
+  },
+  {
+    n: 6,
+    titulo: 'Eventos y Broadcast',
+    fecha: '6 nov 2026',
+    modulo: 'Módulo 5',
+    resumen: 'El historial con triggers y la moto moviéndose en el mapa en tiempo real.',
+    laminas: 22,
+    pdf: '3.4 MB',
+    pptx: '5.3 MB',
+  },
+] as const;
+---
+<BaseLayout
+  title="Clases: Supabase + Next.js"
+  description="Las láminas de las seis clases de Supabase + Next.js que di en el bootcamp de Código Facilito: base de datos, autenticación y RLS, Realtime, Edge Functions, Storage y Broadcast."
+  image={`${BASE}/clase-1/portada.jpg`}
+>
+  <section class="container-site clases">
+    <header class="clases__head">
+      <p class="kicker">clases</p>
+      <h1 class="clases__title">Supabase + Next.js, en seis clases</h1>
+      <p class="clases__intro">
+        Las láminas de las clases que di en el bootcamp de Código Facilito. En cada una
+        construimos una parte de Rastro, una app para seguir pedidos a domicilio.
+      </p>
+      <p class="clases__note">
+        * en la presentación: flechas o barra espaciadora para avanzar y F para pantalla
+        completa · el código de cada clase está en
+        <a href={REPO} target="_blank" rel="noopener">github.com/rodrigo2392/rastreo-facilito</a>
+      </p>
+    </header>
+
+    <div class="clases__grid">
+      {
+        CLASES.map((c) => (
+          <article class="ccard reveal">
+            <a
+              class="ccard__preview"
+              href={`${BASE}/clase-${c.n}/`}
+              target="_blank"
+              rel="noopener"
+              aria-label={`Ver la presentación de la clase ${c.n}: ${c.titulo}`}
+            >
+              <img
+                src={`${BASE}/clase-${c.n}/portada.jpg`}
+                alt=""
+                width="960"
+                height="541"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+            <div class="ccard__body">
+              <p class="ccard__meta">
+                clase {c.n} · {c.fecha} · {c.laminas} láminas
+              </p>
+              <h2 class="ccard__name">{c.titulo}</h2>
+              <p class="ccard__desc">{c.resumen}</p>
+              <div class="ccard__actions">
+                <a class="ccard__cta" href={`${BASE}/clase-${c.n}/`} target="_blank" rel="noopener">
+                  Ver presentación <span aria-hidden="true">↗</span>
+                </a>
+                <a class="ccard__file" href={`${BASE}/clase-${c.n}/clase-${c.n}.pdf`} download>
+                  PDF <span>{c.pdf}</span>
+                </a>
+                <a class="ccard__file" href={`${BASE}/clase-${c.n}/clase-${c.n}.pptx`} download>
+                  PPTX <span>{c.pptx}</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .clases {
+    padding-block: 3.5rem 2rem;
+  }
+  .clases__title {
+    font-size: clamp(2.6rem, 6vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0.5rem 0 1rem;
+    max-width: 22ch;
+  }
+  .clases__intro {
+    color: var(--color-muted);
+    font-size: 1.25rem;
+    max-width: 56ch;
+  }
+  .clases__note {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-faint);
+    margin-top: 0.9rem;
+    max-width: 80ch;
+  }
+  .clases__note a {
+    color: var(--color-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .clases__note a:hover {
+    color: var(--color-ink);
+  }
+
+  .clases__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .ccard {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+    overflow: hidden;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .ccard:hover {
+    border-color: color-mix(in srgb, var(--color-accent) 30%, var(--color-border));
+    transform: translateY(-2px);
+  }
+  .ccard__preview {
+    display: block;
+    aspect-ratio: 16 / 9;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface-2);
+  }
+  .ccard__preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ccard__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.35rem 1.5rem 1.5rem;
+  }
+  .ccard__meta {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--color-accent);
+  }
+  .ccard__name {
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-top: 0.25rem;
+  }
+  .ccard__desc {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin-top: 0.5rem;
+  }
+
+  .ccard__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+    margin-top: auto;
+    padding-top: 1.1rem;
+  }
+  .ccard__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    color: var(--color-accent);
+    margin-right: auto;
+  }
+  .ccard__cta span {
+    transition: transform 0.15s ease;
+  }
+  .ccard__cta:hover span {
+    transform: translate(2px, -2px);
+  }
+  .ccard__file {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-ink);
+    padding: 0.3rem 0.65rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    transition: border-color 0.15s ease;
+  }
+  .ccard__file span {
+    color: var(--color-faint);
+    font-size: 0.72rem;
+  }
+  .ccard__file:hover {
+    border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  }
+
+  @media (max-width: 64rem) {
+    .clases__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 46rem) {
+    .clases__grid {
+      grid-template-columns: minmax(0, 1fr);
+      margin-top: 2rem;
+    }
+  }
+  @media (max-width: 40rem) {
+    .clases {
+      padding-block: 2.25rem 1.5rem;
+    }
+    .clases__intro {
+      font-size: 1.08rem;
+    }
+  }
+</style>

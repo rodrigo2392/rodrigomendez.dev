@@ -1,0 +1,239 @@
+/* El formato de Código Facilito sobre el motor de las presentaciones: sus fondos,
+   su logo, su mascota, sus letras (IBM Plex Sans y DM Sans) y sus colores.
+   Las piezas salieron de su PDF de ejemplo (Introducción a React) y viven en marca/.
+   Va después de motor.css y comun.css. */
+
+/* Siempre oscuro, como el formato. El :not(#nunca) le gana a los temas de las otras hojas. */
+:root:not(#nunca) {
+  --papel: #1A0C45;
+  --superficie: rgba(255, 255, 255, 0.07);
+  --tinta: #FFFFFF;
+  --tinta-suave: #CFC8EE;
+  --plano: #27BFF3;
+  --senal: #5ACC86;
+  --senal-fondo: rgba(90, 204, 134, 0.16);
+  --sobre-senal: #0C2D3A;
+  --verde: #5ACC86;
+  --amarillo: #F2CB4A;
+  --magenta: #F449E5;
+  --cian: #12D1DB;
+  --azul: #27BFF3;
+  --resalta: #5ACC86;
+  --linea: rgba(255, 255, 255, 0.14);
+  --linea-fuerte: rgba(255, 255, 255, 0.3);
+  --reticula: transparent;
+  --reticula-fuerte: transparent;
+  --exterior: #0B0718;
+  --neutro-marca: rgba(255, 255, 255, 0.16);
+  --sombra: 0 18px 44px rgba(0, 0, 0, 0.45);
+  --rojo: #FF7A8A;
+  --rojo-fondo: rgba(255, 122, 138, 0.16);
+  --codigo-fondo: #151718;
+  --terminal: #151718;
+  --display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --cuerpo: "DM Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, monospace;
+  color-scheme: dark;
+}
+
+/* El tema claro no existe en este formato. */
+.controles [data-accion="tema"] { display: none; }
+
+/* ---------- el lienzo y cada lámina ---------- */
+
+.lienzo { background: #1A0C45; box-shadow: none; }
+.registro, .cajetin { display: none; }
+.avance { height: 4px; background: var(--verde); }
+
+.lamina {
+  padding: 150px 124px 104px;
+  background: #1A0C45 url("../marca/fondo-contenido.png") center / cover no-repeat;
+}
+.lamina.fondo-seccion { background-image: url("../marca/fondo-seccion.png"); }
+.lamina.fondo-portada { background-image: url("../marca/fondo-portada.png"); }
+
+/* el logo de Código Facilito, arriba a la izquierda en todas */
+.lamina::before {
+  content: "";
+  position: absolute;
+  left: 138px;
+  top: 50px;
+  width: 258px;
+  height: 42px;
+  background: url("../marca/logo-cf.png") left center / contain no-repeat;
+  pointer-events: none;
+}
+
+/* Los adornos (mascota, círculos, fichas) van detrás del contenido y no estorban al clic. */
+.deco { position: absolute; pointer-events: none; z-index: 0; }
+.lamina > *:not(.deco):not(.notas) { position: relative; z-index: 1; }
+
+/* la mascota */
+.mascota.laptop { right: 44px; bottom: 0; width: 330px; }
+.mascota.lupa { right: 110px; bottom: 16px; width: 340px; }
+.mascota.lupa-chica { left: 100px; bottom: 0; width: 220px; }
+
+/* los círculos de colores de las portadas de sección */
+.circulo { border-radius: 50%; }
+.circulo.amarillo { background: var(--amarillo); }
+.circulo.cian { background: var(--cian); }
+.circulo.verde { background: var(--verde); }
+
+/* ---------- letras ---------- */
+
+body { font-family: var(--cuerpo); }
+.ceja { font: 700 20px/1.2 var(--cuerpo); letter-spacing: 0.14em; color: var(--verde); margin-bottom: 22px; }
+.t1 { font: 700 98px/1.08 var(--display); letter-spacing: -0.01em; }
+.t2 { font: 700 68px/1.12 var(--display); letter-spacing: -0.01em; max-width: 1352px; }
+.t3 { font: 700 32px/1.22 var(--display); letter-spacing: 0; }
+.lede { font: 400 32px/1.45 var(--cuerpo); color: var(--tinta-suave); max-width: 1180px; }
+.texto { font: 400 25px/1.45 var(--cuerpo); }
+.dicho {
+  font: 500 30px/1.4 var(--cuerpo);
+  font-style: normal;
+  color: var(--tinta);
+  border-left-color: var(--verde);
+}
+.chico { font: 500 21px/1.4 var(--cuerpo); }
+.etiqueta { font: 700 16px/1.2 var(--cuerpo); }
+.lista li { font: 400 30px/1.4 var(--cuerpo); }
+svg text { font-family: var(--display); }
+
+.caja { background: rgba(255, 255, 255, 0.07); border-color: var(--linea); border-radius: 14px; }
+.caja-no { border-left-color: var(--amarillo); }
+
+/* ---------- el código, como lo muestra el formato ---------- */
+
+.codigo, .terminal, .consola { background: #151718; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; }
+.codigo-cabeza, .terminal-cabeza {
+  background: transparent;
+  border-bottom: 0;
+  color: #8E92A4;
+  font-family: var(--mono);
+  padding: 16px 22px 4px;
+}
+.codigo-cabeza::before, .terminal-cabeza::before {
+  content: "";
+  flex: none;
+  width: 58px;
+  height: 14px;
+  margin-right: 8px;
+  background:
+    radial-gradient(circle at 7px 7px, #FF5F57 6.5px, transparent 7px),
+    radial-gradient(circle at 29px 7px, #FEBC2E 6.5px, transparent 7px),
+    radial-gradient(circle at 51px 7px, #28C840 6.5px, transparent 7px);
+}
+.terminal-cabeza i { display: none; }
+.codigo pre { color: #E8E8EA; }
+.codigo .k { color: #E5C07B; font-weight: 500; }
+.codigo .f { color: #61C8F0; font-weight: 500; }
+.codigo .s { color: #98C379; }
+.codigo .c { color: #7C8394; }
+.codigo mark { background: rgba(90, 204, 134, 0.2); box-shadow: 0 0 0 3px rgba(90, 204, 134, 0.2); }
+.consola { color: #E8E8EA; }
+.consola-cabeza { background: rgba(255, 255, 255, 0.04); }
+.consola-tabla th { background: rgba(255, 255, 255, 0.06); }
+.etiqueta-gris { color: #B7B2D6; border-color: rgba(255, 255, 255, 0.28); }
+
+/* La ventana del navegador enseña la app tal como se ve: clara. */
+.navegador {
+  --papel: #F4F4F5;
+  --superficie: #FFFFFF;
+  --tinta: #18181B;
+  --tinta-suave: #52525B;
+  --linea: #E4E4E7;
+  --linea-fuerte: #D4D4D8;
+  --senal: #EA580C;
+  --codigo-fondo: #FFFFFF;
+  color: var(--tinta);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------- portada ---------- */
+
+.portada { justify-content: flex-start; padding-top: 170px; }
+.portada .portada-bootcamp { margin: 0; font: 400 36px/1.3 var(--cuerpo); color: #FFFFFF; }
+.portada .t1 { color: var(--verde); max-width: 900px; margin-top: 30px; }
+.portada .portada-clase { margin: 26px 0 0; font: 500 30px/1.3 var(--cuerpo); color: var(--tinta-suave); }
+.portada .portada-autor { margin: auto 0 0; font: 400 34px/1.35 var(--cuerpo); color: #FFFFFF; }
+.portada .portada-autor small { display: block; font-size: 28px; color: var(--tinta-suave); }
+.portada .mascota-portada { right: 0; bottom: 42px; width: 470px; }
+.fichas-tec { right: 240px; top: 150px; width: 420px; height: 300px; }
+.ficha-tec {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  font: 700 30px/1 var(--display);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+}
+.ficha-tec.next { left: 0; top: 70px; width: 190px; height: 110px; background: #FFFFFF; color: #000000; transform: rotate(-4deg); }
+.ficha-tec.supa { left: 150px; top: 0; width: 200px; height: 104px; background: #1F1F1F; color: #3ECF8E; transform: rotate(5deg); }
+.ficha-tec.ts { left: 250px; top: 150px; width: 110px; height: 110px; background: #3178C6; color: #FFFFFF; transform: rotate(-6deg); }
+.destellos { right: 80px; top: 236px; width: 110px; }
+
+/* ---------- hola: quién te enseña ---------- */
+
+.hola-tarjeta {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 60px;
+  align-items: center;
+  height: 100%;
+  padding: 56px 64px;
+  background: linear-gradient(120deg, rgba(40, 30, 80, 0.72), rgba(60, 50, 140, 0.45));
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  border-radius: 34px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+}
+.lamina.hola { padding: 118px 30px 60px; }
+.hola-titulo { display: flex; align-items: center; gap: 22px; margin: 0; font: 700 76px/1 var(--display); color: var(--verde); }
+.hola-titulo img { width: 84px; height: 84px; }
+.hola-quien { margin: 34px 0 0; font: 400 31px/1.45 var(--cuerpo); color: #F2F2F2; }
+.hola-quien b { font-weight: 700; color: var(--verde); }
+.hola-anios { display: flex; align-items: baseline; gap: 18px; margin: 26px 0 0; }
+.hola-anios .numero { font: 700 88px/0.9 var(--display); color: #FFFFFF; }
+.hola-anios span:last-child { font: 400 30px/1.3 var(--cuerpo); color: #F2F2F2; }
+.hola-logros { list-style: none; margin: 30px 0 0; padding: 0; display: grid; gap: 16px; }
+.hola-logros li { position: relative; padding-left: 36px; font: 400 25px/1.4 var(--cuerpo); color: #E9E6F7; }
+.hola-logros li::before { content: ""; position: absolute; left: 4px; top: 12px; width: 12px; height: 12px; border-radius: 50%; background: var(--verde); }
+.hola-foto { display: grid; gap: 22px; justify-items: center; margin: 0; }
+.hola-foto img { width: 340px; height: 340px; object-fit: cover; border-radius: 22px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
+.hola-foto p { margin: 0; text-align: center; font: 400 26px/1.45 var(--cuerpo); color: #F2F2F2; }
+
+/* ---------- tabla de contenido y portadas de sección ---------- */
+
+.chip-seccion {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 96px;
+  height: 96px;
+  border-radius: 6px;
+  font: 700 46px/1 var(--display);
+  color: #0C2D3A;
+  background: var(--verde);
+}
+.chip-seccion.c2 { background: var(--azul); }
+.chip-seccion.c3 { background: var(--amarillo); }
+.chip-seccion.c4 { background: var(--magenta); }
+.chip-seccion.c5 { background: var(--verde); }
+
+.temario-titulo { display: flex; align-items: center; justify-content: center; gap: 28px; margin: -34px 0 0; font: 700 52px/1 var(--display); }
+.temario-titulo img { width: 96px; height: 96px; }
+.temario { display: grid; grid-template-columns: 1fr 1fr; gap: 42px 70px; margin: 54px 0 0 70px; max-width: 1080px; }
+.temario li { display: flex; align-items: center; gap: 30px; font: 700 40px/1.15 var(--display); }
+.temario { list-style: none; padding: 0; }
+
+.seccion { justify-content: center; }
+.seccion-fila { display: flex; align-items: flex-start; gap: 22px; margin-top: -90px; }
+.seccion-fila .t1 { font-size: 76px; line-height: 1.12; max-width: 900px; padding-top: 4px; }
+.seccion-fila p { margin: 22px 0 0; font: 400 30px/1.4 var(--cuerpo); color: var(--tinta-suave); }
+
+/* ---------- para profundizar ---------- */
+
+.recursos { list-style: disc; margin: 60px 0 0; padding-left: 40px; display: grid; gap: 22px; max-width: 1100px; }
+.recursos li { font: 400 32px/1.4 var(--cuerpo); color: #FFFFFF; }
+.recursos li::marker { color: var(--verde); }
+.recursos a { color: #FFFFFF; text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }

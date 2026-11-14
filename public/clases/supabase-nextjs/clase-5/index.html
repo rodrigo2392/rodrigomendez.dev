@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clase 5 · Storage con Supabase</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@500;700&display=swap"
+    />
+    <link rel="stylesheet" href="../motor/motor.css" />
+    <link rel="stylesheet" href="../motor/comun.css" />
+    <link rel="stylesheet" href="../motor/codigofacilito.css" />
+    <link rel="stylesheet" href="../motor/piezas.css" />
+    <link rel="stylesheet" href="clase-5.css" />
+  </head>
+  <body>
+    <!--
+      Clase 5 del bootcamp: storage con Supabase (mié 4 nov 2026).
+      La teoría y sus tiempos están en las notas de cada lámina; la práctica, en el vault: 10-proyectos/bootcamp-clase-5-guion.
+      El código de la clase: branches clase-5-inicio, clase-5-rescate y clase-5-final del repo.
+    -->
+    <div class="escenario" data-nombre="clase-5" role="region" aria-roledescription="presentación" aria-label="Clase 5: storage con Supabase">
+      <div class="lienzo">
+        <div class="registro" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+        <!-- 1. Portada -->
+        <section class="lamina portada fondo-portada" data-titulo="Portada: Storage con Supabase" data-min="0">
+          <p class="portada-bootcamp">Bootcamp · Módulo 5: Edge, Storage y serverless</p>
+          <h1 class="t1">Storage<br />con Supabase</h1>
+          <p class="portada-clase">Clase 5 de 6 · Supabase + Next.js</p>
+          <p class="portada-autor">Rodrigo Méndez<small>rodrigomendez.dev</small></p>
+          <div class="deco fichas-tec" aria-hidden="true" data-anima="aparece" style="--d:300ms">
+            <span class="ficha-tec next">Next.js</span>
+            <span class="ficha-tec supa">Supabase</span>
+            <span class="ficha-tec ts">TS</span>
+          </div>
+          <img class="deco destellos" src="../marca/destellos.png" alt="" data-anima="pop" style="--d:800ms" />
+          <img class="deco mascota-portada" src="../marca/mascota-portada.png" alt="" />
+          <aside class="notas">
+            <p>Bienvenida. Hasta hoy Rastro solo guarda datos. Hoy guarda archivos: la foto de entrega de cada pedido.</p>
+            <p>Y como es la foto de la puerta de alguien, la pregunta importante es quién más la puede ver.</p>
+          </aside>
+        </section>
+
+        <!-- 2. Tabla de contenido -->
+        <section class="lamina" data-titulo="Tabla de contenido" data-min="0 a 1">
+          <h2 class="temario-titulo"><img src="../marca/tabla.png" alt="" />Tabla de contenido</h2>
+          <ol class="temario">
+            <li class="entra" style="--i:1"><span class="chip-seccion">/01</span>El problema y la meta</li>
+            <li class="entra" style="--i:2"><span class="chip-seccion c2">/02</span>Archivos en Storage</li>
+            <li class="entra" style="--i:3"><span class="chip-seccion c3">/03</span>Público o privado</li>
+            <li class="entra" style="--i:4"><span class="chip-seccion c4">/04</span>Políticas de Storage</li>
+            <li class="entra" style="--i:5"><span class="chip-seccion c5">/05</span>Para cerrar la clase</li>
+          </ol>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>El mapa de hoy: cuatro partes de teoría y, en cuanto terminen, construyo en vivo mientras ustedes miran. La parte 5 va al final, después de la práctica.</p></aside>
+        </section>
+
+        <!-- 3. Sección 1 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 1: el problema y la meta" data-min="1">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion">/01</span>
+            <div><h2 class="t1">El problema y la meta</h2><p>Qué vamos a construir hoy, y por qué.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Primera parte: dónde se guarda un archivo y quién lo puede ver, y lo que vamos a construir hoy.</p></aside>
+        </section>
+
+        <!-- 4. El problema -->
+        <section class="lamina" data-titulo="El problema: dónde se guarda la foto y quién la ve" data-min="1 a 4">
+          <p class="ceja">El problema</p>
+          <h2 class="t2 pregunta">La tienda toma una foto del pedido en la puerta del cliente. ¿Dónde se guarda y quién más la puede ver?</h2>
+          <figure class="problema">
+            <svg viewBox="0 0 1384 330" role="img" aria-label="Con una liga pública, cualquiera que tenga la liga ve la foto de la puerta del cliente, sin sesión. La solución: la foto va en un bucket privado y solo el cliente del pedido la ve, con una liga firmada que caduca.">
+              <defs>
+                <marker id="punta-problema-5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-senal"/>
+                </marker>
+              </defs>
+              <text x="0" y="22" font-size="17" class="t-suave t-fuerte" letter-spacing="2">CON UNA LIGA PÚBLICA</text>
+              <g data-anima="pop" style="--d:300ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="44" width="250" height="200" rx="12"/>
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="24" y="68" width="202" height="112" rx="8"/>
+                <path class="svg-linea s-linea" style="stroke-width:2" d="M44 160 L94 112 L130 142 L160 116 L206 160"/>
+                <circle cx="182" cy="96" r="12" class="f-neutro"/>
+                <text x="24" y="218" font-size="19" class="t-fuerte">foto de la puerta</text>
+              </g>
+              <g data-anima="pop" style="--d:500ms">
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="290" y="120" width="250" height="48" rx="24"/>
+                <text x="415" y="151" font-size="17" class="t-fuerte mono" text-anchor="middle">…/public/entregas/12…</text>
+                <text x="290" y="206" font-size="19" class="t-suave">cualquiera con la liga,</text>
+                <text x="290" y="232" font-size="19" class="t-suave">sin sesión</text>
+              </g>
+              <text x="0" y="296" font-size="23" class="t-rojo t-fuerte" data-anima="aparece" style="--d:900ms">La liga circula y la foto la ve cualquiera</text>
+
+              <g data-paso="1" data-en="2200">
+                <path class="svg-linea s-senal" style="stroke-width:3" d="M576 144 H648" marker-end="url(#punta-problema-5)"/>
+                <text x="690" y="22" font-size="17" class="t-senal t-fuerte" letter-spacing="2">LA SOLUCIÓN: BUCKET PRIVADO Y LIGA FIRMADA</text>
+                <g data-anima="pop" style="--d:150ms">
+                  <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="690" y="44" width="330" height="200" rx="12"/>
+                  <text x="714" y="84" font-size="22" class="t-fuerte">Bucket privado</text>
+                  <text x="714" y="116" font-size="18" class="t-suave">una política decide</text>
+                  <text x="714" y="142" font-size="18" class="t-suave">quién puede ver cada foto</text>
+                  <text x="714" y="206" font-size="18" class="t-fuerte">si puedes ver el pedido</text>
+                </g>
+                <path class="svg-linea s-senal" data-anima="traza" style="--d:400ms; stroke-width:2.6" d="M1032 144 H1100" marker-end="url(#punta-problema-5)"/>
+                <g data-anima="pop" style="--d:800ms">
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="1112" y="44" width="272" height="200" rx="12"/>
+                  <text x="1136" y="84" font-size="22" class="t-fuerte">Liga firmada</text>
+                  <text x="1136" y="116" font-size="18" class="t-suave">solo para el cliente</text>
+                  <text x="1136" y="142" font-size="18" class="t-suave">del pedido</text>
+                  <text x="1136" y="206" font-size="18" class="t-fuerte">caduca en 60 s</text>
+                </g>
+                <text x="690" y="296" font-size="23" class="t-verde t-fuerte">Solo la ve quien puede ver el pedido</text>
+              </g>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>Pregunta de arranque: algunas paqueterías te mandan la foto del paquete en tu puerta. ¿Dónde se guarda esa foto y quién más la puede ver?</p>
+            <p>Si se guarda con una liga pública, cualquiera que tenga la liga ve la puerta de tu casa, sin sesión. A los dos segundos aparece la solución: bucket privado, una política que decide quién la ve y una liga firmada que caduca.</p>
+          </aside>
+        </section>
+
+        <!-- 5. La meta de hoy -->
+        <section class="lamina llevas" data-titulo="La meta de hoy: la foto de entrega, en privado" data-min="4 a 7">
+          <p class="ceja">La meta de hoy</p>
+          <h2 class="t2">La foto de entrega, en privado</h2>
+          <div class="meta-foto">
+            <div class="mf-tarjeta" data-paso="1">
+              <p class="mf-chico">La tienda</p>
+              <b>Pedido 3 · En camino</b>
+              <span class="campo-archivo">foto-puerta.jpeg</span>
+              <span class="boton-claro">Subir foto de entrega</span>
+            </div>
+            <div class="mf-tarjeta mf-oscura" data-paso="2">
+              <p class="mf-chico">Supabase Storage</p>
+              <code>entregas/3/1760000000000.jpeg</code>
+              <p>El pedido guarda la ruta en <code>foto_entrega</code>.</p>
+            </div>
+            <div class="mf-tarjeta" data-paso="3">
+              <p class="mf-chico">El cliente del pedido</p>
+              <div class="mf-foto"></div>
+              <small>liga firmada · caduca en 60 s</small>
+            </div>
+          </div>
+          <div class="llevas-curso" data-paso="4">
+            <p class="etiqueta">Rastro, sigue tu pedido · una sola app que crece clase a clase</p>
+            <div class="ruta-curso">
+              <div class="ruta-fila">
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:150ms"></i></div>
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:300ms"></i></div>
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:450ms"></i></div>
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:600ms"></i></div>
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:750ms"></i><span class="aqui" data-anima="aparece" style="--d:1200ms">Hoy</span></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:900ms"></i></div>
+              </div>
+              <div class="ruta-fila ruta-partes">
+                <p><b>Clase 1</b>Base de datos</p>
+                <p><b>Clase 2</b>Auth y RLS</p>
+                <p><b>Clase 3</b>Realtime</p>
+                <p><b>Clase 4</b>Edge Functions</p>
+                <p class="actual"><b>Clase 5</b>Storage</p>
+                <p><b>Clase 6</b>Eventos y Broadcast</p>
+              </div>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>La meta de hoy: la tienda sube la foto de entrega desde el celular, el pedido guarda dónde quedó y solo el cliente de ese pedido la ve, con una liga que caduca.</p>
+            <p>Primero lo hacemos público, para ver el problema, y luego lo cerramos.</p>
+          </aside>
+        </section>
+
+        <!-- 6. Sección 2 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 2: archivos en Storage" data-min="7">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c2">/02</span>
+            <div><h2 class="t1">Archivos en Storage</h2><p>Buckets, rutas y cómo se sube un archivo.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Segunda parte: qué es un bucket, cómo se organizan los archivos y cómo se sube uno desde una Server Action.</p></aside>
+        </section>
+
+        <!-- 7. Buckets y rutas -->
+        <section class="lamina" data-titulo="Buckets y rutas: la tabla guarda la ruta, el archivo vive en Storage" data-min="7 a 10">
+          <p class="ceja">Buckets y rutas</p>
+          <h2 class="t2">La tabla guarda la ruta; el archivo vive en Storage</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 250" role="img" aria-label="Un bucket llamado entregas, con límite de 5 MB y solo imágenes. Dentro, una carpeta por pedido y la foto con su nombre. La tabla de pedidos no guarda la foto: guarda la ruta en la columna foto_entrega.">
+              <defs>
+                <marker id="punta-bucket" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="0" y="0" width="640" height="214" rx="14"/>
+                <text x="26" y="42" font-size="25" class="t-fuerte">Bucket <tspan class="mono">entregas</tspan></text>
+                <text x="26" y="72" font-size="17" class="t-suave">privado · máximo 5 MB · jpeg, png y webp</text>
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="26" y="96" width="280" height="96" rx="10"/>
+                <text x="46" y="130" font-size="18" class="t-fuerte mono">3/</text>
+                <text x="46" y="162" font-size="16" class="t-suave mono">1760000000000.jpeg</text>
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="332" y="96" width="280" height="96" rx="10"/>
+                <text x="352" y="130" font-size="18" class="t-fuerte mono">12/</text>
+                <text x="352" y="162" font-size="16" class="t-suave mono">1760000900000.jpeg</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:600ms; stroke-width:2.4" d="M760 107 H652" marker-end="url(#punta-bucket)"/>
+              <g data-anima="pop" style="--d:800ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="772" y="0" width="580" height="214" rx="14"/>
+                <text x="798" y="42" font-size="25" class="t-fuerte">Tabla <tspan class="mono">pedidos</tspan></text>
+                <text x="798" y="72" font-size="17" class="t-suave">no guarda la foto: guarda dónde quedó</text>
+                <rect x="798" y="96" width="528" height="96" rx="10" class="f-codigo"/>
+                <text x="818" y="132" font-size="17" class="mono t-codigo">id: 3</text>
+                <text x="818" y="164" font-size="17" class="mono t-codigo">foto_entrega: "3/1760000000000.jpeg"</text>
+              </g>
+              <text x="0" y="248" font-size="21" class="t-suave" data-anima="aparece" style="--d:1300ms">Una carpeta por pedido: con la ruta se sabe de qué pedido es cada foto.</text>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>Un bucket es un contenedor de archivos con su propia configuración: público o privado, tamaño máximo y tipos permitidos. El de hoy, <em>entregas</em>: 5 MB por foto y solo imágenes.</p>
+            <p>Cada archivo tiene una ruta. Usamos una carpeta por pedido: <em>3/1760000000000.jpeg</em>. La tabla no guarda la foto, que pesa megas: guarda la ruta en <em>foto_entrega</em>. Y la carpeta va a servir para las políticas.</p>
+          </aside>
+        </section>
+
+        <!-- 8. Subir desde una Server Action -->
+        <section class="lamina" data-titulo="Subir un archivo desde una Server Action" data-min="10 a 13">
+          <p class="ceja">Subir un archivo</p>
+          <h2 class="t2">De la cámara del celular al bucket</h2>
+          <div class="pasos de4 ciclo-pasos">
+            <article class="paso entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">El formulario</h3><p class="texto"><code>capture="environment"</code> abre la cámara en el celular.</p></article>
+            <article class="paso" data-paso="1"><span class="paso-num">2</span><h3 class="t3">La Server Action</h3><p class="texto">Recibe el archivo en el <code>FormData</code>, como un <code>File</code>.</p></article>
+            <article class="paso" data-paso="2"><span class="paso-num">3</span><h3 class="t3">upload</h3><p class="texto">Sube la foto a su carpeta con <code>storage.from().upload()</code>.</p></article>
+            <article class="paso ancla" data-paso="3"><span class="paso-num">4</span><h3 class="t3">update</h3><p class="texto">El pedido guarda la ruta en <code>foto_entrega</code>.</p></article>
+          </div>
+          <p class="dicho" data-paso="4">Una Server Action acepta 1 MB por defecto: <code>next.config.ts</code> sube el límite a 10 MB y el tope real, 5 MB, lo pone el bucket.</p>
+          <aside class="notas">
+            <p>El recorrido de una foto. El formulario ya viene hecho: <em>capture="environment"</em> hace que en el celular se abra la cámara trasera. La Server Action recibe la foto dentro del <em>FormData</em> como un <em>File</em>, la sube a su carpeta y guarda la ruta en el pedido.</p>
+            <p>Detalle práctico: Next.js acepta 1 MB por formulario en una Server Action y una foto de celular pesa más. Por eso <em>next.config.ts</em> sube el límite a 10 MB; el límite de verdad lo pone el bucket.</p>
+          </aside>
+        </section>
+
+        <!-- 9. Sección 3 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 3: público o privado" data-min="13">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c3">/03</span>
+            <div><h2 class="t1">Público o privado</h2><p>Ligas públicas, ligas firmadas y el caché.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Tercera parte: la diferencia entre un bucket público y uno privado, y por qué lo privado se decide desde el principio.</p></aside>
+        </section>
+
+        <!-- 10. Público o privado -->
+        <section class="lamina" data-titulo="Liga pública o liga firmada" data-min="13 a 17">
+          <p class="ceja">Público o privado</p>
+          <h2 class="t2">Liga pública o liga firmada</h2>
+          <div class="col2 preguntas">
+            <div class="caja caja-no entra" style="--i:2">
+              <p class="etiqueta">Bucket público · <code>getPublicUrl()</code></p>
+              <h3 class="t3">Para cualquiera</h3>
+              <p class="texto">Una liga fija. Quien la tenga ve el archivo, sin sesión y para siempre. Sirve para imágenes de catálogo.</p>
+            </div>
+            <div class="caja caja-si" data-paso="1" data-en="1500">
+              <p class="etiqueta">Bucket privado · <code>createSignedUrl(ruta, 60)</code></p>
+              <h3 class="t3">Firmada y temporal</h3>
+              <p class="texto">Una liga que caduca en 60 segundos, y solo se genera si la política te deja ver el archivo.</p>
+            </div>
+          </div>
+          <p class="dicho" data-paso="2" data-en="2600">La foto de la puerta de alguien nunca va en un bucket público.</p>
+          <aside class="notas">
+            <p>Dos formas de servir un archivo. Público: una liga fija que cualquiera puede abrir, sin sesión. Sirve para lo que de verdad es público, como las fotos de un catálogo.</p>
+            <p>Privado: el servidor pide una liga firmada, que solo se genera si la política te deja ver ese archivo y que caduca, hoy en 60 segundos. Si la liga se comparte, deja de servir en un minuto.</p>
+          </aside>
+        </section>
+
+        <!-- 11. Lo privado se decide desde el principio -->
+        <section class="lamina" data-titulo="Lo privado se decide desde el principio" data-min="17 a 19">
+          <p class="ceja">Un detalle del caché</p>
+          <h2 class="t2">Lo privado se decide desde el principio</h2>
+          <div class="pasos de4 ciclo-pasos">
+            <article class="paso entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Bucket público</h3><p class="texto">Subes la foto y se sirve con su liga pública.</p></article>
+            <article class="paso" data-paso="1"><span class="paso-num">2</span><h3 class="t3">Alguien la abre</h3><p class="texto">La respuesta queda en el caché de la red de Supabase.</p></article>
+            <article class="paso" data-paso="2"><span class="paso-num">3</span><h3 class="t3">La vuelves privada</h3><p class="texto">Las fotos nuevas ya no se ven por liga pública.</p></article>
+            <article class="paso ancla" data-paso="3"><span class="paso-num">4</span><h3 class="t3">Hasta una hora</h3><p class="texto">La liga que ya se abrió puede seguir sirviendo desde el caché.</p></article>
+          </div>
+          <p class="dicho" data-paso="4">Cambiar un bucket a privado no borra lo que ya se sirvió: decide qué es privado antes de subir el primer archivo.</p>
+          <aside class="notas">
+            <p>Momento honesto: si un bucket fue público y lo vuelves privado, las fotos nuevas ya no se ven por liga pública, pero una liga que ya se abrió puede seguir sirviendo hasta una hora, porque la respuesta quedó en el caché.</p>
+            <p>La lección: lo privado se decide desde el principio. En la práctica lo van a ver pasar.</p>
+          </aside>
+        </section>
+
+        <!-- 12. Sección 4 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 4: políticas de Storage" data-min="19">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c4">/04</span>
+            <div><h2 class="t1">Políticas de Storage</h2><p>Quién sube y quién ve cada archivo.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Cuarta parte, la última de teoría: las políticas de Storage y el error del día. Al terminarla empieza la práctica.</p></aside>
+        </section>
+
+        <!-- 13. Storage usa RLS -->
+        <section class="lamina" data-titulo="Storage también usa RLS" data-min="19 a 23">
+          <p class="ceja"><code>storage.objects</code></p>
+          <h2 class="t2">Storage también usa RLS</h2>
+          <div class="hoja reglas-hoja entra" style="--i:2">
+            <p class="hoja-nombre">storage.objects · RLS</p>
+            <table>
+              <thead><tr><th>La regla</th><th>Operación</th><th>La condición</th></tr></thead>
+              <tbody>
+                <tr data-paso="1"><td>Solo la tienda sube fotos de entrega</td><td class="op">insert · <b>with check</b></td><td><code>bucket_id = 'entregas' and es_tienda()</code></td></tr>
+                <tr data-paso="2"><td>Ves la foto si puedes ver el pedido</td><td class="op">select · <b>using</b></td><td><code>exists (pedido de esa carpeta)</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="dicho" data-paso="3">Cada archivo es una fila de <code>storage.objects</code>, y esa tabla tiene RLS: sin política, no se sube ni se ve nada.</p>
+          <aside class="notas">
+            <p>Storage guarda cada archivo como una fila de la tabla <em>storage.objects</em>, y esa tabla tiene RLS. Las políticas se escriben igual que las de la clase 2: por operación y con una condición.</p>
+            <p>Subir es un insert: solo la tienda, y solo en el bucket de entregas. Ver o pedir una liga firmada es un select: si puedes ver el pedido de esa foto.</p>
+          </aside>
+        </section>
+
+        <!-- 14. Si puedes ver el pedido -->
+        <section class="lamina" data-titulo="Si puedes ver el pedido, puedes ver su foto" data-min="23 a 26">
+          <p class="ceja">La regla que se reutiliza</p>
+          <h2 class="t2">Si puedes ver el pedido, puedes ver su foto</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 250" role="img" aria-label="La ruta de la foto, 3 barra el nombre del archivo. storage.foldername saca la carpeta: 3. La política busca si existe el pedido 3, y esa consulta pasa por la RLS de pedidos: el cliente dueño y la tienda lo encuentran; otro cliente no, así que no puede ver la foto.">
+              <defs>
+                <marker id="punta-carpeta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="40" width="300" height="140" rx="14"/>
+                <text x="24" y="80" font-size="22" class="t-fuerte">La foto</text>
+                <text x="24" y="120" font-size="17" class="t-suave mono">3/1760000000000.jpeg</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:400ms; stroke-width:2.4" d="M308 110 H372" marker-end="url(#punta-carpeta)"/>
+              <g data-anima="pop" style="--d:600ms">
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="380" y="40" width="300" height="140" rx="14"/>
+                <text x="404" y="80" font-size="20" class="t-fuerte mono">storage.foldername</text>
+                <text x="404" y="112" font-size="18" class="t-suave">saca la carpeta:</text>
+                <text x="404" y="150" font-size="22" class="t-fuerte mono">'3'</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:900ms; stroke-width:2.4" d="M688 110 H752" marker-end="url(#punta-carpeta)"/>
+              <g data-anima="pop" style="--d:1100ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="760" y="40" width="592" height="140" rx="14"/>
+                <text x="784" y="80" font-size="20" class="t-fuerte">¿Existe el pedido 3 para esta sesión?</text>
+                <text x="784" y="114" font-size="18" class="t-suave">La consulta pasa por la RLS de pedidos:</text>
+                <text x="784" y="148" font-size="18" class="t-fuerte">el dueño y la tienda sí; otro cliente, no.</text>
+              </g>
+              <text x="0" y="236" font-size="21" class="t-suave" data-anima="aparece" style="--d:1500ms">Las políticas de archivos reutilizan las de la tabla: no se escribe la misma regla dos veces.</text>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>La política para ver fotos no repite la regla de quién ve qué pedido: la reutiliza. Saca la carpeta de la ruta con <em>storage.foldername</em> y pregunta si existe ese pedido. Como esa consulta corre con la sesión del usuario, pasa por la RLS de <em>pedidos</em> de la clase 2.</p>
+            <p>El dueño del pedido y la tienda lo encuentran; otro cliente no. La regla de oro del curso: si puedes ver el pedido, puedes ver lo que depende de él.</p>
+          </aside>
+        </section>
+
+        <!-- 15. El error del día -->
+        <section class="lamina" data-titulo="El error del día: la primera subida falla" data-min="26 a 30">
+          <p class="ceja">El error del día</p>
+          <h2 class="t2">La primera subida falla</h2>
+          <div class="pasos de4 error-pasos">
+            <article class="paso entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Creas el bucket</h3><p class="texto">Público, para empezar.</p></article>
+            <article class="paso" data-paso="1"><span class="paso-num">2</span><h3 class="t3">Subes la foto</h3><p class="texto">Desde la Server Action, con la sesión de la tienda.</p></article>
+            <article class="paso" data-paso="2"><span class="paso-num">3</span><h3 class="t3">Falla</h3><p class="texto"><code>new row violates row-level security policy</code></p></article>
+            <article class="paso ancla" data-paso="3"><span class="paso-num">4</span><h3 class="t3">La política</h3><p class="texto">Un insert en <code>storage.objects</code> solo para la tienda.</p></article>
+          </div>
+          <p class="dicho" data-paso="4">Público solo significa que se puede leer por liga. Subir siempre necesita una política.</p>
+          <aside class="notas">
+            <p>Adelántales el error del día: el bucket es público y aun así la primera subida falla con <em>new row violates row-level security policy</em>. Público solo aplica a leer por liga; subir es un insert en <em>storage.objects</em>, que tiene RLS.</p>
+            <p>En la práctica lo provocas: escribes la Server Action antes de la política de insert, subes, falla, y lo arreglas con la política "solo la tienda sube".</p>
+            <p>Aquí terminan las láminas de teoría: empieza la práctica. Al final de la clase regresa a la parte 5.</p>
+          </aside>
+        </section>
+
+        <!-- 16. Sección 5 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 5: para cerrar la clase" data-min="112">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c5">/05</span>
+            <div><h2 class="t1">Para cerrar la clase</h2><p>Lo que te llevas, la tarea y lo que sigue.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Esta parte va al final de la clase, cuando ya construiste todo en vivo: las tres ideas, la tarea, los recursos y el cierre.</p></aside>
+        </section>
+
+        <!-- 17. Resumen -->
+        <section class="lamina" data-titulo="Resumen: las tres ideas de hoy" data-min="112 a 114">
+          <p class="ceja">Lo que te llevas hoy</p>
+          <h2 class="t2">Tres ideas</h2>
+          <div class="col3 ideas">
+            <article class="idea entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">El archivo en el bucket, la ruta en la tabla</h3><p class="texto">Cada bucket con sus límites; una carpeta por pedido.</p></article>
+            <article class="idea entra" style="--i:3"><span class="paso-num">2</span><h3 class="t3">Pública para cualquiera, firmada para quien puede</h3><p class="texto">Y lo privado se decide antes de subir el primer archivo.</p></article>
+            <article class="idea entra" style="--i:4"><span class="paso-num">3</span><h3 class="t3">Storage también usa RLS</h3><p class="texto">Si puedes ver el pedido, puedes ver su foto.</p></article>
+          </div>
+          <aside class="notas">
+            <p>Ya con la foto funcionando: tres frases, una por idea. Pregunta si alguien la puede decir con sus palabras antes de enseñarla.</p>
+          </aside>
+        </section>
+
+        <!-- 18. Tarea -->
+        <section class="lamina" data-titulo="Tarea: construye tú solo lo que viste hoy" data-min="114 a 116">
+          <p class="ceja">Tarea · para la clase 6</p>
+          <h2 class="t2">Construye tú solo lo que viste hoy</h2>
+          <div class="tarea">
+            <div>
+              <p class="etiqueta">Cómo sé que ya quedó</p>
+              <ul class="checklist">
+                <li data-paso="1">El bucket <code>entregas</code> es privado, con 5 MB y solo imágenes.</li>
+                <li data-paso="1">La tienda sube la foto de un pedido en camino.</li>
+                <li data-paso="1">El cliente del pedido la ve con una liga firmada.</li>
+                <li data-paso="1">Otro cliente no la puede ver, ni con la ruta.</li>
+              </ul>
+            </div>
+            <div class="caja caja-si atorado" data-paso="2" data-en="2000">
+              <p class="etiqueta">¿No te salió?</p>
+              <h3 class="t3">No pasa nada</h3>
+              <p class="texto">Toma la base de la clase 6: ya trae todo esto hecho. Compárala con lo tuyo y encuentra qué te faltó.</p>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>La tarea es simple: construir por su cuenta lo que vieron hoy. Si no les sale, toman la base de la clase 6 (<em>clase-6-inicio</em>), que ya trae todo esto hecho, y la comparan con lo suyo.</p>
+          </aside>
+        </section>
+
+        <!-- 19. Para profundizar -->
+        <section class="lamina" data-titulo="Recursos para profundizar" data-min="116">
+          <h2 class="t2">Recursos para profundizar</h2>
+          <ul class="recursos">
+            <li class="entra" style="--i:1">Buckets de Storage: <a href="https://supabase.com/docs/guides/storage/buckets/fundamentals">supabase.com/docs/guides/storage/buckets/fundamentals</a></li>
+            <li class="entra" style="--i:2">Control de acceso en Storage: <a href="https://supabase.com/docs/guides/storage/security/access-control">supabase.com/docs/guides/storage/security/access-control</a></li>
+            <li class="entra" style="--i:3">Ligas públicas y firmadas: <a href="https://supabase.com/docs/guides/storage/serving/downloads">supabase.com/docs/guides/storage/serving/downloads</a></li>
+            <li class="entra" style="--i:4">El límite de las Server Actions: <a href="https://nextjs.org/docs/app/api-reference/config/next-config-js/serverActions">nextjs.org/docs/app/api-reference/config/next-config-js/serverActions</a></li>
+          </ul>
+          <img class="deco mascota laptop" src="../marca/mascota-laptop.png" alt="" />
+          <aside class="notas">
+            <p>La documentación oficial, por si quieren ir más lejos. No es tarea.</p>
+          </aside>
+        </section>
+
+        <!-- 20. Cierre -->
+        <section class="lamina" data-titulo="Cierre: todo se conecta solo" data-min="116 a 120">
+          <p class="ceja">Lo que sigue</p>
+          <h2 class="t2">El historial y la moto en el mapa</h2>
+          <div class="col2 preguntas">
+            <div class="caja entra" style="--i:2">
+              <p class="etiqueta">El historial del pedido</p>
+              <h3 class="t3">Que la base lo anote</h3>
+              <p class="texto">Cada cambio de estado con su hora, sin que ningún botón lo escriba.</p>
+            </div>
+            <div class="caja caja-si" data-paso="1" data-en="1500">
+              <p class="etiqueta">La moto en el mapa</p>
+              <h3 class="t3">Mensajes al momento</h3>
+              <p class="texto">Una posición por segundo, que no hace falta guardar en la base.</p>
+            </div>
+          </div>
+          <p class="final" data-paso="2" data-en="2600">Hoy la foto de entrega. <strong>En la clase 6, todo se conecta solo, y la moto en el mapa.</strong></p>
+          <aside class="notas">
+            <p>El gancho para la última clase: cuando rastreas un paquete ves cada paso con su hora, y en la app de comida ves la moto moverse. ¿Cómo se construye eso sin que nadie lo anote a mano?</p>
+          </aside>
+        </section>
+
+        <div class="cajetin" aria-hidden="true">
+          <span>Rastro · Supabase + Next.js</span><span>Clase 5</span><span>Lámina <b>01 de 20</b></span>
+        </div>
+        <div class="avance" aria-hidden="true"></div>
+      </div>
+      <p class="solo-lector" aria-live="polite"></p>
+    </div>
+
+    <nav class="controles" aria-label="Controles de la presentación">
+      <button type="button" data-accion="anterior" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="contador" aria-live="off">1 / 1</span>
+      <button type="button" data-accion="siguiente" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <span class="separa" aria-hidden="true"></span>
+      <button type="button" data-accion="pantalla" aria-label="Pantalla completa" title="Pantalla completa (F)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+      <button type="button" data-accion="tema" aria-label="Cambiar entre claro y oscuro" title="Claro u oscuro (T)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/></svg>
+      </button>
+      <button type="button" data-accion="otra" title="Pasar a la otra presentación (O)" hidden>
+        <span class="otra-texto"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </button>
+      <button type="button" data-accion="presentador" title="Abrir las notas en otra ventana (P)">Notas</button>
+      <button type="button" data-accion="ayuda" aria-label="Ver los atajos del teclado" title="Atajos (?)">?</button>
+    </nav>
+
+    <div class="aviso-teclas fuera" role="status"></div>
+
+    <div class="ayuda" hidden>
+      <div class="ayuda-caja" role="dialog" aria-modal="true" aria-label="Atajos del teclado">
+        <h2>Atajos del teclado</h2>
+        <dl>
+          <dt><kbd>→</kbd> <kbd>Espacio</kbd> <kbd>Av Pág</kbd></dt><dd>Pasar a la siguiente lámina: lo de cada lámina aparece solo, con su animación</dd>
+          <dt><kbd>←</kbd> <kbd>Re Pág</kbd></dt><dd>Regresar</dd>
+          <dt><kbd>Inicio</kbd> <kbd>Fin</kbd></dt><dd>Ir a la primera o a la última</dd>
+          <dt><kbd>F</kbd></dt><dd>Pantalla completa</dd>
+          <dt><kbd>P</kbd></dt><dd>Notas y cronómetro en otra ventana. Desde ahí se prende el modo limpio: sin botones, y solo las notas mueven las láminas</dd>
+          <dt><kbd>Esc</kbd></dt><dd>Cerrar esta ayuda</dd>
+        </dl>
+      </div>
+    </div>
+
+    <script src="../motor/motor.js"></script>
+  </body>
+</html>

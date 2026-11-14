@@ -1,0 +1,51 @@
+/* Lo propio de las láminas de la clase 6: eventos y Broadcast.
+   Las piezas compartidas viven en motor/piezas.css. */
+
+/* la meta: el pedido con su historial y el mapa con la moto */
+.cuerpo-moto { grid-template-columns: 300px 1fr; align-items: start; }
+.cuerpo-moto .app-demo-pedido { grid-row: span 2; }
+.linea-demo { list-style: none; margin: 10px 0 0; padding: 4px 0 4px 14px; display: grid; gap: 6px; border-left: 2px solid #FED7AA; border-radius: 4px; transition: box-shadow 0.4s ease; }
+.linea-demo li { font: 500 13px/1.2 var(--display); color: #71717A; }
+.linea-demo b { color: #18181B; font-weight: 600; }
+.mapa-demo { position: relative; height: 196px; border-radius: 12px; overflow: hidden; background: #EEF2E6; border: 1px solid #D4D4D8; transition: box-shadow 0.4s ease; }
+.mapa-demo .calle { position: absolute; background: #FFFFFF; }
+.mapa-demo .c1 { left: 0; right: 0; top: 60px; height: 14px; }
+.mapa-demo .c2 { left: 120px; width: 14px; top: 0; bottom: 0; }
+.mapa-demo .c3 { left: 0; right: 0; top: 140px; height: 10px; transform: rotate(-8deg); }
+.ruta-demo { position: absolute; left: 20px; top: 66px; width: 240px; height: 3px; background: #F97316; border-radius: 3px; }
+.moto-demo { position: absolute; left: 190px; top: 44px; font-size: 30px; }
+.peso-demo { margin: 0; font: 500 13px/1.3 var(--display); color: #71717A; border-radius: 8px; padding: 4px 6px; transition: box-shadow 0.4s ease; }
+
+/* el aviso del canal público */
+.aviso-seguridad { border-color: var(--amarillo); }
+.aviso-seguridad code { font-size: 20px; }
+
+/* texto contra binario */
+.pesos { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; margin-top: 48px; }
+.peso { display: grid; gap: 14px; align-content: start; padding: 26px 30px; border: 1px solid var(--linea); border-radius: 14px; background: var(--superficie); }
+.peso > code { justify-self: start; font-size: 20px; }
+.peso-barra { height: 18px; border-radius: 99px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+.peso-barra i { display: block; height: 100%; width: var(--ancho); border-radius: 99px; background: var(--plano); }
+.peso:last-child .peso-barra i { background: var(--senal); }
+.peso b { font: 700 30px/1.2 var(--display); color: var(--tinta); }
+.pesos + .dicho { margin-top: 40px; }
+
+/* la cuenta de los 200 repartidores */
+.cuenta { display: grid; gap: 12px; margin-top: 40px; }
+.cuenta-fila { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; padding: 16px 24px; border: 1px solid var(--linea); border-radius: 12px; background: var(--superficie); }
+.cuenta-fila span { font: 400 24px/1.35 var(--cuerpo); color: var(--tinta-suave); }
+.cuenta-fila b { font: 700 28px/1.2 var(--mono); color: var(--tinta); white-space: nowrap; }
+.cuenta-limite { border-color: var(--rojo); }
+.cuenta-limite b { color: var(--rojo); }
+.cuenta-bien { border-color: var(--senal); }
+.cuenta-bien b { color: var(--senal); }
+.cuenta + .dicho { margin-top: 32px; }
+
+/* el proyecto final */
+.negocios { margin-top: 56px; gap: 26px; }
+.negocio { margin: 0; padding: 40px 20px; text-align: center; border: 1px solid var(--linea); border-top: 4px solid var(--senal); border-radius: 14px; background: var(--superficie); font: 700 34px/1.2 var(--display); color: var(--tinta); }
+.negocios + .dicho { margin-top: 48px; }
+
+/* el cierre del curso */
+.cierre-curso { margin-top: 60px; }
+.contacto { margin: 22px 0 0; font: 500 26px/1.3 var(--mono); color: var(--tinta-suave); }

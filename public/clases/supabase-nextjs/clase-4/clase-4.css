@@ -1,0 +1,23 @@
+/* Lo propio de las láminas de la clase 4: Edge Functions y webhooks.
+   Las piezas compartidas viven en motor/piezas.css. */
+
+/* la meta: del botón al correo, en tres pasos */
+.meta-correo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; margin-top: 44px; }
+.mc-paso { display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: start; }
+.mc-tarjeta { display: grid; gap: 10px; align-content: start; min-height: 180px; padding: 20px 22px; border-radius: 14px; background: #FFFFFF; border: 1px solid rgba(255, 255, 255, 0.2); color: #18181B; }
+.mc-chico { margin: 0; font: 600 13px/1.2 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: #71717A; }
+.mc-tarjeta b { font: 700 20px/1.3 var(--display); }
+.mc-tarjeta .boton-oscuro { justify-self: start; }
+.mc-oscura { background: var(--superficie); border-color: var(--senal); color: var(--tinta); }
+.mc-oscura .mc-chico { color: var(--tinta-suave); }
+.mc-oscura code { justify-self: start; font-size: 18px; }
+.mc-correo p { margin: 0; font: 400 16px/1.45 var(--cuerpo); color: #3F3F46; }
+.llevas .meta-correo + .llevas-curso { margin-top: 44px; }
+
+/* los pasos de la función */
+.ciclo-pasos { margin-top: 70px; }
+.ciclo-pasos .texto code { font-size: 0.8em; }
+.ciclo-pasos + .dicho { margin-top: 48px; }
+
+/* el 401 grande */
+.preguntas .caja-no .t3, .preguntas .caja-si .t3 { font-variant-numeric: tabular-nums; }

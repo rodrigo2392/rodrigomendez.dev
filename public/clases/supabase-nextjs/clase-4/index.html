@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clase 4 · Edge Functions y webhooks</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@500;700&display=swap"
+    />
+    <link rel="stylesheet" href="../motor/motor.css" />
+    <link rel="stylesheet" href="../motor/comun.css" />
+    <link rel="stylesheet" href="../motor/codigofacilito.css" />
+    <link rel="stylesheet" href="../motor/piezas.css" />
+    <link rel="stylesheet" href="clase-4.css" />
+  </head>
+  <body>
+    <!--
+      Clase 4 del bootcamp: edge Functions y webhooks (vie 30 oct 2026).
+      La teoría y sus tiempos están en las notas de cada lámina; la práctica, en el vault: 10-proyectos/bootcamp-clase-4-guion.
+      El código de la clase: branches clase-4-inicio y clase-4-final del repo.
+    -->
+    <div class="escenario" data-nombre="clase-4" role="region" aria-roledescription="presentación" aria-label="Clase 4: edge Functions y webhooks">
+      <div class="lienzo">
+        <div class="registro" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+        <!-- 1. Portada -->
+        <section class="lamina portada fondo-portada" data-titulo="Portada: Edge Functions y webhooks" data-min="0">
+          <p class="portada-bootcamp">Bootcamp · Módulo 5: Edge, Storage y serverless</p>
+          <h1 class="t1">Edge Functions<br />y webhooks</h1>
+          <p class="portada-clase">Clase 4 de 6 · Supabase + Next.js</p>
+          <p class="portada-autor">Rodrigo Méndez<small>rodrigomendez.dev</small></p>
+          <div class="deco fichas-tec" aria-hidden="true" data-anima="aparece" style="--d:300ms">
+            <span class="ficha-tec next">Next.js</span>
+            <span class="ficha-tec supa">Supabase</span>
+            <span class="ficha-tec ts">TS</span>
+          </div>
+          <img class="deco destellos" src="../marca/destellos.png" alt="" data-anima="pop" style="--d:800ms" />
+          <img class="deco mascota-portada" src="../marca/mascota-portada.png" alt="" />
+          <aside class="notas">
+            <p>Bienvenida. La pantalla ya se actualiza sola, pero el cliente tiene que tener la app abierta para enterarse.</p>
+            <p>Hoy, cuando el pedido sale, le llega un correo, sin que nadie en la tienda apriete nada extra.</p>
+          </aside>
+        </section>
+
+        <!-- 2. Tabla de contenido -->
+        <section class="lamina" data-titulo="Tabla de contenido" data-min="0 a 1">
+          <h2 class="temario-titulo"><img src="../marca/tabla.png" alt="" />Tabla de contenido</h2>
+          <ol class="temario">
+            <li class="entra" style="--i:1"><span class="chip-seccion">/01</span>El problema y la meta</li>
+            <li class="entra" style="--i:2"><span class="chip-seccion c2">/02</span>Edge Functions</li>
+            <li class="entra" style="--i:3"><span class="chip-seccion c3">/03</span>Secretos y llaves</li>
+            <li class="entra" style="--i:4"><span class="chip-seccion c4">/04</span>Webhooks</li>
+            <li class="entra" style="--i:5"><span class="chip-seccion c5">/05</span>Para cerrar la clase</li>
+          </ol>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>El mapa de hoy: cuatro partes de teoría y, en cuanto terminen, construyo en vivo mientras ustedes miran. Hoy casi todo pasa en el panel de Supabase; en Next.js no se toca nada. La parte 5 va al final.</p></aside>
+        </section>
+
+        <!-- 3. Sección 1 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 1: el problema y la meta" data-min="1">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion">/01</span>
+            <div><h2 class="t1">El problema y la meta</h2><p>Qué vamos a construir hoy, y por qué.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Primera parte: por qué el correo no se puede mandar desde el navegador y lo que vamos a construir hoy.</p></aside>
+        </section>
+
+        <!-- 4. El problema -->
+        <section class="lamina" data-titulo="El problema: dónde corre el código que manda el correo" data-min="1 a 4">
+          <p class="ceja">El problema</p>
+          <h2 class="t2 pregunta">Mandar un correo necesita una llave secreta. ¿Dónde corre ese código para que la llave nunca llegue al navegador?</h2>
+          <figure class="problema">
+            <svg viewBox="0 0 1384 330" role="img" aria-label="Si el código que manda el correo corre en el navegador, la llave de Resend viaja con él y cualquiera puede copiarla para mandar correos a tu nombre. La solución: el código corre en Supabase, en una Edge Function, con la llave guardada como secreto.">
+              <defs>
+                <marker id="punta-problema-4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-senal"/>
+                </marker>
+              </defs>
+              <text x="0" y="22" font-size="17" class="t-suave t-fuerte" letter-spacing="2">EN EL NAVEGADOR: LA LLAVE QUEDA EXPUESTA</text>
+              <g data-anima="pop" style="--d:300ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="44" width="540" height="200" rx="12"/>
+                <text x="24" y="84" font-size="22" class="t-fuerte">El código que llega al navegador</text>
+                <rect x="24" y="108" width="492" height="52" rx="8" class="f-codigo"/>
+                <text x="42" y="141" font-size="18" class="mono t-codigo">Authorization: Bearer re_8Kq…</text>
+                <text x="24" y="206" font-size="19" class="t-suave">se ve con F12, en la pestaña de red</text>
+              </g>
+              <text x="0" y="296" font-size="23" class="t-rojo t-fuerte" data-anima="aparece" style="--d:900ms">Cualquiera la copia y manda correos a tu nombre</text>
+
+              <g data-paso="1" data-en="2200">
+                <path class="svg-linea s-senal" style="stroke-width:3" d="M576 144 H648" marker-end="url(#punta-problema-4)"/>
+                <text x="690" y="22" font-size="17" class="t-senal t-fuerte" letter-spacing="2">LA SOLUCIÓN: UNA EDGE FUNCTION</text>
+                <g data-anima="pop" style="--d:150ms">
+                  <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="690" y="44" width="400" height="200" rx="12"/>
+                  <text x="714" y="84" font-size="22" class="t-fuerte">Corre en Supabase</text>
+                  <text x="714" y="116" font-size="18" class="t-suave">la llave vive en sus secretos:</text>
+                  <rect x="714" y="136" width="352" height="46" rx="8" class="f-codigo"/>
+                  <text x="730" y="166" font-size="17" class="mono t-codigo">Deno.env.get("RESEND_API_KEY")</text>
+                  <text x="714" y="222" font-size="18" class="t-suave">ni tu app la conoce</text>
+                </g>
+                <path class="svg-linea s-senal" data-anima="traza" style="--d:400ms; stroke-width:2.6" d="M1102 144 H1172" marker-end="url(#punta-problema-4)"/>
+                <g data-anima="pop" style="--d:800ms">
+                  <rect class="f-super s-linea" style="stroke-width:1.5" x="1184" y="84" width="200" height="120" rx="12"/>
+                  <text x="1208" y="126" font-size="22" class="t-fuerte">Resend</text>
+                  <text x="1208" y="158" font-size="18" class="t-suave">manda el</text>
+                  <text x="1208" y="184" font-size="18" class="t-suave">correo</text>
+                </g>
+                <text x="690" y="296" font-size="23" class="t-verde t-fuerte">La llave nunca sale del servidor</text>
+              </g>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>Pregunta de arranque: cuando tu pedido sale te llega un correo de "va en camino". ¿Quién lo manda, si en la tienda nadie está escribiendo correos?</p>
+            <p>Para mandar correos se usa un servicio como Resend, que pide una llave secreta. Si ese código corriera en el navegador, la llave viajaría con él y cualquiera la vería en la pestaña de red. A los dos segundos aparece la solución: el código corre en Supabase, en una Edge Function, con la llave guardada como secreto.</p>
+          </aside>
+        </section>
+
+        <!-- 5. La meta de hoy -->
+        <section class="lamina llevas" data-titulo="La meta de hoy: el correo sale solo" data-min="4 a 7">
+          <p class="ceja">La meta de hoy</p>
+          <h2 class="t2">El correo sale solo</h2>
+          <div class="meta-correo">
+            <div class="mc-paso" data-paso="1">
+              <span class="parte-num">1</span>
+              <div class="mc-tarjeta">
+                <p class="mc-chico">En la app de la tienda</p>
+                <b>Pedido 3 · Pozole grande para llevar</b>
+                <span class="boton-oscuro">Marcar “En camino”</span>
+              </div>
+            </div>
+            <div class="mc-paso" data-paso="2">
+              <span class="parte-num">2</span>
+              <div class="mc-tarjeta mc-oscura">
+                <p class="mc-chico">En Supabase</p>
+                <b>El webhook llama a la función</b>
+                <code>avisar-cliente</code>
+              </div>
+            </div>
+            <div class="mc-paso" data-paso="3">
+              <span class="parte-num">3</span>
+              <div class="mc-tarjeta mc-correo">
+                <p class="mc-chico">De: Fonda La Esquina</p>
+                <b>Tu pedido 3 va en camino</b>
+                <p>¡Ya salió tu pedido! Pozole grande para llevar va en camino a Calle Allende 12.</p>
+              </div>
+            </div>
+          </div>
+          <div class="llevas-curso" data-paso="4">
+            <p class="etiqueta">Rastro, sigue tu pedido · una sola app que crece clase a clase</p>
+            <div class="ruta-curso">
+              <div class="ruta-fila">
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:150ms"></i></div>
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:300ms"></i></div>
+                <div class="ruta-tramo hecho"><i data-anima="crece" style="--d:450ms"></i></div>
+                <div class="ruta-tramo actual"><i data-anima="crece" style="--d:600ms"></i><span class="aqui" data-anima="aparece" style="--d:1200ms">Hoy</span></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:750ms"></i></div>
+                <div class="ruta-tramo"><i data-anima="crece" style="--d:900ms"></i></div>
+              </div>
+              <div class="ruta-fila ruta-partes">
+                <p><b>Clase 1</b>Base de datos</p>
+                <p><b>Clase 2</b>Auth y RLS</p>
+                <p><b>Clase 3</b>Realtime</p>
+                <p class="actual"><b>Clase 4</b>Edge Functions</p>
+                <p><b>Clase 5</b>Storage</p>
+                <p><b>Clase 6</b>Eventos y Broadcast</p>
+              </div>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>La meta de hoy: la tienda marca "En camino" en la app de siempre, la base llama sola a una función en Supabase y al cliente le llega un correo de verdad. Nadie tiene que acordarse de avisar.</p>
+            <p>Detalle práctico: sin dominio propio, Resend solo te deja mandarte correos a ti mismo. Para la clase es perfecto: cada quien se manda el aviso a su propio correo.</p>
+          </aside>
+        </section>
+
+        <!-- 6. Sección 2 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 2: Edge Functions" data-min="7">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c2">/02</span>
+            <div><h2 class="t1">Edge Functions</h2><p>Tu código, corriendo en Supabase.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Segunda parte: qué es una Edge Function y qué hace la de hoy, paso por paso.</p></aside>
+        </section>
+
+        <!-- 7. Qué es una Edge Function -->
+        <section class="lamina" data-titulo="Qué es una Edge Function" data-min="7 a 10">
+          <p class="ceja">Qué es una Edge Function</p>
+          <h2 class="t2">Tu código, corriendo en Supabase</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 250" role="img" aria-label="Una Edge Function es código TypeScript que corre en Supabase, en el runtime de Deno, con su propia URL. La pueden llamar tu app, la base de datos con un webhook o un horario. Tiene acceso a sus secretos y puede llamar a servicios externos como Resend.">
+              <defs>
+                <marker id="punta-funcion" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="0" width="280" height="60" rx="10"/>
+                <text x="22" y="38" font-size="20" class="t-fuerte">Tu app</text>
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="84" width="280" height="60" rx="10"/>
+                <text x="22" y="122" font-size="20" class="t-fuerte">La base, con un webhook</text>
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="168" width="280" height="60" rx="10"/>
+                <text x="22" y="206" font-size="20" class="t-fuerte">Un horario</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:450ms; stroke-width:2.2" d="M288 30 C350 30 350 114 412 114" marker-end="url(#punta-funcion)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:550ms; stroke-width:2.2" d="M288 114 H412" marker-end="url(#punta-funcion)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:650ms; stroke-width:2.2" d="M288 198 C350 198 350 114 412 114" marker-end="url(#punta-funcion)"/>
+              <g data-anima="pop" style="--d:850ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="420" y="10" width="560" height="208" rx="14"/>
+                <text x="446" y="52" font-size="25" class="t-fuerte">Edge Function</text>
+                <text x="446" y="84" font-size="18" class="t-suave">TypeScript en el runtime de Deno, con su propia URL:</text>
+                <rect x="446" y="104" width="508" height="46" rx="8" class="f-codigo"/>
+                <text x="462" y="134" font-size="16" class="mono t-codigo">tu-proyecto.supabase.co/functions/v1/avisar-cliente</text>
+                <text x="446" y="190" font-size="18" class="t-suave">lee sus secretos con Deno.env.get()</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1150ms; stroke-width:2.4" d="M988 114 H1076" marker-end="url(#punta-funcion)"/>
+              <g data-anima="pop" style="--d:1350ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="1084" y="54" width="268" height="120" rx="12"/>
+                <text x="1108" y="96" font-size="22" class="t-fuerte">Un servicio</text>
+                <text x="1108" y="126" font-size="22" class="t-fuerte">externo</text>
+                <text x="1108" y="156" font-size="18" class="t-suave">hoy: Resend</text>
+              </g>
+              <text x="0" y="248" font-size="21" class="t-suave" data-anima="aparece" style="--d:1700ms">Se crea y se despliega desde el panel, sin instalar nada. Corre solo cuando alguien la llama.</text>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>Una Edge Function es código TypeScript que corre en Supabase, en el runtime de Deno, y tiene su propia URL. Corre solo cuando alguien la llama: tu app, la base de datos con un webhook, o un horario.</p>
+            <p>Tiene acceso a sus secretos con <em>Deno.env.get()</em> y puede llamar a servicios externos. Hoy se crea desde el panel, pegando el código, sin instalar nada.</p>
+            <p>Por eso <em>supabase/functions</em> queda fuera de ESLint y de TypeScript en el proyecto de Next.js: ese código no corre en Node, corre en Deno.</p>
+          </aside>
+        </section>
+
+        <!-- 8. Lo que hace avisar-cliente -->
+        <section class="lamina" data-titulo="Lo que hace la función avisar-cliente" data-min="10 a 13">
+          <p class="ceja"><code>avisar-cliente</code></p>
+          <h2 class="t2">Lo que hace la función, paso por paso</h2>
+          <div class="pasos de4 ciclo-pasos">
+            <article class="paso entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Valida la llave</h3><p class="texto">Sin la llave secreta, responde 401 y no sigue.</p></article>
+            <article class="paso" data-paso="1"><span class="paso-num">2</span><h3 class="t3">Lee el pedido</h3><p class="texto">Cómo quedó (<code>record</code>) y cómo estaba (<code>old_record</code>).</p></article>
+            <article class="paso" data-paso="2"><span class="paso-num">3</span><h3 class="t3">Decide</h3><p class="texto">Solo sigue si el pedido acaba de pasar a <code>en_camino</code>.</p></article>
+            <article class="paso ancla" data-paso="3"><span class="paso-num">4</span><h3 class="t3">Llama a Resend</h3><p class="texto">Con la llave de sus secretos, y deja el resultado en los logs.</p></article>
+          </div>
+          <p class="dicho" data-paso="4">La función no sabe de botones ni de pantallas: recibe un pedido, decide y avisa.</p>
+          <aside class="notas">
+            <p>La función de hoy en cuatro pasos. Primero valida que la petición traiga la llave secreta; si no, contesta 401. Luego lee el pedido: el webhook manda cómo quedó y cómo estaba antes.</p>
+            <p>Decide: solo avisa cuando el pedido acaba de pasar a <em>en_camino</em>; cualquier otro cambio lo ignora. Y llama a la API de Resend con la llave que guarda en sus secretos. Lo que imprime con <em>console.log</em> queda en los logs de la función.</p>
+            <p>En la práctica se pega el código en el panel y se explica línea por línea.</p>
+          </aside>
+        </section>
+
+        <!-- 9. Sección 3 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 3: secretos y llaves" data-min="13">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c3">/03</span>
+            <div><h2 class="t1">Secretos y llaves</h2><p>Dónde vive cada llave y quién puede llamar a la función.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Tercera parte: dónde vive cada llave, cómo se protege la función y el error del día.</p></aside>
+        </section>
+
+        <!-- 10. Cada llave en su lugar -->
+        <section class="lamina" data-titulo="Cada llave en su lugar" data-min="13 a 16">
+          <p class="ceja">Las llaves del proyecto</p>
+          <h2 class="t2">Cada llave en su lugar</h2>
+          <div class="hoja reglas-hoja entra" style="--i:2">
+            <p class="hoja-nombre">llaves</p>
+            <table>
+              <thead><tr><th>La llave</th><th>Dónde vive</th><th>Qué puede hacer</th></tr></thead>
+              <tbody>
+                <tr data-paso="1"><td>Publishable · <code>sb_publishable_</code></td><td>En la app y en el navegador</td><td>Solo lo que las políticas RLS le dejen</td></tr>
+                <tr data-paso="2"><td>Secreta · <code>sb_secret_</code></td><td>Solo en el servidor: hoy, en el webhook</td><td>Todo: se salta RLS</td></tr>
+                <tr data-paso="3"><td>Resend · <code>re_</code></td><td>En los secretos de la función</td><td>Mandar correos a tu nombre</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="dicho" data-paso="4">Una llave que puede hacer daño nunca llega al navegador, ni al repo, ni al código de tu app.</p>
+          <aside class="notas">
+            <p>Tres llaves y tres lugares. La publishable va en la app y en el navegador: es pública por diseño y solo puede lo que dejen las políticas. La secreta se salta RLS: solo del lado del servidor, y hoy la usa el webhook para llamar a la función.</p>
+            <p>La llave de Resend vive en los secretos de la función: ni tu app de Next.js la conoce. Si se filtra una llave secreta, se rota en el panel.</p>
+          </aside>
+        </section>
+
+        <!-- 11. La función se protege sola -->
+        <section class="lamina" data-titulo="La función se protege sola" data-min="16 a 19">
+          <p class="ceja"><code>withSupabase({ auth: "secret" })</code></p>
+          <h2 class="t2">La función se protege sola</h2>
+          <div class="col2 preguntas">
+            <div class="caja caja-no entra" style="--i:2">
+              <p class="etiqueta">Sin llave o con la publishable</p>
+              <h3 class="t3">401</h3>
+              <p class="texto">La función responde que no está autorizada, con un mensaje que dice qué llave falta.</p>
+            </div>
+            <div class="caja caja-si" data-paso="1" data-en="1500">
+              <p class="etiqueta">Con la llave secreta</p>
+              <h3 class="t3">Corre</h3>
+              <p class="texto">Solo el webhook de tu base la trae: nadie más puede disparar correos.</p>
+            </div>
+          </div>
+          <p class="dicho" data-paso="2" data-en="2600">Por eso en el panel se apaga "Verify JWT": el webhook no manda la sesión de un usuario, y la función valida la llave por su cuenta.</p>
+          <aside class="notas">
+            <p>La URL de la función es pública: cualquiera la puede llamar. Si no se protege, cualquiera podría mandar correos con tu cuenta de Resend. <em>withSupabase</em> con <em>auth: "secret"</em> hace que solo responda a peticiones que traen la llave secreta.</p>
+            <p>El panel trae además su propia verificación de JWT, que pide el token de un usuario con sesión. El webhook no tiene sesión de usuario, así que esa opción se apaga y la función valida la llave ella misma.</p>
+          </aside>
+        </section>
+
+        <!-- 12. El error del día -->
+        <section class="lamina" data-titulo="El error del día: el correo no llega y la app no dice nada" data-min="19 a 21">
+          <p class="ceja">El error del día</p>
+          <h2 class="t2">El correo no llega y la app no dice nada</h2>
+          <div class="pasos de4 error-pasos">
+            <article class="paso entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Cambias el estado</h3><p class="texto">En la app todo funciona igual.</p></article>
+            <article class="paso" data-paso="1"><span class="paso-num">2</span><h3 class="t3">No llega el correo</h3><p class="texto">La función falló en Supabase.</p></article>
+            <article class="paso" data-paso="2"><span class="paso-num">3</span><h3 class="t3">La app no se entera</h3><p class="texto">La función corre aparte: su error no llega a tu página.</p></article>
+            <article class="paso ancla" data-paso="3"><span class="paso-num">4</span><h3 class="t3">Los logs</h3><p class="texto">En el panel, en los logs de la función, está la respuesta.</p></article>
+          </div>
+          <p class="dicho" data-paso="4">Lo que pasa dentro de una Edge Function se ve en sus logs: imprime ahí lo que necesites revisar.</p>
+          <aside class="notas">
+            <p>Adelántales el error del día: el correo no llega y en la app no hay nada raro, porque la función corre aparte, en Supabase. La respuesta está en los logs de la función, en el panel: ahí sale lo que imprimió <em>console.log</em>, por ejemplo la respuesta de Resend.</p>
+            <p>En la práctica lo provocas: pruebas la función antes de guardar los secretos. Resend responde con error y el log lo muestra. Y si alguien la llama sin llave o con la publishable, la función contesta 401 con un mensaje que dice qué llave falta.</p>
+          </aside>
+        </section>
+
+        <!-- 13. Sección 4 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 4: webhooks" data-min="21">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c4">/04</span>
+            <div><h2 class="t1">Webhooks</h2><p>Que la base llame a la función sola.</p></div>
+          </div>
+          <img class="deco mascota lupa-chica" src="../marca/mascota-lupa-chica.png" alt="" />
+          <aside class="notas"><p>Cuarta parte, la última de teoría: el webhook que llama a la función y por qué no se hizo en Next.js. Al terminarla empieza la práctica.</p></aside>
+        </section>
+
+        <!-- 14. Un webhook -->
+        <section class="lamina" data-titulo="Un webhook: la base llama a la función" data-min="21 a 25">
+          <p class="ceja">Database Webhook</p>
+          <h2 class="t2">La base llama a la función sola</h2>
+          <figure class="diagrama">
+            <svg viewBox="0 0 1352 250" role="img" aria-label="La tienda actualiza un pedido. Un trigger de la tabla de pedidos, el Database Webhook, hace una petición POST a la función con el pedido como quedó y como estaba antes, y el encabezado apikey con la llave secreta. La función decide y manda el correo.">
+              <defs>
+                <marker id="punta-webhook" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" class="f-plano"/>
+                </marker>
+              </defs>
+              <g data-anima="pop" style="--d:150ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="0" y="0" width="290" height="200" rx="14"/>
+                <text x="24" y="42" font-size="25" class="t-fuerte">La tienda</text>
+                <text x="24" y="74" font-size="18" class="t-suave">marca "En camino"</text>
+                <rect x="24" y="116" width="242" height="48" rx="8" class="f-codigo"/>
+                <text x="42" y="147" font-size="17" class="mono t-codigo">update pedidos</text>
+              </g>
+              <g data-anima="pop" style="--d:400ms">
+                <rect class="f-senal-fondo s-senal" style="stroke-width:1.5" x="354" y="0" width="330" height="200" rx="14"/>
+                <text x="378" y="42" font-size="25" class="t-fuerte">Database Webhook</text>
+                <text x="378" y="74" font-size="18" class="t-suave">un trigger de la tabla:</text>
+                <text x="378" y="122" font-size="18" class="t-fuerte">after update, por fila,</text>
+                <text x="378" y="150" font-size="18" class="t-fuerte">hace un POST a la función</text>
+                <text x="378" y="180" font-size="17" class="t-suave">con el encabezado apikey</text>
+              </g>
+              <g data-anima="pop" style="--d:650ms">
+                <rect class="f-papel s-linea" style="stroke-width:1.5" x="748" y="30" width="264" height="140" rx="12"/>
+                <text x="772" y="70" font-size="19" class="t-fuerte">El cuerpo del POST</text>
+                <text x="772" y="104" font-size="17" class="mono t-suave">record</text>
+                <text x="772" y="130" font-size="17" class="mono t-suave">old_record</text>
+                <text x="772" y="156" font-size="17" class="mono t-suave">type: "UPDATE"</text>
+              </g>
+              <g data-anima="pop" style="--d:900ms">
+                <rect class="f-super s-linea" style="stroke-width:1.5" x="1076" y="0" width="276" height="200" rx="14"/>
+                <text x="1100" y="42" font-size="25" class="t-fuerte">La función</text>
+                <text x="1100" y="74" font-size="18" class="t-suave">valida la llave,</text>
+                <text x="1100" y="100" font-size="18" class="t-suave">decide y manda</text>
+                <text x="1100" y="126" font-size="18" class="t-suave">el correo</text>
+              </g>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1100ms; stroke-width:2.4" d="M298 100 H346" marker-end="url(#punta-webhook)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1300ms; stroke-width:2.4" d="M692 100 H740" marker-end="url(#punta-webhook)"/>
+              <path class="svg-linea s-plano" data-anima="traza" style="--d:1500ms; stroke-width:2.4" d="M1020 100 H1068" marker-end="url(#punta-webhook)"/>
+              <text x="0" y="246" font-size="21" class="t-suave" data-anima="aparece" style="--d:1800ms">Nadie tiene que acordarse de avisar: el aviso reacciona al cambio en la base.</text>
+            </svg>
+          </figure>
+          <aside class="notas">
+            <p>Un Database Webhook es un trigger de la tabla que, en cada cambio, hace una petición HTTP. Hoy: después de cada update en <em>pedidos</em>, un POST a la función con el pedido como quedó (<em>record</em>) y como estaba (<em>old_record</em>), y el encabezado <em>apikey</em> con la llave secreta.</p>
+            <p>Así el aviso no depende de que alguien lo mande: reacciona al cambio en la base, venga de donde venga. Se crea en el panel, en Database, Webhooks; <em>clase-4.sql</em> hace lo mismo en SQL.</p>
+          </aside>
+        </section>
+
+        <!-- 15. Por qué no en Next.js -->
+        <section class="lamina" data-titulo="¿Por qué no lo hice en Next.js?" data-min="25 a 30">
+          <p class="ceja">La pregunta que siempre sale</p>
+          <h2 class="t2">¿Por qué no lo hice en Next.js?</h2>
+          <div class="col2 preguntas">
+            <div class="caja entra" style="--i:2">
+              <p class="etiqueta">En Next.js</p>
+              <h3 class="t3">También se puede</h3>
+              <p class="texto">Una Server Action con la llave en el servidor funciona. Pero el aviso depende de que el cambio pase por tu app web.</p>
+            </div>
+            <div class="caja caja-si" data-paso="1" data-en="1500">
+              <p class="etiqueta">En una Edge Function</p>
+              <h3 class="t3">Vive junto a la base</h3>
+              <p class="texto">La llama la base misma, venga de donde venga el cambio: tu app web, una app de celular, el panel o un horario.</p>
+            </div>
+          </div>
+          <p class="dicho" data-paso="2" data-en="2600">Cuando algo tiene que pasar siempre que cambia un dato, conviene que reaccione a la base, no a un botón.</p>
+          <aside class="notas">
+            <p>Respuesta honesta: se podría hacer en Next.js, con una Server Action y la llave en las variables del servidor. El problema es que el aviso dependería de que el cambio pase por tu app web.</p>
+            <p>Con la función y el webhook, el aviso reacciona al cambio en la base: si mañana hay una app de celular, o alguien cambia el estado desde el panel, el correo sale igual.</p>
+            <p>Aquí terminan las láminas de teoría: empieza la práctica. Al final de la clase regresa a la parte 5.</p>
+          </aside>
+        </section>
+
+        <!-- 16. Sección 5 -->
+        <section class="lamina seccion fondo-seccion" data-titulo="Sección 5: para cerrar la clase" data-min="112">
+          <span class="deco circulo amarillo" style="width: 178px; height: 178px; left: 828px; top: 36px"></span>
+          <span class="deco circulo cian" style="width: 134px; height: 134px; left: 1446px; top: 446px"></span>
+          <span class="deco circulo verde" style="width: 78px; height: 78px; left: 1004px; top: 778px"></span>
+          <div class="seccion-fila">
+            <span class="chip-seccion c5">/05</span>
+            <div><h2 class="t1">Para cerrar la clase</h2><p>Lo que te llevas, la tarea y lo que sigue.</p></div>
+          </div>
+          <img class="deco mascota lupa" src="../marca/mascota-lupa.png" alt="" />
+          <aside class="notas"><p>Esta parte va al final de la clase, cuando ya construiste todo en vivo: las tres ideas, la tarea, los recursos y el cierre.</p></aside>
+        </section>
+
+        <!-- 17. Resumen -->
+        <section class="lamina" data-titulo="Resumen: las tres ideas de hoy" data-min="112 a 114">
+          <p class="ceja">Lo que te llevas hoy</p>
+          <h2 class="t2">Tres ideas</h2>
+          <div class="col3 ideas">
+            <article class="idea entra" style="--i:2"><span class="paso-num">1</span><h3 class="t3">Una Edge Function es tu código en Supabase</h3><p class="texto">TypeScript en Deno, con su propia URL, que corre cuando alguien la llama.</p></article>
+            <article class="idea entra" style="--i:3"><span class="paso-num">2</span><h3 class="t3">Los secretos se quedan en el servidor</h3><p class="texto">La llave de Resend vive en los secretos de la función; ni tu app la conoce.</p></article>
+            <article class="idea entra" style="--i:4"><span class="paso-num">3</span><h3 class="t3">Un webhook reacciona a la base</h3><p class="texto">Cada cambio dispara la función, con la llave secreta en el encabezado.</p></article>
+          </div>
+          <aside class="notas">
+            <p>Ya con el correo funcionando: tres frases, una por idea. Pregunta si alguien la puede decir con sus palabras antes de enseñarla.</p>
+          </aside>
+        </section>
+
+        <!-- 18. Tarea -->
+        <section class="lamina" data-titulo="Tarea: construye tú solo lo que viste hoy" data-min="114 a 116">
+          <p class="ceja">Tarea · para la clase 5</p>
+          <h2 class="t2">Construye tú solo lo que viste hoy</h2>
+          <div class="tarea">
+            <div>
+              <p class="etiqueta">Cómo sé que ya quedó</p>
+              <ul class="checklist">
+                <li data-paso="1">Tienes tu cuenta de Resend y su llave.</li>
+                <li data-paso="1">La función <code>avisar-cliente</code> está desplegada, con sus dos secretos.</li>
+                <li data-paso="1">El webhook de <code>pedidos</code> llama a la función en cada update.</li>
+                <li data-paso="1">Al marcar un pedido "En camino", te llega el correo.</li>
+              </ul>
+            </div>
+            <div class="caja caja-si atorado" data-paso="2" data-en="2000">
+              <p class="etiqueta">¿No te salió?</p>
+              <h3 class="t3">No pasa nada</h3>
+              <p class="texto">Toma la base de la clase 5 y revisa los logs de tu función: ahí está el motivo.</p>
+            </div>
+          </div>
+          <aside class="notas">
+            <p>La tarea es simple: construir por su cuenta lo que vieron hoy, con su propia cuenta de Resend. Mientras no tengan dominio propio, el correo solo les llega a ellos mismos.</p>
+            <p>Si no les sale, toman la base de la clase 5 (<em>clase-5-inicio</em>) y revisan los logs de la función: casi siempre el motivo está ahí.</p>
+          </aside>
+        </section>
+
+        <!-- 19. Para profundizar -->
+        <section class="lamina" data-titulo="Recursos para profundizar" data-min="116">
+          <h2 class="t2">Recursos para profundizar</h2>
+          <ul class="recursos">
+            <li class="entra" style="--i:1">Edge Functions: <a href="https://supabase.com/docs/guides/functions">supabase.com/docs/guides/functions</a></li>
+            <li class="entra" style="--i:2">Secretos de las funciones: <a href="https://supabase.com/docs/guides/functions/secrets">supabase.com/docs/guides/functions/secrets</a></li>
+            <li class="entra" style="--i:3">Database Webhooks: <a href="https://supabase.com/docs/guides/database/webhooks">supabase.com/docs/guides/database/webhooks</a></li>
+            <li class="entra" style="--i:4">Mandar un correo con Resend: <a href="https://resend.com/docs/api-reference/emails/send-email">resend.com/docs/api-reference/emails/send-email</a></li>
+          </ul>
+          <img class="deco mascota laptop" src="../marca/mascota-laptop.png" alt="" />
+          <aside class="notas">
+            <p>La documentación oficial, por si quieren ir más lejos. No es tarea.</p>
+          </aside>
+        </section>
+
+        <!-- 20. Cierre -->
+        <section class="lamina" data-titulo="Cierre: dónde se guarda la foto de entrega" data-min="116 a 120">
+          <p class="ceja">Lo que sigue</p>
+          <h2 class="t2">¿Dónde guardas la foto de entrega?</h2>
+          <div class="col2 preguntas">
+            <div class="caja entra" style="--i:2">
+              <p class="etiqueta">En una tabla</p>
+              <h3 class="t3">No</h3>
+              <p class="texto">Las tablas guardan datos. Una foto de celular pesa megas: va en otro lado, y la tabla solo guarda dónde quedó.</p>
+            </div>
+            <div class="caja caja-si" data-paso="1" data-en="1500">
+              <p class="etiqueta">En Storage</p>
+              <h3 class="t3">Archivos con políticas</h3>
+              <p class="texto">Buckets con las mismas reglas de la clase 2: la foto solo la ve el cliente del pedido.</p>
+            </div>
+          </div>
+          <p class="final" data-paso="2" data-en="2600">Hoy el aviso sale solo. <strong>En la clase 5, la foto de entrega, guardada en privado.</strong></p>
+          <aside class="notas">
+            <p>El gancho para la clase 5: algunas paqueterías te mandan la foto del paquete en tu puerta. ¿Dónde se guarda esa foto y quién más la puede ver?</p>
+            <p>La respuesta es Supabase Storage: archivos en buckets, con políticas como las de la clase 2.</p>
+          </aside>
+        </section>
+
+        <div class="cajetin" aria-hidden="true">
+          <span>Rastro · Supabase + Next.js</span><span>Clase 4</span><span>Lámina <b>01 de 20</b></span>
+        </div>
+        <div class="avance" aria-hidden="true"></div>
+      </div>
+      <p class="solo-lector" aria-live="polite"></p>
+    </div>
+
+    <nav class="controles" aria-label="Controles de la presentación">
+      <button type="button" data-accion="anterior" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="contador" aria-live="off">1 / 1</span>
+      <button type="button" data-accion="siguiente" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <span class="separa" aria-hidden="true"></span>
+      <button type="button" data-accion="pantalla" aria-label="Pantalla completa" title="Pantalla completa (F)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+      <button type="button" data-accion="tema" aria-label="Cambiar entre claro y oscuro" title="Claro u oscuro (T)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/></svg>
+      </button>
+      <button type="button" data-accion="otra" title="Pasar a la otra presentación (O)" hidden>
+        <span class="otra-texto"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </button>
+      <button type="button" data-accion="presentador" title="Abrir las notas en otra ventana (P)">Notas</button>
+      <button type="button" data-accion="ayuda" aria-label="Ver los atajos del teclado" title="Atajos (?)">?</button>
+    </nav>
+
+    <div class="aviso-teclas fuera" role="status"></div>
+
+    <div class="ayuda" hidden>
+      <div class="ayuda-caja" role="dialog" aria-modal="true" aria-label="Atajos del teclado">
+        <h2>Atajos del teclado</h2>
+        <dl>
+          <dt><kbd>→</kbd> <kbd>Espacio</kbd> <kbd>Av Pág</kbd></dt><dd>Pasar a la siguiente lámina: lo de cada lámina aparece solo, con su animación</dd>
+          <dt><kbd>←</kbd> <kbd>Re Pág</kbd></dt><dd>Regresar</dd>
+          <dt><kbd>Inicio</kbd> <kbd>Fin</kbd></dt><dd>Ir a la primera o a la última</dd>
+          <dt><kbd>F</kbd></dt><dd>Pantalla completa</dd>
+          <dt><kbd>P</kbd></dt><dd>Notas y cronómetro en otra ventana. Desde ahí se prende el modo limpio: sin botones, y solo las notas mueven las láminas</dd>
+          <dt><kbd>Esc</kbd></dt><dd>Cerrar esta ayuda</dd>
+        </dl>
+      </div>
+    </div>
+
+    <script src="../motor/motor.js"></script>
+  </body>
+</html>
