@@ -1,5 +1,14 @@
 [
   {
+    "id": "_1XuOcvhWQM",
+    "title": "Ciberseguridad para vibecoders: qué revisar antes de publicar tu app",
+    "url": "https://www.youtube.com/watch?v=_1XuOcvhWQM",
+    "description": "Hiciste con IA una app para organizar los pendientes de un negocio. Hoy solo la usa tu empresa y mañana entra tu primer cliente, una cafetería, a…",
+    "duration": "8:09",
+    "thumbnail": "/img/videos/_1XuOcvhWQM.jpg",
+    "publishedAt": "2026-11-20T19:29:53-08:00"
+  },
+  {
     "id": "SUzB4_FNOrw",
     "title": "10 tecnologías que debes dominar para 2027",
     "url": "https://www.youtube.com/watch?v=SUzB4_FNOrw",
@@ -43,14 +52,5 @@
     "duration": "4:28",
     "thumbnail": "/img/videos/psol9rE2chU.jpg",
     "publishedAt": "2026-06-24T23:46:39-07:00"
-  },
-  {
-    "id": "5cDsm-Zep9A",
-    "title": "Ser programador puede reducir tu promedio de vida.",
-    "url": "https://www.youtube.com/watch?v=5cDsm-Zep9A",
-    "description": "Hablemos de los malos hábitos como programadores.",
-    "duration": "6:35",
-    "thumbnail": "/img/videos/5cDsm-Zep9A.jpg",
-    "publishedAt": "2025-06-17T23:31:03-07:00"
   }
 ]
